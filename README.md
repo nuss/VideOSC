@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/nuss/VideOSC.svg?branch=master)](https://travis-ci.org/nuss/VideOSC)
+
 VideOSC is an experimental OSC-controller for Android that uses RGB data for generating OSC-messages. The phones camera input (video-stream, smallest possible preview size) first gets downsampled to a user-defined size (e.g. 8 x 6 px) and the RGB-information of each pixel of the downsampled preview gets sent to an arbitrary IP address in the network. Hence, a preview of 8 x 6 px gives 144 separate values (0-255) at the interval defined by the framerate of the app.
 
 # Installation #
