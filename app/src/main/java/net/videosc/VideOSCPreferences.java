@@ -7,6 +7,7 @@ import apwidgets.APCheckBox;
 import apwidgets.APEditText;
 import apwidgets.APWidget;
 import apwidgets.APWidgetContainer;
+import ketai.data.KetaiSQLite;
 import ketai.net.KetaiNet;
 import ketai.ui.KetaiAlertDialog;
 import netP5.NetAddress;
@@ -261,7 +262,7 @@ public class VideOSCPreferences extends VideOSC {
 		}
 	}
 
-	static void setPreferences(PApplet applet, APWidget button) {
+	static void setPreferences(PApplet applet, APWidget button, KetaiSQLite db) {
 		boolean querySuccess;
 
 		if (button == setNetwork) {
@@ -273,7 +274,7 @@ public class VideOSCPreferences extends VideOSC {
 			rootCmd = cmdNameSpace.getText();
 
 			if (match(rootCmd, "^[a-zA-Z0-9]+[a-zA-Z0-9_/]*[a-zA-Z0-9]+$") != null) {
-				querySuccess = VideOSCDB.updateNetworkSettings();
+				querySuccess = VideOSCDB.updateNetworkSettings(db);
 				if (querySuccess) {
 					apContainer.removeWidget(ipText);
 					apContainer.removeWidget(portText);
@@ -322,7 +323,7 @@ public class VideOSCPreferences extends VideOSC {
 			normalize = setNormalize.isChecked();
 
 			if (framerate > 0 && tResW > 0 && tResH > 0 && tCalcsPerPeriod > 0) {
-				querySuccess = VideOSCDB.updateResolutionSettings();
+				querySuccess = VideOSCDB.updateResolutionSettings(db);
 				if (querySuccess) {
 					apContainer.removeWidget(setResWText);
 					apContainer.removeWidget(setResHText);

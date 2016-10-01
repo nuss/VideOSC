@@ -1,5 +1,6 @@
 package net.videosc;
 
+import ketai.data.KetaiSQLite;
 import ketai.ui.KetaiAlertDialog;
 import processing.core.PApplet;
 
@@ -21,7 +22,7 @@ public class VideOSCDB extends VideOSC {
 			+ "calc_period INTEGER NOT NULL DEFAULT '" + calcsPerPeriod + "',"
 			+ "normalisation INTEGER NOT NULL DEFAULT '" + normalize + "');";
 
-	static boolean setUpNetworkSettings(PApplet applet) {
+	static boolean setUpNetworkSettings(PApplet applet, KetaiSQLite db) {
 		boolean success = false;
 
 		if (db.connect()) {
@@ -66,7 +67,7 @@ public class VideOSCDB extends VideOSC {
 		return success;
 	}
 
-	static boolean setUpResolutionSettings(PApplet applet) {
+	static boolean setUpResolutionSettings(PApplet applet, KetaiSQLite db) {
 		boolean success = false;
 
 		if (db.connect()) {
@@ -112,7 +113,7 @@ public class VideOSCDB extends VideOSC {
 		return success;
 	}
 
-	static void setUpSnapshots(PApplet applet) {
+	static void setUpSnapshots(PApplet applet, KetaiSQLite db) {
 		boolean success = false;
 
 		if (db.connect()) {
@@ -131,7 +132,7 @@ public class VideOSCDB extends VideOSC {
 		}
 	}
 
-	static boolean updateNetworkSettings() {
+	static boolean updateNetworkSettings(KetaiSQLite db) {
 		boolean success = false;
 
 		if (db.connect()) {
@@ -143,7 +144,7 @@ public class VideOSCDB extends VideOSC {
 		return success;
 	}
 
-	static boolean updateResolutionSettings() {
+	static boolean updateResolutionSettings(KetaiSQLite db) {
 		boolean success = false;
 
 		if (db.connect()) {
@@ -157,7 +158,7 @@ public class VideOSCDB extends VideOSC {
 		return success;
 	}
 
-	static boolean addSnapshot(PApplet applet) {
+	static boolean addSnapshot(PApplet applet, KetaiSQLite db) {
 		boolean success = false;
 
 		if (db.connect()) {
@@ -185,7 +186,7 @@ public class VideOSCDB extends VideOSC {
 		return success;
 	}
 
-	static String[] getSnapshotKeys() {
+	static String[] getSnapshotKeys(KetaiSQLite db) {
 		boolean success;
 		String[] snapshotKeys = {};
 
@@ -202,9 +203,10 @@ public class VideOSCDB extends VideOSC {
 		return snapshotKeys;
 	}
 
-	static void selectSnapshot(PApplet applet, String snapshot) {
+	static void selectSnapshot(PApplet applet, String snapshot, KetaiSQLite db) {
 		boolean success;
 		String res;
+		int resl;
 		int slot = 0;
 
 		if (db.connect()) {
@@ -213,7 +215,11 @@ public class VideOSCDB extends VideOSC {
 			if (success) {
 				while (db.next()) {
 					res = db.getString("pattern");
-					for (int i = 0; i < res.length(); i++) {
+					// make sure not to set any pixels that don't exist, e.g. if a snapshot has
+					// been set for 24 pixels but the current setup only has 20
+					resl = res.length();
+					if (resl > dimensions) resl = dimensions * 3;
+					for (int i = 0; i < resl; i++) {
 						if (i % 3 == 0) {
 							// a snapshot is an ArrayList of boolean tripplets
 							// we simply add the result of a non-equality check applied on the
@@ -231,7 +237,7 @@ public class VideOSCDB extends VideOSC {
 		}
 	}
 
-	static void resetSnapshots(PApplet applet) {
+	static void resetSnapshots(PApplet applet, KetaiSQLite db) {
 		boolean success;
 		String query;
 
@@ -248,7 +254,7 @@ public class VideOSCDB extends VideOSC {
 		}
 	}
 
-	static void countSnapshots(PApplet applet) {
+	static void countSnapshots(PApplet applet, KetaiSQLite db) {
 		if (db.connect()) {
 			numSnapshots = db.getRecordCount("vosc_snapshots");
 		} else {

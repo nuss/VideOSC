@@ -1,7 +1,6 @@
 package net.videosc;
 
-import android.widget.Adapter;
-
+import ketai.data.KetaiSQLite;
 import ketai.ui.KetaiList;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -144,9 +143,10 @@ public class VideOSCUI extends VideOSC {
 				+ applet.height / 12);
 	}
 
-	static void processUIClicks(PApplet applet, int x, int y) {
-		String[] snapshotsList = {};
-		Adapter adapter;
+	static void processUIClicks(PApplet applet, int x, int y, KetaiSQLite db) {
+		String[] snapshotsList;
+		KetaiList snapshotsSelect;
+		KetaiList preferencesList;
 
 		if (!selectionListActive) {
 			// only allow interaction if screen is not overlazed by some selection list
@@ -222,12 +222,12 @@ public class VideOSCUI extends VideOSC {
 						gestureMode = GestureModes.ERASE;
 					} else if (x <= applet.width - 490 && x >= applet.width - 590) {
 						// add a new snapshot
-						VideOSCDB.addSnapshot(applet);
+						VideOSCDB.addSnapshot(applet, db);
 						snapshotProcessing = true;
 					} else if (x <= applet.width - 640 && x >= applet.width - 740) {
 						// show list of selectable saved snapshots
 						showSnapshots = true;
-						snapshotsList = VideOSCDB.getSnapshotKeys();
+						snapshotsList = VideOSCDB.getSnapshotKeys(db);
 						snapshotsList = append(snapshotsList, "Reset Snapshots");
 						snapshotsSelect = new KetaiList(applet, snapshotsList);
 						snapshotsSelect.setAlpha(0.6f);
@@ -354,25 +354,20 @@ public class VideOSCUI extends VideOSC {
 		}
 	}
 
-	static void processKetaiListClicks(PApplet applet, KetaiList klist) {
+	static void processKetaiListClicks(PApplet applet, KetaiList klist, KetaiSQLite db) {
 		String select = klist.getSelection();
 
 		if (select.equals("Network Settings") || select.equals("Resolution Settings") || select
 				.equals("About VideOSC")) {
 			VideOSCPreferences.createPreferences(applet, select);
 		} else if (select.equals("Reset Snapshots")) {
-			VideOSCDB.resetSnapshots(applet);
+			VideOSCDB.resetSnapshots(applet, db);
 		} else {
-			VideOSCDB.selectSnapshot(applet, select);
+			VideOSCDB.selectSnapshot(applet, select, db);
 		}
-	}
 
-	static void setInteractionMode(Enum mode) {
-		VideOSC.mode = mode;
-	}
-
-	static boolean setActivationFlag() {
-		return true;
+		VideOSCUI.selectionListActive = false;
+		klist.setAdapter(null);
 	}
 
 }

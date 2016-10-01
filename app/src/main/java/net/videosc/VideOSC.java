@@ -4,7 +4,6 @@ import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.WindowManager;
 
 import java.util.ArrayList;
@@ -44,7 +43,7 @@ public class VideOSC extends PApplet {
 	private static OscMessage oscB;
 
 	// dimensions = width * height of the user defined resolution
-	private static int dimensions;
+	static int dimensions;
 	static int resW = 6;
 	static int resH = 4;
 	static int pxWidth;
@@ -79,10 +78,7 @@ public class VideOSC extends PApplet {
 
 	static int backKeyState;
 	static ArrayList<String> optionsList = new ArrayList<String>();
-	static KetaiList preferencesList;
 	static boolean preferencesListInvisible;
-
-	static KetaiList snapshotsSelect;
 
 	static String sendAddr = "192.168.1.2";
 	static String rootCmd = "vosc";
@@ -95,7 +91,7 @@ public class VideOSC extends PApplet {
 	static Set<String> gCmds = new HashSet<String>();
 	static Set<String> bCmds = new HashSet<String>();
 
-	static KetaiSQLite db;
+	KetaiSQLite db;
 
 	static float density;
 
@@ -157,9 +153,10 @@ public class VideOSC extends PApplet {
 		if (optionsList.indexOf("About VideOSC") < 0) {
 			optionsList.add("About VideOSC");
 		}
+
 		db = new KetaiSQLite(this); // open database file
 
-		querySuccess = VideOSCDB.setUpNetworkSettings(this);
+		querySuccess = VideOSCDB.setUpNetworkSettings(this, db);
 		if (!querySuccess) {
 			KetaiAlertDialog.popup(this, "SQL Error", "The network settings could not be " +
 					"determined");
@@ -169,14 +166,14 @@ public class VideOSC extends PApplet {
 		g = "/" + rootCmd + "/green";
 		b = "/" + rootCmd + "/blue";
 
-		querySuccess = VideOSCDB.setUpResolutionSettings(this);
+		querySuccess = VideOSCDB.setUpResolutionSettings(this, db);
 		if (!querySuccess) {
 			KetaiAlertDialog.popup(this, "SQL Error", "The resolution settings could not be " +
 					"determined");
 		}
 
-		VideOSCDB.setUpSnapshots(this);
-		VideOSCDB.countSnapshots(this);
+		VideOSCDB.setUpSnapshots(this, db);
+		VideOSCDB.countSnapshots(this, db);
 
 		pxWidth = width / resW;
 		pxHeight = height / resH;
@@ -216,11 +213,7 @@ public class VideOSC extends PApplet {
 	public void draw() {
 		float rval, gval, bval;
 
-		preferencesListInvisible = (
-				preferencesList == null ||
-						preferencesList.getVisibility() == View.GONE ||
-						preferencesList.getVisibility() == View.INVISIBLE
-		);
+//		preferencesListInvisible = VideOSCUI.isPreferencesListVisible();
 		if (frameCount % calcsPerPeriod == 0) {
 			// wipe out anything that's still on screen from the previous cycle
 			// e.g. text from preferences dialogs...
@@ -585,7 +578,7 @@ public class VideOSC extends PApplet {
 		switch (action) {                              // let us know which action code shows up
 			case MotionEvent.ACTION_DOWN:
 				hoverPixel = getHoverPixel(x, y);
-				VideOSCUI.processUIClicks(this, x, y);
+				VideOSCUI.processUIClicks(this, x, y, db);
 				break;
 			case MotionEvent.ACTION_UP:
 				hoverPixel = getHoverPixel(x, y);
@@ -640,19 +633,17 @@ public class VideOSC extends PApplet {
 	}
 
 	public void onKetaiListSelection(KetaiList klist) {
-		VideOSCUI.processKetaiListClicks(this, klist);
-		VideOSCUI.selectionListActive = false;
-		klist.setAdapter(null);
+		VideOSCUI.processKetaiListClicks(this, klist, db);
 	}
 
 	// @Override
 	public void onClickWidget(APWidget button) {
-		VideOSCPreferences.setPreferences(this, button);
+		VideOSCPreferences.setPreferences(this, button, db);
 	}
 
 	public void keyPressed() {
 		if (key == CODED) {
-			if (keyCode == MENU && curOptions.equals("") && preferencesListInvisible) {
+			if (keyCode == MENU && curOptions.equals("")/* && preferencesListInvisible*/) {
 				showHide = true;
 			} /*else if (keyCode == android.view.KeyEvent.KEYCODE_BACK) {
 				return true;
