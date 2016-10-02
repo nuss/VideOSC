@@ -213,7 +213,6 @@ public class VideOSC extends PApplet {
 	public void draw() {
 		float rval, gval, bval;
 
-//		preferencesListInvisible = VideOSCUI.isPreferencesListVisible();
 		if (frameCount % calcsPerPeriod == 0) {
 			// wipe out anything that's still on screen from the previous cycle
 			// e.g. text from preferences dialogs...
