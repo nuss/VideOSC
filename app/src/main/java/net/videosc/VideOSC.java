@@ -248,6 +248,7 @@ public class VideOSC extends PApplet {
 				int sizeDiff = dimensions - offPxls.size();
 				for (int i = 0; i < sizeDiff; i++) {
 					offPxls.add(falses.clone());
+					lockList.add(falses.clone());
 				}
 			}
 
