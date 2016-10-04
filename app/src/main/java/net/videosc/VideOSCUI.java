@@ -6,7 +6,7 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 /**
- * Created by stefan on 03.02.16.
+ * Created by Stefan Nussbaumer on 03.02.16.
  */
 public class VideOSCUI extends VideOSC {
 	private static String TAG = "VideOSCUI";
@@ -199,8 +199,7 @@ public class VideOSCUI extends VideOSC {
 					} else if (y >= applet.height / 6 * 4 && y < applet
 							.height / 6 * 5 && curOptions.equals("")) {
 						displayFramerate = !displayFramerate;
-					} else if (y >= applet.height / 6 * 5) {
-						VideOSCPreferences.resetPreferencesWidgets();
+					} else if (y >= applet.height / 6 * 5 && curOptions.equals("")) {
 						preferencesList = new KetaiList(applet, optionsList);
 						preferencesList.setAlpha(0.6f);
 						selectionListActive = true;
@@ -359,7 +358,7 @@ public class VideOSCUI extends VideOSC {
 
 		if (select.equals("Network Settings") || select.equals("Resolution Settings") || select
 				.equals("About VideOSC")) {
-			VideOSCPreferences.createPreferences(applet, select);
+			VideOSCPreferences.createPreferences(applet, select, db);
 		} else if (select.equals("Reset Snapshots")) {
 			VideOSCDB.resetSnapshots(applet, db);
 		} else {
@@ -372,6 +371,6 @@ public class VideOSCUI extends VideOSC {
 
 }
 
-enum InteractionModes { BASIC, SINGLE_PIXEL };
-enum GestureModes { SWAP, ERASE };
-enum RGBModes { RGB, R, G, B };
+enum InteractionModes { BASIC, SINGLE_PIXEL }
+enum GestureModes { SWAP, ERASE }
+enum RGBModes { RGB, R, G, B }

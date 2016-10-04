@@ -8,9 +8,9 @@ import apwidgets.APWidgetContainer;
 import processing.core.PApplet;
 
 /**
- * Created by stefan on 03.03.16.
+ * Created by Stefan Nussbaumer on 03.03.16.
  */
-public class APText extends APTextView {
+class APText extends APTextView {
 	private String TAG = "APText";
 
 	/**
@@ -20,7 +20,7 @@ public class APText extends APTextView {
 	 * @param width The text field's width.
 	 * @param height The text field's height.
 	 */
-	public APText(int x, int y, int width, int height) {
+	APText(int x, int y, int width, int height) {
 		super(x, y, width, height, "");
 		this.shouldNotSetOnClickListener = true; //otherwise ime options done, next etc doesn't work
 	}
@@ -44,7 +44,7 @@ public class APText extends APTextView {
 	 * Hack: set horizontal alignment
 	 * Must be called after addWidget
 	 */
-	public void setTextCentered() {
+	void setTextCentered() {
 		((TextView) view).setGravity(Gravity.CENTER_HORIZONTAL);
 	}
 }

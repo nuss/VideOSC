@@ -9,15 +9,15 @@ import java.util.Set;
 import processing.core.PApplet;
 
 /**
- * Created by stefan on 08.02.16.
+ * Created by Stefan Nussbaumer on 08.02.16.
  */
-public class VideOSCPreload {
+class VideOSCPreload {
 	String TAG = "VideOSCPreload";
 
-	static ArrayList<int[][]> squareRows = new ArrayList<int[][]>();
-	static int width;
+	private static ArrayList<int[][]> squareRows = new ArrayList<int[][]>();
+	private static int width;
 
-	public VideOSCPreload(PApplet applet, int x, int y, int size, float probability) {
+	VideOSCPreload(PApplet applet, int x, int y, int size, float probability) {
 		width = size * 50;
 
 		if (squareRows.size() > 0) {

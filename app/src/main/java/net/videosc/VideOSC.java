@@ -12,7 +12,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import apwidgets.APWidget;
 import ketai.camera.KetaiCamera;
 import ketai.data.KetaiSQLite;
 import ketai.ui.KetaiAlertDialog;
@@ -637,9 +636,9 @@ public class VideOSC extends PApplet {
 	}
 
 	// @Override
-	public void onClickWidget(APWidget button) {
-		VideOSCPreferences.setPreferences(this, button, db);
-	}
+//	public void onClickWidget(APWidget button) {
+//		VideOSCPreferences.setPreferences(this, button, db);
+//	}
 
 	public void keyPressed() {
 		if (key == CODED) {

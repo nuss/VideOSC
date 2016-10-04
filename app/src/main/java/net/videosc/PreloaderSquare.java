@@ -3,16 +3,16 @@ package net.videosc;
 import processing.core.PApplet;
 
 /**
- * Created by stefan on 09.02.16.
+ * Created by Stefan Nussbaumer on 09.02.16.
  */
-public class PreloaderSquare {
+class PreloaderSquare {
 	private String TAG = "PreloaderSquare";
 
-	public int x;
-	public int y;
-	public int alpha;
+	private int x;
+	private int y;
+	private int alpha;
 
-	public PreloaderSquare(PApplet applet, int x, int y, int alpha) {
+	PreloaderSquare(PApplet applet, int x, int y, int alpha) {
 		this.x = x;
 		this.y = y;
 		this.alpha = alpha;

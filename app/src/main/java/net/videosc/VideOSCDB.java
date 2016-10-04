@@ -5,7 +5,7 @@ import ketai.ui.KetaiAlertDialog;
 import processing.core.PApplet;
 
 /**
- * Created by stefan on 04.02.16.
+ * Created by Stefan Nussbaumer on 04.02.16.
  */
 public class VideOSCDB extends VideOSC {
 	private static String TAG = "VideOSCDB";
@@ -114,7 +114,7 @@ public class VideOSCDB extends VideOSC {
 	}
 
 	static void setUpSnapshots(PApplet applet, KetaiSQLite db) {
-		boolean success = false;
+		boolean success;
 
 		if (db.connect()) {
 //			if (db.execute("DROP TABLE vosc_snapshots;"))
