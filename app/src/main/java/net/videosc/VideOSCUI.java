@@ -6,7 +6,8 @@ import processing.core.PApplet;
 import processing.core.PImage;
 
 /**
- * Created by Stefan Nussbaumer on 03.02.16.
+ * Package: net.videosc
+ * Created by Stefan Nussbaumer on Okt 05 2016, 12:01.
  */
 public class VideOSCUI extends VideOSC {
 	private static String TAG = "VideOSCUI";

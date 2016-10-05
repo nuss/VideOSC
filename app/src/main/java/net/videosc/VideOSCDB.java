@@ -5,7 +5,8 @@ import ketai.ui.KetaiAlertDialog;
 import processing.core.PApplet;
 
 /**
- * Created by Stefan Nussbaumer on 04.02.16.
+ * Package: net.videosc
+ * Created by Stefan Nussbaumer on Okt 05 2016, 12:02.
  */
 public class VideOSCDB extends VideOSC {
 	private static String TAG = "VideOSCDB";

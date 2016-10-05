@@ -9,7 +9,8 @@ import java.util.Set;
 import processing.core.PApplet;
 
 /**
- * Created by Stefan Nussbaumer on 08.02.16.
+ * Package: net.videosc
+ * Created by Stefan Nussbaumer on 08.02.16, 11:49.
  */
 class VideOSCPreload {
 	String TAG = "VideOSCPreload";

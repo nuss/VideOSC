@@ -15,7 +15,8 @@ import netP5.NetAddress;
 import processing.core.PApplet;
 
 /**
- * Created by Stefan Nussbaumer on 03.02.16.
+ * Package: net.videosc
+ * Created by Stefan Nussbaumer on Okt 05, 11:51.
  */
 
 public class VideOSCPreferences extends VideOSC {

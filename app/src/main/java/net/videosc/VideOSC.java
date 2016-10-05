@@ -22,6 +22,10 @@ import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
 
+/**
+ * Package: net.videosc
+ * Created by Stefan Nussbaumer on Okt 05 2016, 12:02.
+ */
 public class VideOSC extends PApplet {
 	private static String TAG = "VideOSC";
 

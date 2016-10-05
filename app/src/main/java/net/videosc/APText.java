@@ -8,7 +8,8 @@ import apwidgets.APWidgetContainer;
 import processing.core.PApplet;
 
 /**
- * Created by Stefan Nussbaumer on 03.03.16.
+ * Package: net.videosc
+ * Created by Stefan Nussbaumer on Okt 05 2016, 12:01.
  */
 class APText extends APTextView {
 	private String TAG = "APText";
