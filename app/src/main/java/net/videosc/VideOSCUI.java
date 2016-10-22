@@ -150,7 +150,7 @@ public class VideOSCUI extends VideOSC {
 		KetaiList preferencesList;
 
 		if (!selectionListActive) {
-			// only allow interaction if screen is not overlazed by some selection list
+			// only allow interaction if screen is not overlayed by some selection list
 			if (x > 100 && y > 100 && x < applet.width - 130 && !displayRGBselector && curOptions.equals
 					("")) {
 				if (!cam.isStarted()) cam.start();
