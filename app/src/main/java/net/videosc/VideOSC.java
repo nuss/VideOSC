@@ -639,11 +639,6 @@ public class VideOSC extends PApplet {
 		VideOSCUI.processKetaiListClicks(this, klist, db);
 	}
 
-	// @Override
-//	public void onClickWidget(APWidget button) {
-//		VideOSCPreferences.setPreferences(this, button, db);
-//	}
-
 	public void keyPressed() {
 		if (key == CODED) {
 			if (keyCode == MENU && curOptions.equals("")/* && preferencesListInvisible*/) {
