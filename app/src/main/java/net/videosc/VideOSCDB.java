@@ -1,5 +1,7 @@
 package net.videosc;
 
+import android.util.Log;
+
 import ketai.data.KetaiSQLite;
 import ketai.ui.KetaiAlertDialog;
 import processing.core.PApplet;
@@ -219,7 +221,7 @@ public class VideOSCDB extends VideOSC {
 					// make sure not to set any pixels that don't exist, e.g. if a snapshot has
 					// been set for 24 pixels but the current setup only has 20
 					resl = res.length();
-					if (resl > dimensions) resl = dimensions * 3;
+					if (resl > dimensions * 3) resl = dimensions * 3;
 					for (int i = 0; i < resl; i++) {
 						if (i % 3 == 0) {
 							// a snapshot is an ArrayList of boolean tripplets
