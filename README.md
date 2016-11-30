@@ -2,9 +2,11 @@
 
 VideOSC is an experimental OSC-controller for Android that uses RGB data for generating OSC-messages. The phones camera input (video-stream, smallest possible preview size) first gets downsampled to a user-defined size (e.g. 8 x 6 px) and the RGB-information of each pixel of the downsampled preview gets sent to an arbitrary IP address in the network. Hence, a preview of 8 x 6 px gives 144 separate values (0-255) at the interval defined by the framerate of the app.
 
+Website: http://videosc.net
+
 # Installation #
 
-VideOSC is not yet available from Google Play (hopefully it will be soon). It can, however, be installed from Android Studio. The Android developer tools, including the necessary compiler, are needed. These can be obtained freely from https://developer.android.com. The application should be compatible with Android 4.0.3 and higher.
+[VideOSC is available from Google Play](https://play.google.com/store/apps/details?id=net.videosc). It can, however, be installed from source as well, using Android Studio. The Android developer tools, including the necessary compiler, are needed. These can be obtained freely from https://developer.android.com. The application should be compatible with Android 4.0.3 and higher.
 
 Furthermore the following external libraries are needed:
 
