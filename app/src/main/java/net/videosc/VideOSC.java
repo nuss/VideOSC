@@ -3,6 +3,7 @@ package net.videosc;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
@@ -14,6 +15,7 @@ import java.util.Set;
 
 import ketai.camera.KetaiCamera;
 import ketai.data.KetaiSQLite;
+import ketai.sensors.KetaiSensor;
 import ketai.ui.KetaiAlertDialog;
 import ketai.ui.KetaiList;
 import netP5.NetAddress;
@@ -117,6 +119,9 @@ public class VideOSC extends PApplet {
 	static boolean showSnapshots = false;
 	static long numSnapshots;
 
+	static KetaiSensor sensors;
+	static float oriX, oriY, oriZ;
+
 	public void setup() {
 		boolean querySuccess;
 
@@ -134,6 +139,9 @@ public class VideOSC extends PApplet {
 			}
 		}
 		camera.release();
+
+		sensors = new KetaiSensor(this);
+		sensors.start();
 
 		imageMode(CENTER);
 
@@ -668,5 +676,21 @@ public class VideOSC extends PApplet {
 		if (!curOptions.equals("")) {
 			curOptions = "";
 		}
+	}
+
+	public void sendOrientation() {
+		OscMessage omsg = new OscMessage("/vosc/ori");
+		omsg.add(oriX).add(oriY).add(oriZ);
+		oscP5.send(omsg, broadcastLoc);
+	}
+
+	public void onOrientationEvent(float x, float y, float z) {
+		oriX = x;
+		oriY = y;
+		oriZ = z;
+
+		Log.d(TAG, "orientation: " + oriX + ", " + oriY + ", " + oriZ);
+
+		thread("sendOrientation");
 	}
 }
