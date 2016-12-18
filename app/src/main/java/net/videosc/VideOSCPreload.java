@@ -1,5 +1,7 @@
 package net.videosc;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -16,6 +18,7 @@ class VideOSCPreload {
 	String TAG = "VideOSCPreload";
 
 	private static ArrayList<int[][]> squareRows = new ArrayList<int[][]>();
+	private static ArrayList<int[][]> rowsToRemove = new ArrayList<int[][]>();
 	private static int width;
 
 	VideOSCPreload(PApplet applet, int x, int y, int size, float probability) {
@@ -27,15 +30,13 @@ class VideOSCPreload {
 			// color is a random color
 			for (int[][] row : squareRows) {
 				int l = row.length;
-				List<int[]> asList;
-				Set<int[]> nullSet;
 
 				for (int i = 0; i < l; i++) {
 					if (row[i] != null) {
 						int newY = row[i][1] - 50;
 						int newAlpha = row[i][2] - 25;
 						if (newY < -50) {
-							row[i] = null;
+							rowsToRemove.add(row);
 						} else {
 							new PreloaderSquare(applet, row[i][0], newY, newAlpha);
 							row[i][1] = newY;
@@ -43,17 +44,8 @@ class VideOSCPreload {
 						}
 					}
 				}
-
-				asList = Arrays.asList(row);
-				nullSet = new HashSet<int[]>(asList);
-
-				// nullSet.size() == 1 means only one unique object is in doneRow
-				// which should only be the case if all slots are null
-				if (nullSet.size() == 1) {
-					int index = squareRows.indexOf(row);
-					squareRows.remove(index);
-				}
 			}
+			squareRows.removeAll(rowsToRemove);
 		}
 
 		int[][] row = createRow(applet, x, y, size, probability);
