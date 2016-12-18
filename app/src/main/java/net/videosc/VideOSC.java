@@ -689,8 +689,8 @@ public class VideOSC extends PApplet {
 		oriY = y;
 		oriZ = z;
 
-		Log.d(TAG, "orientation: " + oriX + ", " + oriY + ", " + oriZ);
+//		Log.d(TAG, "orientation: " + oriX + ", " + oriY + ", " + oriZ);
 
-		thread("sendOrientation");
+//		thread("sendOrientation");
 	}
 }
