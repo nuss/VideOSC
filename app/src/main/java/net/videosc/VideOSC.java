@@ -680,6 +680,7 @@ public class VideOSC extends PApplet {
 
 	public void sendOrientation() {
 		OscMessage omsg = new OscMessage("/vosc/ori");
+		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 		omsg.add(oriX).add(oriY).add(oriZ);
 		oscP5.send(omsg, broadcastLoc);
 	}
@@ -691,6 +692,6 @@ public class VideOSC extends PApplet {
 
 //		Log.d(TAG, "orientation: " + oriX + ", " + oriY + ", " + oriZ);
 
-//		thread("sendOrientation");
+		thread("sendOrientation");
 	}
 }
