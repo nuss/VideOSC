@@ -24,6 +24,8 @@ import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
 
+//import static net.videosc.VideOSCSensors.sensorThread;
+
 /**
  * Package: net.videosc
  * Created by Stefan Nussbaumer on Okt 05 2016, 12:02.
@@ -139,6 +141,8 @@ public class VideOSC extends PApplet {
 			}
 		}
 		camera.release();
+
+//		sensorThread = VideOSCSensors.initThread();
 
 		sensors = new KetaiSensor(this);
 		sensors.start();
@@ -276,6 +280,11 @@ public class VideOSC extends PApplet {
 				if (negative)
 					pImg.pixels[i] = color(rVal, gVal, bVal, 255);
 
+				// compose basic OSC message for slot
+				oscR = VideOSCOscHandling.makeMessage(oscR, r + str(i + 1));
+				oscG = VideOSCOscHandling.makeMessage(oscG, g + str(i + 1));
+				oscB = VideOSCOscHandling.makeMessage(oscB, b + str(i + 1));
+
 				if (rgbMode.equals(RGBModes.RGB)) {
 					if (offPxls.get(i)[0] && !offPxls.get(i)[1] && !offPxls.get(i)[2]) {
 						// r
@@ -329,12 +338,18 @@ public class VideOSC extends PApplet {
 							bval = bVal;
 						}
 
-						if (!offPxls.get(i)[0])
-							sendOSC(broadcastLoc, oscR, r, i, rval);
-						if (!offPxls.get(i)[1])
-							sendOSC(broadcastLoc, oscG, g, i, gval);
-						if (!offPxls.get(i)[2])
-							sendOSC(broadcastLoc, oscB, b, i, bval);
+						if (!offPxls.get(i)[0]) {
+							oscR.add(rval);
+							oscP5.send(oscR, broadcastLoc);
+						}
+						if (!offPxls.get(i)[1]) {
+							oscR.add(gval);
+							oscP5.send(oscG, broadcastLoc);
+						}
+						if (!offPxls.get(i)[2]) {
+							oscR.add(bval);
+							oscP5.send(oscB, broadcastLoc);
+						}
 					} else {
 						curInput[0] = (float) rVal;
 						curInput[1] = (float) gVal;
@@ -354,13 +369,16 @@ public class VideOSC extends PApplet {
 							}
 
 							if (!offPxls.get(i)[0]) {
-								sendOSC(broadcastLoc, oscR, r, i, rval);
+								oscR.add(rval);
+								oscP5.send(oscR, broadcastLoc);
 							}
 							if (!offPxls.get(i)[1]) {
-								sendOSC(broadcastLoc, oscG, g, i, gval);
+								oscG.add(gval);
+								oscP5.send(oscG, broadcastLoc);
 							}
 							if (!offPxls.get(i)[2]) {
-								sendOSC(broadcastLoc, oscB, b, i, bval);
+								oscB.add(bval);
+								oscP5.send(oscB, broadcastLoc);
 							}
 
 							float lastInputR = lastInputList.get(i)[0];
@@ -379,12 +397,8 @@ public class VideOSC extends PApplet {
 
 			image(pImg, width / 2, height / 2, width, height);
 			VideOSCUI.drawTools(this);
-			if (showFB) {
+			if (showFB)
 				printOSC();
-				// rCmds.clear();
-				// gCmds.clear();
-				// bCmds.clear();
-			}
 			VideOSCUI.drawRGBUI(this);
 			if (displayRGBselector)
 				VideOSCUI.drawRGBModeSelector(this);
@@ -396,46 +410,40 @@ public class VideOSC extends PApplet {
 				int index = frameCount % calcsPerPeriod;
 				for (int i = 0; i < dimensions; i++) {
 					if (!offPxls.get(i)[0]) {
+						oscR = VideOSCOscHandling.makeMessage(oscR, r + str(i + 1));
 						float lastInputR = lastInputList.get(i)[0];
 						float slopeR = slopes.get(i)[0];
 						if (normalize)
-							sendOSC(broadcastLoc, oscR, r, i, (slopeR * index + lastInputR) / 255);
+							oscR.add((slopeR * index + lastInputR) / 255);
 						else
-							sendOSC(broadcastLoc, oscR, r, i, slopeR * index + lastInputR);
+							oscR.add(slopeR * index + lastInputR);
+						oscP5.send(oscR, broadcastLoc);
 					}
 					if (!offPxls.get(i)[1]) {
+						oscG = VideOSCOscHandling.makeMessage(oscG, g + str(i + 1));
 						float lastInputG = lastInputList.get(i)[1];
 						float slopeG = slopes.get(i)[1];
 						if (normalize)
-							sendOSC(broadcastLoc, oscG, g, i, (slopeG * index + lastInputG) / 255);
+							oscG.add((slopeG * index + lastInputG) / 255);
 						else
-							sendOSC(broadcastLoc, oscG, g, i, slopeG * index + lastInputG);
+							oscG.add(slopeG * index + lastInputG);
+						oscP5.send(oscG, broadcastLoc);
 					}
 					if (!offPxls.get(i)[2]) {
+						oscB = VideOSCOscHandling.makeMessage(oscB, b + str(i + 1));
 						float lastInputB = lastInputList.get(i)[2];
 						float slopeB = slopes.get(i)[2];
 						if (normalize)
-							sendOSC(broadcastLoc, oscB, b, i, (slopeB * index + lastInputB) / 255);
+							oscB.add((slopeB * index + lastInputB) / 255);
 						else
-							sendOSC(broadcastLoc, oscB, b, i, slopeB * index + lastInputB);
+							oscB.add(slopeB * index + lastInputB);
+						oscP5.send(oscB, broadcastLoc);
 					}
 				}
 			}
 		}
 		if (showHide)
 			VideOSCUI.setShowHideMenus(this);
-	}
-
-	private void sendOSC(NetAddress broadcastLoc, OscMessage msg, String cmd, int slot, float val) {
-		if (msg == null)
-			msg = new OscMessage(cmd + str(slot + 1));
-		else {
-			msg.clear();
-			msg.setAddrPattern(cmd + str(slot + 1));
-		}
-
-		msg.add(val);
-		oscP5.send(msg, broadcastLoc);
 	}
 
 	private void printOSC() {
@@ -678,20 +686,7 @@ public class VideOSC extends PApplet {
 		}
 	}
 
-	public void sendOrientation() {
-		OscMessage omsg = new OscMessage("/vosc/ori");
-		Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-		omsg.add(oriX).add(oriY).add(oriZ);
-		oscP5.send(omsg, broadcastLoc);
-	}
-
-	public void onOrientationEvent(float x, float y, float z) {
-		oriX = x;
-		oriY = y;
-		oriZ = z;
-
-//		Log.d(TAG, "orientation: " + oriX + ", " + oriY + ", " + oriZ);
-
-		thread("sendOrientation");
+	public void onOrientationEvent(float x, float y, float z, long time, int accuracy) {
+		VideOSCSensors.orientationEvent(x, y, z, time, accuracy);
 	}
 }

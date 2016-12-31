@@ -9,11 +9,11 @@ import ketai.sensors.KetaiSensor;
 
 public class VideOSCSensors extends VideOSC {
     // orientation sensor values
-    static float oriX;
-    static float oriY;
-    static float oriZ;
-    static long oriTime;
-    static int oriAcc;
+    static volatile float oriX;
+    static volatile float oriY;
+    static volatile float oriZ;
+    static volatile long oriTime;
+    static volatile int oriAcc;
 
     // acceleration sensor values
     static float accX;
@@ -70,4 +70,16 @@ public class VideOSCSensors extends VideOSC {
     static float gpsLong;
     static float gpsLat;
     static int gpsAcc;
+
+    public static void orientationEvent(float x, float y, float z, long time, int accuracy) {
+        oriX = x;
+        oriY = y;
+        oriZ = z;
+        oriTime = time;
+        oriAcc = accuracy;
+
+        if (oscP5 != null) {
+            VideOSCSensorRunnable.main(null);
+        }
+    }
 }
