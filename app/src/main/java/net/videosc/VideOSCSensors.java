@@ -1,6 +1,8 @@
 package net.videosc;
 
 
+import android.util.Log;
+
 import ketai.sensors.KetaiSensor;
 
 /**
@@ -8,6 +10,8 @@ import ketai.sensors.KetaiSensor;
  */
 
 public class VideOSCSensors extends VideOSC {
+    private final static String TAG = "VideOSCSensors";
+
     // orientation sensor values
     static volatile float oriX;
     static volatile float oriY;
@@ -71,7 +75,21 @@ public class VideOSCSensors extends VideOSC {
     static float gpsLat;
     static int gpsAcc;
 
-    public static void orientationEvent(float x, float y, float z, long time, int accuracy) {
+    static void availableSensors() {
+        Log.d(TAG, "is orientation available: " + sensors.isOrientationAvailable());
+        Log.d(TAG, "is acceleration available: " + sensors.isAccelerometerAvailable());
+        Log.d(TAG, "is magnetic field available: " + sensors.isMagenticFieldAvailable());
+        sensors.enableAmibentTemperature();
+        Log.d(TAG, "is ambient temperature available: " + sensors.isAmbientTemperatureAvailable());
+        Log.d(TAG, "is pressure available: " + sensors.isPressureAvailable());
+        Log.d(TAG, "is light sensor available: " + sensors.isLightAvailable());
+        Log.d(TAG, "is proximity sensor available: " + sensors.isProximityAvailable());
+        sensors.enableRelativeHumiditySensor();
+        Log.d(TAG, "is humidity sensor available: " + sensors.isRelativeHumidityAvailable());
+        Log.d(TAG, "is linear acceleration available: " + sensors.isLinearAccelerationAvailable());
+    }
+
+    static void orientationEvent(float x, float y, float z, long time, int accuracy) {
         oriX = x;
         oriY = y;
         oriZ = z;

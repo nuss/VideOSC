@@ -1,5 +1,7 @@
 package net.videosc;
 
+import android.util.Log;
+
 import java.util.Calendar;
 
 import apwidgets.APButton;
@@ -20,7 +22,7 @@ import processing.core.PApplet;
  */
 
 public class VideOSCPreferences extends VideOSC {
-	private static String TAG = "VideOSCPreferences";
+	private final static String TAG = "VideOSCPreferences";
 
 	static void createPreferences(final PApplet applet, String select, final KetaiSQLite db) {
 		final APWidgetContainer apContainer = new APWidgetContainer(applet);
@@ -169,7 +171,7 @@ public class VideOSCPreferences extends VideOSC {
 			});
 			curOptions = "network";
 		} else if (select.equals("Resolution Settings")) {
-			final APText setResWText = new APText(50, 50, (applet.width -100) /2 - 60, 50 * (int)
+			final APText setResWText = new APText(50, 50, (applet.width - 100) / 2 - 60, 50 * (int)
 					density);
 			setResWText.setTextSize(20);
 			setResWText.setText("horizontal resolution:");
@@ -204,7 +206,7 @@ public class VideOSCPreferences extends VideOSC {
 			setCalcPeriodText.setText("set calculation period:");
 			final APEditText setCalcPeriod = new APEditText((applet.width - 100) / 4 + 20, 50 + (
 					(int)
-					density * 170), (applet.width - 100) / 4 - 30, (int) density * 50);
+							density * 170), (applet.width - 100) / 4 - 30, (int) density * 50);
 			setCalcPeriod.setInputType(2);
 			setCalcPeriod.setText(str(calcsPerPeriod));
 
@@ -310,7 +312,110 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			curOptions = "resolution";
-		} else if (select.equals("About VideOSC")) {
+		} else if (select.equals("Sensors")) {
+			int nextYPos = 50;
+			final APCheckBox useOri, useAcc, useLinAcc, useMag, useGrav, useProx, useLight, usePress, useTemp, useHum, useGps;
+
+			if(sensors.isOrientationAvailable()) {
+				useOri = new APCheckBox(50, nextYPos, "use orientation sensor");
+				useOri.setTextSize(20);
+				apContainer.addWidget(useOri);
+				nextYPos += 30 * density;
+			}
+			if (sensors.isAccelerometerAvailable()) {
+				useAcc = new APCheckBox(50, nextYPos, "use accelerometer");
+				useAcc.setTextSize(20);
+				apContainer.addWidget(useAcc);
+				nextYPos += 30 * density;
+			}
+			if (sensors.isLinearAccelerationAvailable()) {
+				useLinAcc = new APCheckBox(50, nextYPos, "use linear acceleration sensor (m/s^2, minus gravity)");
+				useLinAcc.setTextSize(20);
+				apContainer.addWidget(useLinAcc);
+				nextYPos += 30 * density;
+			}
+			if (sensors.isMagenticFieldAvailable()) {
+				useMag = new APCheckBox(50, nextYPos, "use magnetic field sensor");
+				useMag.setTextSize(20);
+				apContainer.addWidget(useMag);
+				nextYPos += 30 * density;
+			}
+			useGrav = new APCheckBox(50, nextYPos, "use gravity sensor");
+			useGrav.setTextSize(20);
+			apContainer.addWidget(useGrav);
+			nextYPos += 30 * density;
+			if (sensors.isProximityAvailable()) {
+				useProx = new APCheckBox(50, nextYPos, "use proximity sensor");
+				useProx.setTextSize(20);
+				apContainer.addWidget(useProx);
+				nextYPos += 30 * density;
+			}
+			if (sensors.isLightAvailable()) {
+				useLight = new APCheckBox(50, nextYPos, "use light sensor");
+				useLight.setTextSize(20);
+				apContainer.addWidget(useLight);
+				nextYPos += 30 * density;
+			}
+			if (sensors.isPressureAvailable()) {
+				usePress = new APCheckBox(50, nextYPos, "use air pressure sensor");
+				usePress.setTextSize(20);
+				apContainer.addWidget(usePress);
+				nextYPos += 30 * density;
+			}
+			if (sensors.isTemperatureAvailable()) {
+				useTemp = new APCheckBox(50, nextYPos, "use temperature sensor");
+				useTemp.setTextSize(20);
+				apContainer.addWidget(useTemp);
+				nextYPos += 30 * density;
+			}
+			if (sensors.isRelativeHumidityAvailable()) {
+				useHum = new APCheckBox(50, nextYPos, "use humidity sensor");
+				useHum.setTextSize(20);
+				apContainer.addWidget(useHum);
+				nextYPos += 30 * density;
+			}
+			useGps = new APCheckBox(50, nextYPos, "use geo location");
+			useGps.setTextSize(20);
+			apContainer.addWidget(useGps);
+			nextYPos += 30 * density;
+			final APButton cancel = new APButton(50, 50 + nextYPos, (applet.width -
+					220) /
+					2, 60 * (int) density, "Cancel");
+			final APButton save = new APButton(50 + (applet.width - 220) / 2, 50 + nextYPos, (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
+			apContainer.addWidget(cancel);
+			apContainer.addWidget(save);
+
+			cancel.addOnClickWidgetListener(new OnClickWidgetListener() {
+				@Override
+				public void onClickWidget(APWidget apWidget) {
+//					if (useOri != null)
+//						apContainer.removeWidget(useOri);
+//					if (useAcc != null)
+//						apContainer.removeWidget(useAcc);
+//					if (useLinAcc != null)
+//						apContainer.removeWidget(useLinAcc);
+//					if (useMag != null)
+//						apContainer.removeWidget(useMag);
+//					apContainer.removeWidget(useGrav);
+//					if (useProx != null)
+//						apContainer.removeWidget(useProx);
+//					if (useLight != null)
+//						apContainer.removeWidget(useLight);
+//					if (usePress != null)
+//						apContainer.removeWidget(usePress);
+//					if (useTemp != null)
+//						apContainer.removeWidget(useTemp);
+//					if (useHum != null)
+//						apContainer.removeWidget(useHum);
+					apContainer.removeWidget(useGps);
+					apContainer.removeWidget(save);
+					apContainer.removeWidget(cancel);
+					curOptions = "";
+				}
+			});
+
+			curOptions = "sensors";
+		} else if (select.equals("About VielerometerdeOSC")) {
 			final APText about = new APText(50, 50, applet.width - 230, (int) (applet.height * 4.2));
 			about.setTextSize(16);
 			about.setText("VideOSC is an experimental OSC controller, using the color " +

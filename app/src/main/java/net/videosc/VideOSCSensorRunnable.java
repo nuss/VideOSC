@@ -34,7 +34,7 @@ public class VideOSCSensorRunnable implements Runnable {
         //noinspection InfiniteLoopStatement
         while (true) {
             try {
-                Log.d(TAG, "oriX: " + VideOSCSensors.oriX + ", oriY: " + VideOSCSensors.oriY + ", oriZ: " + VideOSCSensors.oriZ);
+//                Log.d(TAG, "oriX: " + VideOSCSensors.oriX + ", oriY: " + VideOSCSensors.oriY + ", oriZ: " + VideOSCSensors.oriZ);
                 oscOri = VideOSCOscHandling.makeMessage(oscOri, "/" + VideOSC.rootCmd + "/ori");
                 oscOri.add(VideOSCSensors.oriX).add(VideOSCSensors.oriY).add(VideOSCSensors.oriZ).add(VideOSCSensors.oriTime).add(VideOSCSensors.oriAcc);
                 VideOSC.oscP5.send(oscOri, VideOSC.broadcastLoc);

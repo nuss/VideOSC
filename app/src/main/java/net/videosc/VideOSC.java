@@ -146,6 +146,7 @@ public class VideOSC extends PApplet {
 
 		sensors = new KetaiSensor(this);
 		sensors.start();
+//		VideOSCSensors.availableSensors();
 
 		imageMode(CENTER);
 
@@ -164,6 +165,9 @@ public class VideOSC extends PApplet {
 		}
 		if (optionsList.indexOf("Resolution Settings") < 0) {
 			optionsList.add("Resolution Settings");
+		}
+		if (optionsList.indexOf("Sensors") < 0) {
+			optionsList.add("Sensors");
 		}
 		if (optionsList.indexOf("About VideOSC") < 0) {
 			optionsList.add("About VideOSC");
@@ -530,37 +534,7 @@ public class VideOSC extends PApplet {
 
 	// http://www.sojamo.de/libraries/oscP5/examples/oscP5sendReceive/oscP5sendReceive.pde
 	private void oscEvent(OscMessage fbMessage) {
-		if (!rgbMode.equals(RGBModes.RGB)) {
-			String[] msg = {fbMessage.get(0).stringValue()};
-			String chanSlot;
-			// make as sure as possible no incoming messages except the ones
-			// coming from VideOSC are checked
-			if (showFB && match(fbMessage.addrPattern(),
-					"^/[a-zA-Z0-9_/]+/(red|green|blue)[0-9]+") != null) {
-				if (match(fbMessage.addrPattern().split("/")[2],
-						"(red)([0-9]+)") != null) {
-					chanSlot = join(
-							concat(msg,
-									match(fbMessage.addrPattern().split("/")[2],
-											"(red)([0-9]+)")), ";");
-					rCmds.add(chanSlot);
-				} else if (match(fbMessage.addrPattern().split("/")[2],
-						"(green)([0-9]+)") != null) {
-					chanSlot = join(
-							concat(msg,
-									match(fbMessage.addrPattern().split("/")[2],
-											"(green)([0-9]+)")), ";");
-					gCmds.add(chanSlot);
-				} else if (match(fbMessage.addrPattern().split("/")[2],
-						"(blue)([0-9]+)") != null) {
-					chanSlot = join(
-							concat(msg,
-									match(fbMessage.addrPattern().split("/")[2],
-											"(blue)([0-9]+)")), ";");
-					bCmds.add(chanSlot);
-				}
-			}
-		}
+		VideOSCOscHandling.prepareFeedbackStrings(fbMessage);
 	}
 
 	// which pixel am I currently hovering?

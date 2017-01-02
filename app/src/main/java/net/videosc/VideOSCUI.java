@@ -357,7 +357,7 @@ public class VideOSCUI extends VideOSC {
 	static void processKetaiListClicks(PApplet applet, KetaiList klist, KetaiSQLite db) {
 		String select = klist.getSelection();
 
-		if (select.equals("Network Settings") || select.equals("Resolution Settings") || select
+		if (select.equals("Network Settings") || select.equals("Resolution Settings") || select.equals("Sensors") || select
 				.equals("About VideOSC")) {
 			VideOSCPreferences.createPreferences(applet, select, db);
 		} else if (select.equals("Reset Snapshots")) {
