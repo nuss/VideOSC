@@ -181,6 +181,11 @@ public class VideOSC extends PApplet {
 					"determined");
 		}
 
+		querySuccess = VideOSCDB.setUpSensors(this, db);
+		if (!querySuccess) {
+			KetaiAlertDialog.popup(this, "SQL Error", "The sensors settings could not be determined");
+		}
+
 		r = "/" + rootCmd + "/red";
 		g = "/" + rootCmd + "/green";
 		b = "/" + rootCmd + "/blue";

@@ -316,97 +316,147 @@ public class VideOSCPreferences extends VideOSC {
 			int nextYPos = 50;
 			final APCheckBox useOri, useAcc, useLinAcc, useMag, useGrav, useProx, useLight, usePress, useTemp, useHum, useGps;
 
-			if(sensors.isOrientationAvailable()) {
-				useOri = new APCheckBox(50, nextYPos, "use orientation sensor");
-				useOri.setTextSize(20);
-				apContainer.addWidget(useOri);
-				nextYPos += 30 * density;
-			}
-			if (sensors.isAccelerometerAvailable()) {
-				useAcc = new APCheckBox(50, nextYPos, "use accelerometer");
-				useAcc.setTextSize(20);
-				apContainer.addWidget(useAcc);
-				nextYPos += 30 * density;
-			}
-			if (sensors.isLinearAccelerationAvailable()) {
-				useLinAcc = new APCheckBox(50, nextYPos, "use linear acceleration sensor (m/s^2, minus gravity)");
-				useLinAcc.setTextSize(20);
-				apContainer.addWidget(useLinAcc);
-				nextYPos += 30 * density;
-			}
-			if (sensors.isMagenticFieldAvailable()) {
-				useMag = new APCheckBox(50, nextYPos, "use magnetic field sensor");
-				useMag.setTextSize(20);
-				apContainer.addWidget(useMag);
-				nextYPos += 30 * density;
-			}
+			useOri = new APCheckBox(50, nextYPos, "use orientation sensor");
+			useOri.setTextSize(16);
+			if(!sensors.isOrientationAvailable())
+				useOri.setText(useOri.getText() + " (not available)");
+			useOri.setChecked(VideOSCSensors.useOri);
+			apContainer.addWidget(useOri);
+			nextYPos += 40 * density;
+
+			useAcc = new APCheckBox(50, nextYPos, "use accelerometer");
+			useAcc.setTextSize(16);
+			if (!sensors.isAccelerometerAvailable())
+				useAcc.setText(useAcc.getText() + " (not available)");
+			useAcc.setChecked(VideOSCSensors.useAcc);
+			apContainer.addWidget(useAcc);
+			nextYPos += 40 * density;
+
+			useLinAcc = new APCheckBox(50, nextYPos, "use linear acceleration sensor (m/s^2, minus gravity)");
+			useLinAcc.setTextSize(16);
+			if (!sensors.isLinearAccelerationAvailable())
+				useLinAcc.setText(useLinAcc.getText() + " (not available)");
+			useLinAcc.setChecked(VideOSCSensors.useLinAcc);
+			apContainer.addWidget(useLinAcc);
+			nextYPos += 40 * density;
+
+			useMag = new APCheckBox(50, nextYPos, "use magnetic field sensor");
+			useMag.setTextSize(16);
+			if (!sensors.isMagenticFieldAvailable())
+				useMag.setText(useMag.getText() + " (not available)");
+			useMag.setChecked(VideOSCSensors.useMag);
+			apContainer.addWidget(useMag);
+			nextYPos += 40 * density;
+
 			useGrav = new APCheckBox(50, nextYPos, "use gravity sensor");
-			useGrav.setTextSize(20);
+			useGrav.setTextSize(16);
+			useGrav.setChecked(VideOSCSensors.useGrav);
 			apContainer.addWidget(useGrav);
-			nextYPos += 30 * density;
-			if (sensors.isProximityAvailable()) {
-				useProx = new APCheckBox(50, nextYPos, "use proximity sensor");
-				useProx.setTextSize(20);
-				apContainer.addWidget(useProx);
-				nextYPos += 30 * density;
-			}
-			if (sensors.isLightAvailable()) {
-				useLight = new APCheckBox(50, nextYPos, "use light sensor");
-				useLight.setTextSize(20);
-				apContainer.addWidget(useLight);
-				nextYPos += 30 * density;
-			}
-			if (sensors.isPressureAvailable()) {
-				usePress = new APCheckBox(50, nextYPos, "use air pressure sensor");
-				usePress.setTextSize(20);
-				apContainer.addWidget(usePress);
-				nextYPos += 30 * density;
-			}
-			if (sensors.isTemperatureAvailable()) {
-				useTemp = new APCheckBox(50, nextYPos, "use temperature sensor");
-				useTemp.setTextSize(20);
-				apContainer.addWidget(useTemp);
-				nextYPos += 30 * density;
-			}
-			if (sensors.isRelativeHumidityAvailable()) {
-				useHum = new APCheckBox(50, nextYPos, "use humidity sensor");
-				useHum.setTextSize(20);
-				apContainer.addWidget(useHum);
-				nextYPos += 30 * density;
-			}
+			nextYPos += 40 * density;
+
+			useProx = new APCheckBox(50, nextYPos, "use proximity sensor");
+			useProx.setTextSize(16);
+			if (!sensors.isProximityAvailable())
+				useProx.setText(useProx.getText() + " (not available)");
+			useProx.setChecked(VideOSCSensors.useProx);
+			apContainer.addWidget(useProx);
+			nextYPos += 40 * density;
+
+			useLight = new APCheckBox(50, nextYPos, "use light sensor");
+			useLight.setTextSize(16);
+			if (!sensors.isLightAvailable())
+				useLight.setText(useLight.getText() + " (not available)");
+			useLight.setChecked(VideOSCSensors.useLight);
+			apContainer.addWidget(useLight);
+			nextYPos += 40 * density;
+
+			usePress = new APCheckBox(50, nextYPos, "use air pressure sensor");
+			usePress.setTextSize(16);
+			if (sensors.isPressureAvailable())
+				usePress.setText(useLight.getText() + " (not available)");
+			usePress.setChecked(VideOSCSensors.usePress);
+			apContainer.addWidget(usePress);
+			nextYPos += 40 * density;
+
+			useTemp = new APCheckBox(50, nextYPos, "use temperature sensor");
+			useTemp.setTextSize(16);
+			if (sensors.isTemperatureAvailable())
+				useTemp.setText(useLight.getText() + " (not available)");
+			useTemp.setChecked(VideOSCSensors.useTemp);
+			apContainer.addWidget(useTemp);
+			nextYPos += 40 * density;
+
+			useHum = new APCheckBox(50, nextYPos, "use humidity sensor");
+			useHum.setTextSize(16);
+			if (sensors.isRelativeHumidityAvailable())
+				useHum.setText(useHum.getText() + " (not available)");
+			useHum.setChecked(VideOSCSensors.useHum);
+			apContainer.addWidget(useHum);
+			nextYPos += 40 * density;
+
 			useGps = new APCheckBox(50, nextYPos, "use geo location");
-			useGps.setTextSize(20);
+			useGps.setTextSize(16);
+			useGps.setChecked(VideOSCSensors.useGPS);
 			apContainer.addWidget(useGps);
-			nextYPos += 30 * density;
+			nextYPos += 40 * density;
 			final APButton cancel = new APButton(50, 50 + nextYPos, (applet.width -
 					220) /
 					2, 60 * (int) density, "Cancel");
 			final APButton save = new APButton(50 + (applet.width - 220) / 2, 50 + nextYPos, (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
 			apContainer.addWidget(cancel);
+			cancel.getView().setBackgroundColor(0);
 			apContainer.addWidget(save);
+
+			save.addOnClickWidgetListener(new OnClickWidgetListener() {
+				@Override
+				public void onClickWidget(APWidget apWidget) {
+					VideOSCSensors.useOri = useOri.isChecked();
+					VideOSCSensors.useAcc = useAcc.isChecked();
+					VideOSCSensors.useMag = useMag.isChecked();
+					VideOSCSensors.useGrav = useGrav.isChecked();
+					VideOSCSensors.useProx = useProx.isChecked();
+					VideOSCSensors.useLight = useLight.isChecked();
+					VideOSCSensors.usePress = usePress.isChecked();
+					VideOSCSensors.useTemp = useTemp.isChecked();
+					VideOSCSensors.useLinAcc = useLinAcc.isChecked();
+					VideOSCSensors.useHum = useHum.isChecked();
+					VideOSCSensors.useGPS = useGps.isChecked();
+
+					boolean querySuccess = VideOSCDB.updateSensorsSettings(db);
+					if (querySuccess) {
+						apContainer.removeWidget(useOri);
+						apContainer.removeWidget(useAcc);
+						apContainer.removeWidget(useMag);
+						apContainer.removeWidget(useGrav);
+						apContainer.removeWidget(useProx);
+						apContainer.removeWidget(useLight);
+						apContainer.removeWidget(usePress);
+						apContainer.removeWidget(useTemp);
+						apContainer.removeWidget(useLinAcc);
+						apContainer.removeWidget(useHum);
+						apContainer.removeWidget(useGps);
+						apContainer.removeWidget(save);
+						apContainer.removeWidget(cancel);
+						curOptions = "";
+					} else {
+						KetaiAlertDialog.popup(applet, "SQL Error", "Updateting sensors settings failed");
+					}
+				}
+			});
 
 			cancel.addOnClickWidgetListener(new OnClickWidgetListener() {
 				@Override
 				public void onClickWidget(APWidget apWidget) {
-//					if (useOri != null)
-//						apContainer.removeWidget(useOri);
-//					if (useAcc != null)
-//						apContainer.removeWidget(useAcc);
-//					if (useLinAcc != null)
-//						apContainer.removeWidget(useLinAcc);
-//					if (useMag != null)
-//						apContainer.removeWidget(useMag);
-//					apContainer.removeWidget(useGrav);
-//					if (useProx != null)
-//						apContainer.removeWidget(useProx);
-//					if (useLight != null)
-//						apContainer.removeWidget(useLight);
-//					if (usePress != null)
-//						apContainer.removeWidget(usePress);
-//					if (useTemp != null)
-//						apContainer.removeWidget(useTemp);
-//					if (useHum != null)
-//						apContainer.removeWidget(useHum);
+					apContainer.removeWidget(useOri);
+					apContainer.removeWidget(useAcc);
+					apContainer.removeWidget(useLinAcc);
+					apContainer.removeWidget(useMag);
+					apContainer.removeWidget(useGrav);
+					apContainer.removeWidget(useProx);
+					apContainer.removeWidget(useLight);
+					apContainer.removeWidget(usePress);
+					apContainer.removeWidget(useTemp);
+					apContainer.removeWidget(useHum);
 					apContainer.removeWidget(useGps);
 					apContainer.removeWidget(save);
 					apContainer.removeWidget(cancel);

@@ -35,7 +35,7 @@ public class VideOSCDB extends VideOSC {
 				success = db.execute(CREATE_NETWORK_SETTINGS_SQL);
 
 				if (success) {
-					success = db.execute("INSERT into vosc_connect_data (`host_ip`, `host_port`, " +
+					success = db.execute("INSERT INTO vosc_connect_data (`host_ip`, `host_port`, " +
 							"`receive_port`, `root_cmd` ) VALUES ('"
 							+ sendAddr
 							+ "', '"
@@ -79,7 +79,7 @@ public class VideOSCDB extends VideOSC {
 				success = db.execute(CREATE_RESOLUTION_SETUP_SQL);
 
 				if (success) {
-					success = db.execute("INSERT into vosc_resolution_setup (`res_w`, `res_h`, " +
+					success = db.execute("INSERT INTO vosc_resolution_setup (`res_w`, `res_h`, " +
 							"`framerate`, " +
 							"`calc_period`, `normalisation`) VALUES ('"
 							+ resW
@@ -135,6 +135,71 @@ public class VideOSCDB extends VideOSC {
 		}
 	}
 
+	static boolean setUpSensors(PApplet applet, KetaiSQLite db) {
+		boolean success = false;
+
+		if (db.connect()) {
+//			if (db.execute("DROP TABLE vosc_sensors;"))
+//				Log.d(TAG, "Successfully deleted table 'vosc_sensors'");
+			String CREATE_SENSORS_TABLE = "CREATE TABLE vosc_sensors (" +
+					"ori INTEGER NOT NULL DEFAULT 0," +
+					"acc INTEGER NOT NULL DEFAULT 0, " +
+					"magn INTEGER NOT NULL DEFAULT 0, " +
+					"grav INTEGER NOT NULL DEFAULT 0, " +
+					"prox INTEGER NOT NULL DEFAULT 0, " +
+					"light INTEGER NOT NULL DEFAULT 0, " +
+					"press INTEGER NOT NULL DEFAULT 0, " +
+					"temp INTEGER NOT NULL DEFAULT 0, " +
+					"linAcc INTEGER NOT NULL DEFAULT 0, " +
+					"hum INTEGER NOT NULL DEFAULT 0, " +
+					"gps INTEGER NOT NULL DEFAULT 0" +
+			");";
+
+			if (!db.tableExists("vosc_sensors")) {
+				success = db.execute(CREATE_SENSORS_TABLE);
+				if (success) {
+					db.execute("INSERT INTO vosc_sensors (`ori`, `acc`, `magn`, `grav`, `prox`, " +
+					"`light`, `press`, `temp`, `linAcc`, `hum`, `gps`) VALUES (" +
+							(VideOSCSensors.useOri ? 1 : 0) +
+							", " + (VideOSCSensors.useAcc ? 1 : 0) +
+							", " + (VideOSCSensors.useMag ? 1 : 0) +
+							", " + (VideOSCSensors.useGrav ? 1 : 0) +
+							", " + (VideOSCSensors.useProx ? 1 : 0) +
+							", " + (VideOSCSensors.useLight ? 1 : 0) +
+							", " + (VideOSCSensors.usePress ? 1 : 0) +
+							", " + (VideOSCSensors.useTemp ? 1 : 0) +
+							", " + (VideOSCSensors.useLinAcc ? 1 : 0) +
+							", " + (VideOSCSensors.useHum ? 1 : 0) +
+							", " + (VideOSCSensors.useGPS ? 1 : 0) + ");"
+					);
+				} else {
+					KetaiAlertDialog.popup(applet, "SQL Error", "Creating database table for " +
+							"sensors failed");
+				}
+			} else {
+				success = db.query("SELECT * FROM vosc_sensors;");
+				if (success) {
+					while (db.next()) {
+						Log.d(TAG, "orientation: " + db.getInt("ori"));
+						VideOSCSensors.useOri = db.getInt("ori") > 0;
+						VideOSCSensors.useAcc = db.getInt("acc") > 0;
+						VideOSCSensors.useMag = db.getInt("magn") > 0;
+						VideOSCSensors.useGrav = db.getInt("grav") > 0;
+						VideOSCSensors.useProx = db.getInt("prox") > 0;
+						VideOSCSensors.useLight = db.getInt("light") > 0;
+						VideOSCSensors.usePress = db.getInt("press") > 0;
+						VideOSCSensors.useTemp = db.getInt("temp") > 0;
+						VideOSCSensors.useLinAcc = db.getInt("linAcc") > 0;
+						VideOSCSensors.useHum = db.getInt("hum") > 0;
+						VideOSCSensors.useGPS = db.getInt("gps") > 0;
+					}
+				}
+			}
+		}
+
+		return success;
+	}
+
 	static boolean updateNetworkSettings(KetaiSQLite db) {
 		boolean success = false;
 
@@ -157,6 +222,30 @@ public class VideOSCDB extends VideOSC {
 					+ ", calc_period=" + calcsPerPeriod + ", normalisation=" + (normalize ? 1 : 0)
 					+ ";");
 		}
+
+		return success;
+	}
+
+	static boolean updateSensorsSettings(KetaiSQLite db) {
+		boolean success = false;
+
+		if (db.connect()) {
+			success = db.execute("UPDATE vosc_sensors " +
+			"SET ori=" + (VideOSCSensors.useOri ? 1 : 0) +
+					", acc=" + (VideOSCSensors.useAcc ? 1 : 0) +
+					", magn=" + (VideOSCSensors.useMag ? 1 : 0) +
+					", grav=" + (VideOSCSensors.useGrav ? 1 : 0) +
+					", prox=" + (VideOSCSensors.useProx ? 1 : 0) +
+					", light=" + (VideOSCSensors.useLight ? 1 : 0) +
+					", press=" + (VideOSCSensors.usePress ? 1 : 0) +
+					", temp=" + (VideOSCSensors.useTemp ? 1 : 0) +
+					", linAcc=" + (VideOSCSensors.useLinAcc ? 1 : 0) +
+					", hum=" + (VideOSCSensors.useHum ? 1 : 0) +
+					", gps=" + (VideOSCSensors.useGPS ? 1 : 0) + ";"
+			);
+		}
+
+//		Log.d(TAG, "sensors updated: " + success);
 
 		return success;
 	}

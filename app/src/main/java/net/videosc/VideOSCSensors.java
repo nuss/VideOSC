@@ -19,12 +19,16 @@ public class VideOSCSensors extends VideOSC {
     static volatile long oriTime;
     static volatile int oriAcc;
 
+    static boolean useOri = false;
+
     // acceleration sensor values
     static float accX;
     static float accY;
     static float accZ;
     static long accTime;
     static int accAcc;
+
+    static boolean useAcc = false;
 
     // magnetic field sensor values
     static float magX;
@@ -33,6 +37,8 @@ public class VideOSCSensors extends VideOSC {
     static long magTime;
     static int magAcc;
 
+    static boolean useMag = false;
+
     // gravity sensor values
     static float gravX;
     static float gravY;
@@ -40,25 +46,35 @@ public class VideOSCSensors extends VideOSC {
     static long gravTime;
     static int gravAcc;
 
+    static boolean useGrav = false;
+
     // proximity sensor
     static float proxDist;
     static long proxTime;
     static int proxAcc;
+
+    static boolean useProx = false;
 
     // light sensor
     static float lightIntensity;
     static long lightTime;
     static int lightAcc;
 
+    static boolean useLight = false;
+
     // air pressure sensor
     static float pressIntensity;
     static long pressTime;
     static int pressAcc;
 
+    static boolean usePress = false;
+
     // temperature sensor
     static float tempCels;
     static long tempTime;
     static int tempAcc;
+
+    static boolean useTemp = false;
 
     // linear acceleration sensor: acceleration force in m/s^2, minus gravity
     static float linAccX;
@@ -67,13 +83,19 @@ public class VideOSCSensors extends VideOSC {
     static long linAccTime;
     static int linAccAcc;
 
+    static boolean useLinAcc = false;
+
     // humidity sensor
     static float humidity;
+
+    static boolean useHum = false;
 
     // GPS support
     static float gpsLong;
     static float gpsLat;
     static int gpsAcc;
+
+    static boolean useGPS = false;
 
     static void availableSensors() {
         Log.d(TAG, "is orientation available: " + sensors.isOrientationAvailable());
