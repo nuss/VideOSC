@@ -10,8 +10,6 @@ import oscP5.OscMessage;
  */
 
 public class VideOSCSensorRunnable implements Runnable {
-    static volatile boolean runSensors = false;
-
     private static OscMessage oscOri;
     private static OscMessage oscAcc;
     private static OscMessage oscMag;
@@ -22,7 +20,6 @@ public class VideOSCSensorRunnable implements Runnable {
     private static OscMessage oscTemp;
     private static OscMessage oscLinAcc;
     private static OscMessage oscHum;
-    private static OscMessage oscGeo;
 
     private static Thread sensorThread;
     private final String TAG = "VideOSCSensorRunnable";
@@ -58,6 +55,32 @@ public class VideOSCSensorRunnable implements Runnable {
                     oscLinAcc = VideOSCOscHandling.makeMessage(oscLinAcc, "/" + VideOSC.rootCmd + "/lin_acc");
                     oscLinAcc.add(VideOSCSensors.linAccX).add(VideOSCSensors.linAccY).add(VideOSCSensors.linAccZ).add(VideOSCSensors.linAccTime).add(VideOSCSensors.linAccAcc);
                     VideOSC.oscP5.send(oscLinAcc, VideOSC.broadcastLoc);
+                }
+                if (VideOSCSensors.useProx && VideOSC.sensors.isProximityAvailable()) {
+                    oscProx = VideOSCOscHandling.makeMessage(oscProx, "/" + VideOSC.rootCmd + "/prox");
+                    oscProx.add(VideOSCSensors.proxDist).add(VideOSCSensors.proxTime).add(VideOSCSensors.proxAcc);
+                    VideOSC.oscP5.send(oscProx, VideOSC.broadcastLoc);
+                }
+                if (VideOSCSensors.useLight && VideOSC.sensors.isLightAvailable()) {
+                    oscLight = VideOSCOscHandling.makeMessage(oscLight, "/" + VideOSC.rootCmd + "/light");
+                    oscLight.add(VideOSCSensors.lightIntensity).add(VideOSCSensors.lightTime).add(VideOSCSensors.lightAcc);
+                    VideOSC.oscP5.send(oscLight, VideOSC.broadcastLoc);
+                }
+                if (VideOSCSensors.usePress && VideOSC.sensors.isPressureAvailable()) {
+                    oscPress = VideOSCOscHandling.makeMessage(oscPress, "/" + VideOSC.rootCmd + "/press");
+                    oscPress.add(VideOSCSensors.pressIntensity).add(VideOSCSensors.pressTime).add(VideOSCSensors.pressAcc);
+                    VideOSC.oscP5.send(oscPress, VideOSC.broadcastLoc);
+                }
+                if (VideOSCSensors.useTemp && VideOSC.sensors.isAmbientTemperatureAvailable()) {
+                    oscTemp = VideOSCOscHandling.makeMessage(oscTemp, "/" + VideOSC.rootCmd + "/temp");
+//                    oscTemp.add(VideOSCSensors.tempCels).add(VideOSCSensors.tempTime).add(VideOSCSensors.tempAcc);
+                    oscTemp.add(VideOSCSensors.tempCels);
+                    VideOSC.oscP5.send(oscTemp, VideOSC.broadcastLoc);
+                }
+                if (VideOSCSensors.useHum && VideOSC.sensors.isRelativeHumidityAvailable()) {
+                    oscHum = VideOSCOscHandling.makeMessage(oscHum, "/" + VideOSC.rootCmd + "/hum");
+                    oscHum.add(VideOSCSensors.humVal);
+                    VideOSC.oscP5.send(oscHum, VideOSC.broadcastLoc);
                 }
                 Thread.sleep(50);
             } catch (InterruptedException e) {

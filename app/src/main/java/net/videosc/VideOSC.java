@@ -15,6 +15,7 @@ import java.util.Set;
 
 import ketai.camera.KetaiCamera;
 import ketai.data.KetaiSQLite;
+import ketai.sensors.KetaiLocation;
 import ketai.sensors.KetaiSensor;
 import ketai.ui.KetaiAlertDialog;
 import ketai.ui.KetaiList;
@@ -122,7 +123,8 @@ public class VideOSC extends PApplet {
 	static long numSnapshots;
 
 	static KetaiSensor sensors;
-	static float oriX, oriY, oriZ;
+	static KetaiLocation location;
+	static volatile String provider;
 
 	public void setup() {
 		boolean querySuccess;
@@ -146,7 +148,13 @@ public class VideOSC extends PApplet {
 
 		sensors = new KetaiSensor(this);
 		sensors.start();
+		sensors.enableAllSensors();
 //		VideOSCSensors.availableSensors();
+
+		location = new KetaiLocation(this);
+		location.start();
+		provider = location.getProvider();
+		location.setUpdateRate(2000, 1);
 
 		imageMode(CENTER);
 
@@ -181,11 +189,6 @@ public class VideOSC extends PApplet {
 					"determined");
 		}
 
-		querySuccess = VideOSCDB.setUpSensors(this, db);
-		if (!querySuccess) {
-			KetaiAlertDialog.popup(this, "SQL Error", "The sensors settings could not be determined");
-		}
-
 		r = "/" + rootCmd + "/red";
 		g = "/" + rootCmd + "/green";
 		b = "/" + rootCmd + "/blue";
@@ -195,6 +198,16 @@ public class VideOSC extends PApplet {
 			KetaiAlertDialog.popup(this, "SQL Error", "The resolution settings could not be " +
 					"determined");
 		}
+
+		querySuccess = VideOSCDB.setUpSensors(this, db);
+		if (!querySuccess) {
+			KetaiAlertDialog.popup(this, "SQL Error", "The sensors settings could not be determined");
+		}
+
+		if (VideOSCSensors.useLoc)
+			location.start();
+		else
+			location.stop();
 
 		VideOSCDB.setUpSnapshots(this, db);
 		VideOSCDB.countSnapshots(this, db);
@@ -665,8 +678,8 @@ public class VideOSC extends PApplet {
 		}
 	}
 
+	// OSC sensor events
 	public void onOrientationEvent(float x, float y, float z, long time, int accuracy) {
-//		Log.d(TAG, "orientation event fired");
 		VideOSCSensors.orientationEvent(x, y, z, time, accuracy);
 	}
 
@@ -684,5 +697,30 @@ public class VideOSC extends PApplet {
 
 	public void onLinearAccelerationEvent(float x, float y, float z, long time, int accuracy) {
 		VideOSCSensors.linearAccelerationEvent(x, y, z, time, accuracy);
+	}
+
+	public void onProximityEvent(float distance, long time, int accuracy) {
+		VideOSCSensors.proximityEvent(distance, time, accuracy);
+	}
+
+	public void onLightEvent(float intensity, long time, int accuracy) {
+		VideOSCSensors.lightEvent(intensity, time, accuracy);
+	}
+
+	public void onPressureEvent(float pressure, long time, int accuracy) {
+		VideOSCSensors.pressureEvent(pressure, time, accuracy);
+	}
+
+	public void onAmbientTemperatureEvent(float temperature/*, long time, int accuracy*/) {
+		VideOSCSensors.temperatureEvent(temperature/*, time, accuracy*/);
+	}
+
+	public void onRelativeHumidityEvent(float humidity) {
+		VideOSCSensors.humidityEvent(humidity);
+	}
+
+	public void onLocationEvent(double latitude, double longitude, double altitude, float accuracy) {
+		Log.d(TAG, "latitude: " + latitude + ", longitude: " + longitude + ", altitude: " + altitude);
+		VideOSCSensors.gpsEvent(latitude, longitude, altitude, accuracy);
 	}
 }

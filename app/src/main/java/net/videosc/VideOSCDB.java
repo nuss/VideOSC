@@ -170,7 +170,7 @@ public class VideOSCDB extends VideOSC {
 							", " + (VideOSCSensors.useTemp ? 1 : 0) +
 							", " + (VideOSCSensors.useLinAcc ? 1 : 0) +
 							", " + (VideOSCSensors.useHum ? 1 : 0) +
-							", " + (VideOSCSensors.useGPS ? 1 : 0) + ");"
+							", " + (VideOSCSensors.useLoc ? 1 : 0) + ");"
 					);
 				} else {
 					KetaiAlertDialog.popup(applet, "SQL Error", "Creating database table for " +
@@ -191,7 +191,7 @@ public class VideOSCDB extends VideOSC {
 						VideOSCSensors.useTemp = db.getInt("temp") > 0;
 						VideOSCSensors.useLinAcc = db.getInt("linAcc") > 0;
 						VideOSCSensors.useHum = db.getInt("hum") > 0;
-						VideOSCSensors.useGPS = db.getInt("gps") > 0;
+						VideOSCSensors.useLoc = db.getInt("gps") > 0;
 					}
 				}
 			}
@@ -241,7 +241,7 @@ public class VideOSCDB extends VideOSC {
 					", temp=" + (VideOSCSensors.useTemp ? 1 : 0) +
 					", linAcc=" + (VideOSCSensors.useLinAcc ? 1 : 0) +
 					", hum=" + (VideOSCSensors.useHum ? 1 : 0) +
-					", gps=" + (VideOSCSensors.useGPS ? 1 : 0) + ";"
+					", gps=" + (VideOSCSensors.useLoc ? 1 : 0) + ";"
 			);
 		}
 

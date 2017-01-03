@@ -84,16 +84,17 @@ public class VideOSCSensors extends VideOSC {
     static boolean useLinAcc = false;
 
     // humidity sensor
-    static volatile float humidity;
+    static volatile float humVal;
 
     static boolean useHum = false;
 
-    // GPS support
-    static volatile float gpsLong;
-    static volatile float gpsLat;
-    static volatile int gpsAcc;
+    // geolocation support
+    static volatile double locLong;
+    static volatile double locLat;
+    static volatile double locAlt;
+    static volatile float locAcc;
 
-    static boolean useGPS = false;
+    static boolean useLoc = false;
 
     static void availableSensors() {
         Log.d(TAG, "is orientation available: " + sensors.isOrientationAvailable());
@@ -101,6 +102,7 @@ public class VideOSCSensors extends VideOSC {
         Log.d(TAG, "is magnetic field available: " + sensors.isMagenticFieldAvailable());
         sensors.enableAmibentTemperature();
         Log.d(TAG, "is ambient temperature available: " + sensors.isAmbientTemperatureAvailable());
+        Log.d(TAG, "is temperature available: " + sensors.isTemperatureAvailable());
         Log.d(TAG, "is pressure available: " + sensors.isPressureAvailable());
         Log.d(TAG, "is light sensor available: " + sensors.isLightAvailable());
         Log.d(TAG, "is proximity sensor available: " + sensors.isProximityAvailable());
@@ -162,5 +164,58 @@ public class VideOSCSensors extends VideOSC {
 
         if (oscP5 != null)
             VideOSCSensorRunnable.main(null);
+    }
+
+    static void proximityEvent(float dist, long time, int accuracy) {
+        proxDist = dist;
+        proxTime = time;
+        proxAcc = accuracy;
+
+        if (oscP5 != null)
+            VideOSCSensorRunnable.main(null);
+    }
+
+    static void lightEvent(float intensity, long time, int accuracy) {
+        lightIntensity = intensity;
+        lightTime = time;
+        lightAcc = accuracy;
+
+        if (oscP5 != null)
+            VideOSCSensorRunnable.main(null);
+    }
+
+    public static void pressureEvent(float pressure, long time, int accuracy) {
+        pressIntensity = pressure;
+        pressTime = time;
+        pressAcc = accuracy;
+
+        if (oscP5 != null)
+            VideOSCSensorRunnable.main(null);
+    }
+
+    public static void temperatureEvent(float temperature/*, long time, int accuracy*/) {
+        tempCels = temperature;
+//        tempTime = time;
+//        tempAcc = accuracy;
+
+        if (oscP5 != null)
+            VideOSCSensorRunnable.main(null);
+    }
+
+    public static void humidityEvent(float humidity) {
+        humVal = humidity;
+
+        if (oscP5 != null)
+            VideOSCSensorRunnable.main(null);
+    }
+
+    public static void gpsEvent(double latitude, double longitude, double altitude, float accuracy) {
+        locLat = latitude;
+        locLong = longitude;
+        locAlt = altitude;
+        locAcc = accuracy;
+
+        if (oscP5 != null)
+            VideOSCLocationRunnable.main(null);
     }
 }
