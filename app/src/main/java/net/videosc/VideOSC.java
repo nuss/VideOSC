@@ -666,6 +666,23 @@ public class VideOSC extends PApplet {
 	}
 
 	public void onOrientationEvent(float x, float y, float z, long time, int accuracy) {
+//		Log.d(TAG, "orientation event fired");
 		VideOSCSensors.orientationEvent(x, y, z, time, accuracy);
+	}
+
+	public void onAccelerometerEvent(float x, float y, float z, long time, int accuracy) {
+		VideOSCSensors.accelerometerEvent(x, y, z, time, accuracy);
+	}
+
+	public void onMagneticFieldEvent(float x, float y, float z, long time, int accuracy) {
+		VideOSCSensors.magneticFieldEvent(x, y, z, time, accuracy);
+	}
+
+	public void onGravityEvent(float x, float y, float z, long time, int accuracy) {
+		VideOSCSensors.gravityEvent(x, y, z, time, accuracy);
+	}
+
+	public void onLinearAccelerationEvent(float x, float y, float z, long time, int accuracy) {
+		VideOSCSensors.linearAccelerationEvent(x, y, z, time, accuracy);
 	}
 }

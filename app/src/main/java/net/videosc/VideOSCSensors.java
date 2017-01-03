@@ -3,8 +3,6 @@ package net.videosc;
 
 import android.util.Log;
 
-import ketai.sensors.KetaiSensor;
-
 /**
  * Created by stefan on 13.12.16.
  */
@@ -22,78 +20,78 @@ public class VideOSCSensors extends VideOSC {
     static boolean useOri = false;
 
     // acceleration sensor values
-    static float accX;
-    static float accY;
-    static float accZ;
-    static long accTime;
-    static int accAcc;
+    static volatile float accX;
+    static volatile float accY;
+    static volatile float accZ;
+    static volatile long accTime;
+    static volatile int accAcc;
 
     static boolean useAcc = false;
 
     // magnetic field sensor values
-    static float magX;
-    static float magY;
-    static float magZ;
-    static long magTime;
-    static int magAcc;
+    static volatile float magX;
+    static volatile float magY;
+    static volatile float magZ;
+    static volatile long magTime;
+    static volatile int magAcc;
 
     static boolean useMag = false;
 
     // gravity sensor values
-    static float gravX;
-    static float gravY;
-    static float gravZ;
-    static long gravTime;
-    static int gravAcc;
+    static volatile float gravX;
+    static volatile float gravY;
+    static volatile float gravZ;
+    static volatile long gravTime;
+    static volatile int gravAcc;
 
     static boolean useGrav = false;
 
     // proximity sensor
-    static float proxDist;
-    static long proxTime;
-    static int proxAcc;
+    static volatile float proxDist;
+    static volatile long proxTime;
+    static volatile int proxAcc;
 
     static boolean useProx = false;
 
     // light sensor
-    static float lightIntensity;
-    static long lightTime;
-    static int lightAcc;
+    static volatile float lightIntensity;
+    static volatile long lightTime;
+    static volatile int lightAcc;
 
     static boolean useLight = false;
 
     // air pressure sensor
-    static float pressIntensity;
-    static long pressTime;
-    static int pressAcc;
+    static volatile float pressIntensity;
+    static volatile long pressTime;
+    static volatile int pressAcc;
 
     static boolean usePress = false;
 
     // temperature sensor
-    static float tempCels;
-    static long tempTime;
-    static int tempAcc;
+    static volatile float tempCels;
+    static volatile long tempTime;
+    static volatile int tempAcc;
 
     static boolean useTemp = false;
 
     // linear acceleration sensor: acceleration force in m/s^2, minus gravity
-    static float linAccX;
-    static float linAccY;
-    static float linAccZ;
-    static long linAccTime;
-    static int linAccAcc;
+    static volatile float linAccX;
+    static volatile float linAccY;
+    static volatile float linAccZ;
+    static volatile long linAccTime;
+    static volatile int linAccAcc;
 
     static boolean useLinAcc = false;
 
     // humidity sensor
-    static float humidity;
+    static volatile float humidity;
 
     static boolean useHum = false;
 
     // GPS support
-    static float gpsLong;
-    static float gpsLat;
-    static int gpsAcc;
+    static volatile float gpsLong;
+    static volatile float gpsLat;
+    static volatile int gpsAcc;
 
     static boolean useGPS = false;
 
@@ -118,8 +116,51 @@ public class VideOSCSensors extends VideOSC {
         oriTime = time;
         oriAcc = accuracy;
 
-        if (oscP5 != null) {
+        if (oscP5 != null)
             VideOSCSensorRunnable.main(null);
-        }
+    }
+
+    static void accelerometerEvent(float x, float y, float z, long time, int accuracy) {
+        accX = x;
+        accY = y;
+        accZ = z;
+        accTime = time;
+        accAcc = accuracy;
+
+        if (oscP5 != null)
+            VideOSCSensorRunnable.main(null);
+    }
+
+    static void magneticFieldEvent(float x, float y, float z, long time, int accuracy) {
+        magX = x;
+        magY = y;
+        magZ = z;
+        magTime = time;
+        magAcc = accuracy;
+
+        if (oscP5 != null)
+            VideOSCSensorRunnable.main(null);
+    }
+
+    static void gravityEvent(float x, float y, float z, long time, int accuracy) {
+        gravX = x;
+        gravY = y;
+        gravZ = z;
+        gravTime = time;
+        gravAcc = accuracy;
+
+        if (oscP5 != null)
+            VideOSCSensorRunnable.main(null);
+    }
+
+    static void linearAccelerationEvent(float x, float y, float z, long time, int accuracy) {
+        linAccX = x;
+        linAccY = y;
+        linAccZ = z;
+        linAccTime = time;
+        linAccAcc = accuracy;
+
+        if (oscP5 != null)
+            VideOSCSensorRunnable.main(null);
     }
 }
