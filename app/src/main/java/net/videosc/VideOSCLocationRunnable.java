@@ -10,6 +10,11 @@ import oscP5.OscMessage;
 public class VideOSCLocationRunnable implements Runnable{
     private static OscMessage oscGeo;
     private static Thread locationThread;
+    // test
+    static volatile double latitude;
+    static volatile double longitude;
+    static volatile double altitude;
+
     private final static String TAG = "VideOSCLocationRunnable";
 
     @Override
@@ -18,7 +23,11 @@ public class VideOSCLocationRunnable implements Runnable{
         while (true) {
             try {
                 if (VideOSCSensors.useLoc && !VideOSC.provider.equals("none")) {
-                    Log.d(TAG, "latitude: " + VideOSCSensors.locLat + ", longitude: " + VideOSCSensors.locLong + ", altitude: " + VideOSCSensors.locAlt);
+                    // testing, testing...
+                    latitude = VideOSCSensors.locLat;
+                    longitude = VideOSCSensors.locLong;
+                    altitude = VideOSCSensors.locAlt;
+
                     oscGeo = VideOSCOscHandling.makeMessage(oscGeo, "/" + VideOSC.rootCmd + "/loc");
                     oscGeo.add(VideOSCSensors.locLat).add(VideOSCSensors.locLong).add(VideOSCSensors.locAlt).add(VideOSCSensors.locAcc);
                     VideOSC.oscP5.send(oscGeo, VideOSC.broadcastLoc);
