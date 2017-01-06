@@ -1,6 +1,12 @@
 package net.videosc;
 
+import android.content.Context;
 import android.hardware.Camera;
+import android.location.Criteria;
+import android.location.GpsStatus;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -123,8 +129,10 @@ public class VideOSC extends PApplet {
 	static long numSnapshots;
 
 	static KetaiSensor sensors;
-	static KetaiLocation location;
+//	static KetaiLocation location;
 	static volatile String provider;
+
+	static LocationManager locationManager;
 
 	public void setup() {
 		boolean querySuccess;
@@ -151,10 +159,13 @@ public class VideOSC extends PApplet {
 		sensors.enableAllSensors();
 //		VideOSCSensors.availableSensors();
 
-		location = new KetaiLocation(this);
-		location.start();
-		provider = location.getProvider();
-		location.setUpdateRate(2000, 1);
+//		location = new KetaiLocation(this);
+//		location.start();
+//		provider = location.getProvider();
+//		location.setUpdateRate(2000, 1);
+
+		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+		Log.d(TAG, "provider: " + locationManager.getProvider("gps"));
 
 		imageMode(CENTER);
 
@@ -204,10 +215,10 @@ public class VideOSC extends PApplet {
 			KetaiAlertDialog.popup(this, "SQL Error", "The sensors settings could not be determined");
 		}
 
-		if (VideOSCSensors.useLoc)
-			location.start();
-		else
-			location.stop();
+//		if (VideOSCSensors.useLoc)
+//			location.start();
+//		else
+//			location.stop();
 
 		VideOSCDB.setUpSnapshots(this, db);
 		VideOSCDB.countSnapshots(this, db);
@@ -719,8 +730,18 @@ public class VideOSC extends PApplet {
 		VideOSCSensors.humidityEvent(humidity);
 	}
 
-	public void onLocationEvent(double latitude, double longitude, double altitude, float accuracy) {
-		Log.d(TAG, "latitude: " + latitude + ", longitude: " + longitude + ", altitude: " + altitude);
-		VideOSCSensors.gpsEvent(latitude, longitude, altitude, accuracy);
+	public void onLocationChanged(Location location) {
+		VideOSCSensors.locLat = location.getLatitude();
+		VideOSCSensors.locLong = location.getLongitude();
+		VideOSCSensors.locAlt = location.getAltitude();
+		VideOSCSensors.locAcc = location.getAccuracy();
+
+		if (oscP5 != null)
+			VideOSCLocationRunnable.main(null);
 	}
+
+//	public void onLocationEvent(double latitude, double longitude, double altitude, float accuracy) {
+//		Log.d(TAG, "latitude: " + latitude + ", longitude: " + longitude + ", altitude: " + altitude);
+//		VideOSCSensors.gpsEvent(latitude, longitude, altitude, accuracy);
+//	}
 }
