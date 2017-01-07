@@ -1,15 +1,13 @@
 package net.videosc;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
-import android.location.Criteria;
-import android.location.GpsStatus;
-import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
@@ -31,6 +29,8 @@ import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
 
+import net.videosc.runnable.*;
+
 //import static net.videosc.VideOSCSensors.sensorThread;
 
 /**
@@ -47,8 +47,8 @@ public class VideOSC extends PApplet {
 	// Ketai Sensor Library for Android: http://KetaiProject.org
 
 	static KetaiCamera cam;
-	static OscP5 oscP5;
-	static NetAddress broadcastLoc;
+	public static OscP5 oscP5;
+	public static NetAddress broadcastLoc;
 	static NetAddress feedbackAddr;
 
 	// OSC messages to be sent to the remote client
@@ -95,7 +95,7 @@ public class VideOSC extends PApplet {
 	static boolean preferencesListInvisible;
 
 	static String sendAddr = "192.168.1.2";
-	static String rootCmd = "vosc";
+	public static String rootCmd = "vosc";
 	static String r = "/" + rootCmd + "/red";
 	static String g = "/" + rootCmd + "/green";
 	static String b = "/" + rootCmd + "/blue";
@@ -128,13 +128,11 @@ public class VideOSC extends PApplet {
 	static boolean showSnapshots = false;
 	static long numSnapshots;
 
-	static KetaiSensor sensors;
+	public static KetaiSensor sensors;
 	static KetaiLocation location;
-	static volatile String provider;
+	public static volatile String provider;
 
 	static LocationManager locationManager;
-
-	static int count = 0;
 
 	public void setup() {
 		boolean querySuccess;
@@ -482,7 +480,7 @@ public class VideOSC extends PApplet {
 
 		textAlign(CENTER, CENTER);
 		textSize(70);
-		text("Update: " + count + "\nLatitude: " + VideOSCLocationRunnable.latitude + "\n" +
+		text("Update: " + VideOSCSensors.locCount + "\nLatitude: " + VideOSCLocationRunnable.latitude + "\n" +
 				"Longitude: " + VideOSCLocationRunnable.longitude + "\n" +
 				"Altitude: " + VideOSCLocationRunnable.altitude + "\n" +
 				"Provider: " + location.getProvider(),  0, 0, width, height);
@@ -679,25 +677,26 @@ public class VideOSC extends PApplet {
 		}
 	}
 
-//	@Override
-//	public boolean onKeyDown(int keyCode, KeyEvent event)  {
-//		if (keyCode == KeyEvent.KEYCODE_BACK
-//				&& event.getRepeatCount() == 0) {
-//			Log.d(TAG, "onKeyDown Called");
-//			onBackPressed();
-//			return true;
-//		}
-//		return super.onKeyDown(keyCode, event);
-//	}
+	/*public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		if (keyCode == KeyEvent.KEYCODE_BACK
+				&& event.getRepeatCount() == 0) {
+			Log.d(TAG, "onKeyDown Called");
+			onBackPressed();
+			return true;
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 
 	@Override
 	public void onBackPressed() {
-//		Log.d(TAG, "onBackPressed Called");
-		keyCode = 0;
-		if (!curOptions.equals("")) {
+		Log.d("CDA", "onBackPressed Called");
+		if (!curOptions.equals(""))
 			curOptions = "";
-		}
-	}
+		Intent setIntent = new Intent(Intent.ACTION_MAIN);
+		setIntent.addCategory(Intent.CATEGORY_HOME);
+		setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		startActivity(setIntent);
+	}*/
 
 	// OSC sensor events
 	public void onOrientationEvent(float x, float y, float z, long time, int accuracy) {

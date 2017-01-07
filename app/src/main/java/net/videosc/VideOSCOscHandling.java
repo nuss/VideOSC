@@ -7,7 +7,7 @@ import oscP5.OscMessage;
  */
 
 public class VideOSCOscHandling extends VideOSC {
-    static OscMessage makeMessage(OscMessage msg, String cmd) {
+    public static OscMessage makeMessage(OscMessage msg, String cmd) {
 
         if (msg == null)
             msg = new OscMessage(cmd);
@@ -17,22 +17,6 @@ public class VideOSCOscHandling extends VideOSC {
         }
 
         return msg;
-    }
-
-    static void oscAdd(OscMessage msg, float val) {
-        msg.add(val);
-    }
-
-    static void oscAdd(OscMessage msg, String val) {
-        msg.add(val);
-    }
-
-    static void oscAdd(OscMessage msg, int val) {
-        msg.add(val);
-    }
-
-    static void oscAdd(OscMessage msg, long val) {
-        msg.add(val);
     }
 
     static void prepareFeedbackStrings(OscMessage fbMessage) {
