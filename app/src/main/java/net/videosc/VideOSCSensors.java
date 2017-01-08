@@ -70,8 +70,6 @@ public class VideOSCSensors extends VideOSC {
 
     // temperature sensor
     public static volatile float tempCels;
-    public static volatile long tempTime;
-    public static volatile int tempAcc;
 
     public static boolean useTemp = false;
 
@@ -102,7 +100,6 @@ public class VideOSCSensors extends VideOSC {
         Log.d(TAG, "is orientation available: " + sensors.isOrientationAvailable());
         Log.d(TAG, "is acceleration available: " + sensors.isAccelerometerAvailable());
         Log.d(TAG, "is magnetic field available: " + sensors.isMagenticFieldAvailable());
-        sensors.enableAmibentTemperature();
         Log.d(TAG, "is ambient temperature available: " + sensors.isAmbientTemperatureAvailable());
         Log.d(TAG, "is temperature available: " + sensors.isTemperatureAvailable());
         Log.d(TAG, "is pressure available: " + sensors.isPressureAvailable());
