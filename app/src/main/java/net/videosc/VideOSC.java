@@ -220,7 +220,7 @@ public class VideOSC extends PApplet {
 //			location.stop();
 
 		VideOSCDB.setUpSnapshots(this, db);
-		VideOSCDB.countSnapshots(this, db);
+		numSnapshots = VideOSCDB.countSnapshots(this, db);
 
 		pxWidth = width / resW;
 		pxHeight = height / resH;

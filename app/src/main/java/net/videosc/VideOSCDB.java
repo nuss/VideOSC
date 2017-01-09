@@ -369,13 +369,16 @@ public class VideOSCDB extends VideOSC {
 		}
 	}
 
-	static void countSnapshots(PApplet applet, KetaiSQLite db) {
+	static long countSnapshots(PApplet applet, KetaiSQLite db) {
+		long num = 0;
+
 		if (db.connect()) {
-			numSnapshots = db.getRecordCount("vosc_snapshots");
+			num = db.getRecordCount("vosc_snapshots");
 		} else {
-			numSnapshots = 0;
 			KetaiAlertDialog.popup(applet, "SQL Error", "The number of snapshots could not be " +
 					"determined");
 		}
+
+		return num;
 	}
 }
