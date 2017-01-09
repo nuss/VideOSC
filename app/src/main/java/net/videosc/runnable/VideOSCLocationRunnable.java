@@ -13,8 +13,6 @@ import oscP5.OscMessage;
 public class VideOSCLocationRunnable implements Runnable {
     private static OscMessage oscGeo;
     private static Thread locationThread;
-    // print values to screen
-	public volatile static String info;
 
     public static final Object locationLock = new Object();
 
@@ -32,7 +30,6 @@ public class VideOSCLocationRunnable implements Runnable {
 		                String longitude = ", longitude: " + VideOSCSensors.locLong;
 		                String altitude = ", altitude: " + VideOSCSensors.locAlt;
 		                VideOSCSensors.sensorsInUse.put("loc", "location - " + latitude + longitude + altitude);
-//		                info = "location - " + latitude + longitude + altitude;
 	                }
 
 	                oscGeo = VideOSCOscHandling.makeMessage(oscGeo, "/" + VideOSC.rootCmd + "/loc");

@@ -13,8 +13,6 @@ import oscP5.OscMessage;
 public class VideOSCHumidityRunnable implements Runnable {
     private static Thread humidityThread;
     public static final Object humidityLock = new Object();
-	//	print values to screen
-	public static volatile String info;
 
     private static OscMessage oscHum;
 
@@ -29,7 +27,6 @@ public class VideOSCHumidityRunnable implements Runnable {
 				    if (VideOSC.printSensors) {
 					    String humidity = "humidity: " + VideOSCSensors.humVal;
 					    VideOSCSensors.sensorsInUse.put("hum", "humidity sensor - " + humidity);
-//					    info = "humidity sensor - " + humidity;
 				    }
 				    oscHum = VideOSCOscHandling.makeMessage(oscHum, "/" + VideOSC.rootCmd + "/hum");
 					oscHum.add(VideOSCSensors.humVal);

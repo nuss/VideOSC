@@ -13,8 +13,6 @@ import oscP5.OscMessage;
 public class VideOSCProximityRunnable implements Runnable {
     private static Thread proximityThread;
     public final static Object proximityLock = new Object();
-    //	print values to screen
-    public volatile static String info;
 
     private OscMessage oscProx;
 
@@ -31,7 +29,6 @@ public class VideOSCProximityRunnable implements Runnable {
                         String time = ", timestamp: " + VideOSCSensors.proxTime;
                         String accuracy = ", accuracy: " + VideOSCSensors.proxAcc;
                         VideOSCSensors.sensorsInUse.put("prox", "proximity sensor - " + proximity + time + accuracy);
-//                        info = "proximity sensor - " + proximity + time + accuracy;
                     }
                     oscProx = VideOSCOscHandling.makeMessage(oscProx, "/" + VideOSC.rootCmd + "/prox");
                     oscProx.add(VideOSCSensors.proxDist).add(VideOSCSensors.proxTime).add(VideOSCSensors.proxAcc);

@@ -13,8 +13,6 @@ import oscP5.OscMessage;
 public class VideOSCGravityRunnable implements Runnable {
     private static Thread gravityThread;
     public static final Object gravityLock = new Object();
-	//	print values to screen
-	public volatile static String info;
 
     private static OscMessage oscGrav;
 
@@ -33,7 +31,6 @@ public class VideOSCGravityRunnable implements Runnable {
 		                String time = ", timestamp: " + VideOSCSensors.gravTime;
 		                String accuracy = ", accuracy: " + VideOSCSensors.gravAcc;
 		                VideOSCSensors.sensorsInUse.put("grav", "gravity sensor - " + xVal + yVal + zVal + time + accuracy);
-//		                info = "gravity sensor - " + xVal + yVal + zVal + time + accuracy;
 	                }
                     oscGrav = VideOSCOscHandling.makeMessage(oscGrav, "/" + VideOSC.rootCmd + "/grav");
                     oscGrav.add(VideOSCSensors.gravX).add(VideOSCSensors.gravY).add(VideOSCSensors.gravZ).add(VideOSCSensors.gravTime).add(VideOSCSensors.gravAcc);

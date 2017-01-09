@@ -2,7 +2,6 @@ package net.videosc;
 
 import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -155,7 +154,7 @@ public class VideOSCDB extends VideOSC {
 
 				if (success) {
 					success = db.execute("INSERT INTO vosc_sensors (`sensor`, `state`) VALUES " +
-							"('ori', 0), ('acc', 0), ('mag', 0), ('prox', 0), ('light', 0), ('temp', 0), ('linAcc', 0), ('hum', 0), ('gps', 0);");
+							"('ori', 0), ('acc', 0), ('mag', 0), ('grav', 0), ('prox', 0), ('light', 0), ('temp', 0), ('press', 0), ('linAcc', 0), ('hum', 0), ('gps', 0);");
 					if (!success)
 						KetaiAlertDialog.popup(applet, "SQL Error", "Inserting initial sensor values failed!");
 				} else {
