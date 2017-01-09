@@ -1,8 +1,15 @@
 package net.videosc;
 
-
 import android.util.Log;
 import net.videosc.runnable.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import apwidgets.APWidgetContainer;
+import processing.core.PApplet;
 
 /**
  * Created by stefan on 13.12.16.
@@ -96,6 +103,9 @@ public class VideOSCSensors extends VideOSC {
 
     public static boolean useLoc = false;
 
+	// strings to be printed to screen
+	public volatile static Map<String, String> sensorsInUse = new HashMap<String, String>();
+
     static void availableSensors() {
         Log.d(TAG, "is orientation available: " + sensors.isOrientationAvailable());
         Log.d(TAG, "is acceleration available: " + sensors.isAccelerometerAvailable());
@@ -105,7 +115,6 @@ public class VideOSCSensors extends VideOSC {
         Log.d(TAG, "is pressure available: " + sensors.isPressureAvailable());
         Log.d(TAG, "is light sensor available: " + sensors.isLightAvailable());
         Log.d(TAG, "is proximity sensor available: " + sensors.isProximityAvailable());
-        sensors.enableRelativeHumiditySensor();
         Log.d(TAG, "is humidity sensor available: " + sensors.isRelativeHumidityAvailable());
         Log.d(TAG, "is linear acceleration available: " + sensors.isLinearAccelerationAvailable());
     }
@@ -117,12 +126,10 @@ public class VideOSCSensors extends VideOSC {
         oriTime = time;
         oriAcc = accuracy;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCOrientationRunnable.orientationLock) {
-                VideOSCOrientationRunnable.main(null);
-                VideOSCOrientationRunnable.orientationLock.notify();
-            }
-        }
+	    synchronized (VideOSCOrientationRunnable.orientationLock) {
+		    VideOSCOrientationRunnable.main(null);
+		    VideOSCOrientationRunnable.orientationLock.notify();
+	    }
     }
 
     static void accelerometerEvent(float x, float y, float z, long time, int accuracy) {
@@ -132,12 +139,10 @@ public class VideOSCSensors extends VideOSC {
         accTime = time;
         accAcc = accuracy;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCAccelerationRunnable.accelerometerLock) {
-                VideOSCAccelerationRunnable.main(null);
-                VideOSCAccelerationRunnable.accelerometerLock.notify();
-            }
-        }
+	    synchronized (VideOSCAccelerationRunnable.accelerometerLock) {
+		    VideOSCAccelerationRunnable.main(null);
+		    VideOSCAccelerationRunnable.accelerometerLock.notify();
+	    }
     }
 
     static void magneticFieldEvent(float x, float y, float z, long time, int accuracy) {
@@ -147,12 +152,10 @@ public class VideOSCSensors extends VideOSC {
         magTime = time;
         magAcc = accuracy;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCMagnetismRunnable.magnetismLock) {
-	            VideOSCMagnetismRunnable.main(null);
-	            VideOSCMagnetismRunnable.magnetismLock.notify();
-            }
-        }
+	    synchronized (VideOSCMagnetismRunnable.magnetismLock) {
+		    VideOSCMagnetismRunnable.main(null);
+		    VideOSCMagnetismRunnable.magnetismLock.notify();
+	    }
     }
 
     static void gravityEvent(float x, float y, float z, long time, int accuracy) {
@@ -162,12 +165,10 @@ public class VideOSCSensors extends VideOSC {
         gravTime = time;
         gravAcc = accuracy;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCGravityRunnable.gravityLock) {
-                VideOSCGravityRunnable.main(null);
-	            VideOSCGravityRunnable.gravityLock.notify();
-            }
-        }
+	    synchronized (VideOSCGravityRunnable.gravityLock) {
+		    VideOSCGravityRunnable.main(null);
+		    VideOSCGravityRunnable.gravityLock.notify();
+	    }
     }
 
     static void linearAccelerationEvent(float x, float y, float z, long time, int accuracy) {
@@ -177,12 +178,10 @@ public class VideOSCSensors extends VideOSC {
         linAccTime = time;
         linAccAcc = accuracy;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCLinearAccelerationRunnable.linearAccelerationLock) {
-	            VideOSCLinearAccelerationRunnable.main(null);
-	            VideOSCLinearAccelerationRunnable.linearAccelerationLock.notify();
-            }
-        }
+	    synchronized (VideOSCLinearAccelerationRunnable.linearAccelerationLock) {
+		    VideOSCLinearAccelerationRunnable.main(null);
+		    VideOSCLinearAccelerationRunnable.linearAccelerationLock.notify();
+	    }
     }
 
     static void proximityEvent(float dist, long time, int accuracy) {
@@ -190,12 +189,10 @@ public class VideOSCSensors extends VideOSC {
         proxTime = time;
         proxAcc = accuracy;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCProximityRunnable.proximityLock) {
-	            VideOSCProximityRunnable.main(null);
-	            VideOSCProximityRunnable.proximityLock.notify();
-            }
-        }
+	    synchronized (VideOSCProximityRunnable.proximityLock) {
+		    VideOSCProximityRunnable.main(null);
+		    VideOSCProximityRunnable.proximityLock.notify();
+	    }
     }
 
     static void lightEvent(float intensity, long time, int accuracy) {
@@ -203,12 +200,10 @@ public class VideOSCSensors extends VideOSC {
         lightTime = time;
         lightAcc = accuracy;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCLightsensorRunnable.lightsensorLock) {
-	            VideOSCLightsensorRunnable.main(null);
-	            VideOSCLightsensorRunnable.lightsensorLock.notify();
-            }
-        }
+	    synchronized (VideOSCLightsensorRunnable.lightsensorLock) {
+		    VideOSCLightsensorRunnable.main(null);
+		    VideOSCLightsensorRunnable.lightsensorLock.notify();
+	    }
     }
 
     public static void pressureEvent(float pressure, long time, int accuracy) {
@@ -216,36 +211,28 @@ public class VideOSCSensors extends VideOSC {
         pressTime = time;
         pressAcc = accuracy;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCPressureRunnable.pressureLock) {
-	            VideOSCPressureRunnable.main(null);
-	            VideOSCPressureRunnable.pressureLock.notify();
-            }
-        }
+	    synchronized (VideOSCPressureRunnable.pressureLock) {
+		    VideOSCPressureRunnable.main(null);
+		    VideOSCPressureRunnable.pressureLock.notify();
+	    }
     }
 
     public static void temperatureEvent(float temperature/*, long time, int accuracy*/) {
         tempCels = temperature;
-//        tempTime = time;
-//        tempAcc = accuracy;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCTemperatureRunnable.temperatureLock) {
-	            VideOSCTemperatureRunnable.main(null);
-	            VideOSCTemperatureRunnable.temperatureLock.notify();
-            }
-        }
+	    synchronized (VideOSCTemperatureRunnable.temperatureLock) {
+		    VideOSCTemperatureRunnable.main(null);
+		    VideOSCTemperatureRunnable.temperatureLock.notify();
+	    }
     }
 
     public static void humidityEvent(float humidity) {
         humVal = humidity;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCHumidityRunnable.humidityLock) {
-	            VideOSCHumidityRunnable.main(null);
-	            VideOSCHumidityRunnable.humidityLock.notify();
-            }
-        }
+	    synchronized (VideOSCHumidityRunnable.humidityLock) {
+		    VideOSCHumidityRunnable.main(null);
+		    VideOSCHumidityRunnable.humidityLock.notify();
+	    }
     }
 
     public static void gpsEvent(double latitude, double longitude, double altitude, float accuracy) {
@@ -255,11 +242,30 @@ public class VideOSCSensors extends VideOSC {
         locAcc = accuracy;
         locCount++;
 
-        if (oscP5 != null) {
-            synchronized (VideOSCLocationRunnable.locationLock) {
-                VideOSCLocationRunnable.main(null);
-                VideOSCLocationRunnable.locationLock.notify();
-            }
-        }
+	    synchronized (VideOSCLocationRunnable.locationLock) {
+		    VideOSCLocationRunnable.main(null);
+		    VideOSCLocationRunnable.locationLock.notify();
+	    }
+    }
+
+    static void printSensors(final PApplet applet) {
+		final APWidgetContainer container = new APWidgetContainer(applet);
+	    APText text;
+	    ArrayList<APText> texts = new ArrayList<APText>();
+	    int nextYPos = 50;
+
+	    applet.fill(0, 153);
+	    applet.rect(0, 0, applet.width, applet.height);
+
+	    for (String key : VideOSCSensors.sensorsInUse.keySet()) {
+		    text = new APText(50, nextYPos, applet.width - 230, 150);
+		    text.setText(VideOSCSensors.sensorsInUse.get(key));
+		    texts.add(text);
+		    nextYPos = text.getY() + text.getHeight() + 10;
+	    }
+
+	    for (APText t : texts) {
+		    container.addWidget(t);
+	    }
     }
 }

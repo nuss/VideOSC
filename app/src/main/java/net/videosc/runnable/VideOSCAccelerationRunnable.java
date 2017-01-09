@@ -13,6 +13,8 @@ import oscP5.OscMessage;
 public class VideOSCAccelerationRunnable implements Runnable {
     private static Thread accelerometerThread;
     public static final Object accelerometerLock = new Object();
+	//	print values to screen;
+	public static String info;
 
 	private static OscMessage oscAcc;
 
@@ -24,11 +26,18 @@ public class VideOSCAccelerationRunnable implements Runnable {
         while (true) {
             synchronized (accelerometerLock) {
                 try {
-                    if (VideOSCSensors.useAcc && VideOSC.sensors.isAccelerometerAvailable()) {
-                        oscAcc = VideOSCOscHandling.makeMessage(oscAcc, "/" + VideOSC.rootCmd + "/acc");
-                        oscAcc.add(VideOSCSensors.accX).add(VideOSCSensors.accY).add(VideOSCSensors.oriZ).add(VideOSCSensors.accTime).add(VideOSCSensors.accAcc);
-                        VideOSC.oscP5.send(oscAcc, VideOSC.broadcastLoc);
-                    }
+	                if (VideOSC.printSensors) {
+		                String xVal = "x: " + VideOSCSensors.accX;
+		                String yVal = ", y: " + VideOSCSensors.accY;
+		                String zVal = ", z: " + VideOSCSensors.accZ;
+		                String time = ", timestamp: " + VideOSCSensors.accTime;
+		                String accuracy = ", accuracy: " + VideOSCSensors.accAcc;
+		                VideOSCSensors.sensorsInUse.put("acc", "accelerometer - " + xVal + yVal + zVal + time + accuracy);
+//		                info = "accelerometer - " + xVal + yVal + zVal + time + accuracy;
+	                }
+                    oscAcc = VideOSCOscHandling.makeMessage(oscAcc, "/" + VideOSC.rootCmd + "/acc");
+                    oscAcc.add(VideOSCSensors.accX).add(VideOSCSensors.accY).add(VideOSCSensors.oriZ).add(VideOSCSensors.accTime).add(VideOSCSensors.accAcc);
+                    VideOSC.oscP5.send(oscAcc, VideOSC.broadcastLoc);
                     accelerometerLock.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

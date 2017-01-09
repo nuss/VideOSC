@@ -13,6 +13,8 @@ import oscP5.OscMessage;
 public class VideOSCTemperatureRunnable implements Runnable {
 	private static Thread temperatureThread;
 	public final static Object temperatureLock = new Object();
+	//	print values to screen
+	public volatile static String info;
 
 	private static OscMessage oscTemp;
 
@@ -24,11 +26,14 @@ public class VideOSCTemperatureRunnable implements Runnable {
 		while (true) {
 			synchronized (temperatureLock) {
 				try {
-					if (VideOSCSensors.useTemp && VideOSC.sensors.isAmbientTemperatureAvailable()) {
-						oscTemp = VideOSCOscHandling.makeMessage(oscTemp, "/" + VideOSC.rootCmd + "/temp");
-						oscTemp.add(VideOSCSensors.tempCels);
-						VideOSC.oscP5.send(oscTemp, VideOSC.broadcastLoc);
+					if (VideOSC.printSensors) {
+						String temperature = "temperature: " + VideOSCSensors.tempCels;
+						VideOSCSensors.sensorsInUse.put("temp", "temperature sensor - " + temperature + "°C");
+//						info = "temperature sensor - " + temperature + "°C";
 					}
+					oscTemp = VideOSCOscHandling.makeMessage(oscTemp, "/" + VideOSC.rootCmd + "/temp");
+					oscTemp.add(VideOSCSensors.tempCels);
+					VideOSC.oscP5.send(oscTemp, VideOSC.broadcastLoc);
 					temperatureLock.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();

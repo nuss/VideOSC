@@ -13,6 +13,8 @@ import oscP5.OscMessage;
 public class VideOSCLightsensorRunnable implements Runnable {
 	private static Thread lightsensorThread;
 	public final static Object lightsensorLock = new Object();
+	//	print values to screen
+	public volatile static String info;
 
 	private static OscMessage oscLight;
 
@@ -24,11 +26,16 @@ public class VideOSCLightsensorRunnable implements Runnable {
         while (true) {
 	        synchronized (lightsensorLock) {
 		        try {
-			        if (VideOSCSensors.useLight && VideOSC.sensors.isLightAvailable()) {
-				        oscLight = VideOSCOscHandling.makeMessage(oscLight, "/" + VideOSC.rootCmd + "/light");
-				        oscLight.add(VideOSCSensors.lightIntensity).add(VideOSCSensors.lightTime).add(VideOSCSensors.lightAcc);
-				        VideOSC.oscP5.send(oscLight, VideOSC.broadcastLoc);
+			        if (VideOSC.printSensors) {
+				        String light = "intensity: " + VideOSCSensors.lightIntensity;
+				        String time = ", timestamp: " + VideOSCSensors.lightTime;
+				        String accuracy = ", accuracy: " + VideOSCSensors.lightAcc;
+				        VideOSCSensors.sensorsInUse.put("light", "light sensor - " + light + time + accuracy +"lx");
+//				        info = "light sensor - " + light + time + accuracy +"lx";
 			        }
+			        oscLight = VideOSCOscHandling.makeMessage(oscLight, "/" + VideOSC.rootCmd + "/light");
+			        oscLight.add(VideOSCSensors.lightIntensity).add(VideOSCSensors.lightTime).add(VideOSCSensors.lightAcc);
+			        VideOSC.oscP5.send(oscLight, VideOSC.broadcastLoc);
 			        lightsensorLock.wait();
 		        } catch (InterruptedException e) {
 			        e.printStackTrace();

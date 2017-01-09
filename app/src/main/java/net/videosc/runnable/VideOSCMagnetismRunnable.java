@@ -13,6 +13,8 @@ import oscP5.OscMessage;
 public class VideOSCMagnetismRunnable implements Runnable {
     private static Thread magnetismThread;
 	public static final Object magnetismLock = new Object();
+	//	print values to screen
+	public volatile static String info;
 
 	private static OscMessage oscMag;
 
@@ -24,11 +26,18 @@ public class VideOSCMagnetismRunnable implements Runnable {
 	    while (true) {
 		    synchronized (magnetismLock) {
 			    try {
-				    if (VideOSCSensors.useMag && VideOSC.sensors.isMagenticFieldAvailable()) {
-					    oscMag = VideOSCOscHandling.makeMessage(oscMag, "/" + VideOSC.rootCmd + "/mag");
-					    oscMag.add(VideOSCSensors.magX).add(VideOSCSensors.magY).add(VideOSCSensors.magZ).add(VideOSCSensors.magTime).add(VideOSCSensors.magAcc);
-					    VideOSC.oscP5.send(oscMag, VideOSC.broadcastLoc);
+				    if (VideOSC.printSensors) {
+					    String xVal = "x: " + VideOSCSensors.magX;
+					    String yVal = ", y: " + VideOSCSensors.magY;
+					    String zVal = ", z: " + VideOSCSensors.magZ;
+					    String time = ", timestamp: " + VideOSCSensors.magTime;
+					    String accuracy = ", accuracy: " + VideOSCSensors.magAcc;
+					    VideOSCSensors.sensorsInUse.put("mag", "magnetic field sensor - " + xVal + yVal + zVal + time + accuracy);
+//					    info = "magnetic field sensor - " + xVal + yVal + zVal + time + accuracy;
 				    }
+				    oscMag = VideOSCOscHandling.makeMessage(oscMag, "/" + VideOSC.rootCmd + "/mag");
+				    oscMag.add(VideOSCSensors.magX).add(VideOSCSensors.magY).add(VideOSCSensors.magZ).add(VideOSCSensors.magTime).add(VideOSCSensors.magAcc);
+				    VideOSC.oscP5.send(oscMag, VideOSC.broadcastLoc);
 				    magnetismLock.wait();
 			    } catch (InterruptedException e) {
 				    e.printStackTrace();

@@ -13,10 +13,8 @@ import oscP5.OscMessage;
 public class VideOSCLocationRunnable implements Runnable {
     private static OscMessage oscGeo;
     private static Thread locationThread;
-    // test
-    public static volatile double latitude;
-    public static volatile double longitude;
-    public static volatile double altitude;
+    // print values to screen
+	public volatile static String info;
 
     public static final Object locationLock = new Object();
 
@@ -24,20 +22,22 @@ public class VideOSCLocationRunnable implements Runnable {
 
     @Override
     public void run() {
-        //noinspection InfiniteLoopStatement
+	    //noinspection InfiniteLoopStatement
         while (true) {
             synchronized (locationLock) {
                 try {
-                    if (VideOSCSensors.useLoc && !VideOSC.provider.equals("none") && VideOSC.provider != null) {
-                        // testing, testing...
-                        latitude = VideOSCSensors.locLat;
-                        longitude = VideOSCSensors.locLong;
-                        altitude = VideOSCSensors.locAlt;
+                    // printed to screen
+	                if (VideOSC.printSensors) {
+		                String latitude = "latitude: " + VideOSCSensors.locLat;
+		                String longitude = ", longitude: " + VideOSCSensors.locLong;
+		                String altitude = ", altitude: " + VideOSCSensors.locAlt;
+		                VideOSCSensors.sensorsInUse.put("loc", "location - " + latitude + longitude + altitude);
+//		                info = "location - " + latitude + longitude + altitude;
+	                }
 
-                        oscGeo = VideOSCOscHandling.makeMessage(oscGeo, "/" + VideOSC.rootCmd + "/loc");
-                        oscGeo.add(VideOSCSensors.locLat).add(VideOSCSensors.locLong).add(VideOSCSensors.locAlt).add(VideOSCSensors.locAcc);
-                        VideOSC.oscP5.send(oscGeo, VideOSC.broadcastLoc);
-                    }
+	                oscGeo = VideOSCOscHandling.makeMessage(oscGeo, "/" + VideOSC.rootCmd + "/loc");
+                    oscGeo.add(VideOSCSensors.locLat).add(VideOSCSensors.locLong).add(VideOSCSensors.locAlt).add(VideOSCSensors.locAcc);
+	                VideOSC.oscP5.send(oscGeo, VideOSC.broadcastLoc);
                     locationLock.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

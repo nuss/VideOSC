@@ -1,13 +1,11 @@
 package net.videosc;
 
 import android.content.Context;
-import android.content.Intent;
 import android.hardware.Camera;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
@@ -131,6 +129,7 @@ public class VideOSC extends PApplet {
 	public static KetaiSensor sensors;
 	static KetaiLocation location;
 	public static volatile String provider;
+	public static volatile boolean printSensors = true;
 
 	static LocationManager locationManager;
 
@@ -478,13 +477,20 @@ public class VideOSC extends PApplet {
 		if (showHide)
 			VideOSCUI.setShowHideMenus(this);
 
-		textAlign(CENTER, CENTER);
-		textSize(70);
-		text("Update: " + VideOSCSensors.locCount + "\nLatitude: " + VideOSCLocationRunnable.latitude + "\n" +
-				"Longitude: " + VideOSCLocationRunnable.longitude + "\n" +
-				"Altitude: " + VideOSCLocationRunnable.altitude + "\n" +
-				"Provider: " + location.getProvider(),  0, 0, width, height);
+//		textAlign(CENTER, CENTER);
+//		textSize(40);
+//		text("Update: " + VideOSCSensors.locCount + "\nLatitude: " + VideOSCLocationRunnable.latitude + "\n" +
+//				"Longitude: " + VideOSCLocationRunnable.longitude + "\n" +
+//				"Altitude: " + VideOSCLocationRunnable.altitude + "\n" +
+//				"Provider: " + location.getProvider(),  0, 0, width, height);
 
+//		for (String key : VideOSCSensors.sensorsInUse.keySet()) {
+//			Log.d(TAG, VideOSCSensors.sensorsInUse.get(key));
+//		}
+
+		Log.d(TAG, "how many sensors: " + VideOSCSensors.sensorsInUse.size());
+
+//		VideOSCSensors.printSensors(this);
 	}
 
 	private void printOSC() {
@@ -700,46 +706,57 @@ public class VideOSC extends PApplet {
 
 	// OSC sensor events
 	public void onOrientationEvent(float x, float y, float z, long time, int accuracy) {
-		VideOSCSensors.orientationEvent(x, y, z, time, accuracy);
+		if (play && VideOSCSensors.useOri && oscP5 != null)
+			VideOSCSensors.orientationEvent(x, y, z, time, accuracy);
 	}
 
 	public void onAccelerometerEvent(float x, float y, float z, long time, int accuracy) {
-		VideOSCSensors.accelerometerEvent(x, y, z, time, accuracy);
+		if (play && VideOSCSensors.useAcc && oscP5 != null)
+			VideOSCSensors.accelerometerEvent(x, y, z, time, accuracy);
 	}
 
 	public void onMagneticFieldEvent(float x, float y, float z, long time, int accuracy) {
-		VideOSCSensors.magneticFieldEvent(x, y, z, time, accuracy);
+		if (play && VideOSCSensors.useMag && oscP5 != null)
+			VideOSCSensors.magneticFieldEvent(x, y, z, time, accuracy);
 	}
 
 	public void onGravityEvent(float x, float y, float z, long time, int accuracy) {
-		VideOSCSensors.gravityEvent(x, y, z, time, accuracy);
+		if (play && VideOSCSensors.useGrav && oscP5 != null)
+			VideOSCSensors.gravityEvent(x, y, z, time, accuracy);
 	}
 
 	public void onLinearAccelerationEvent(float x, float y, float z, long time, int accuracy) {
-		VideOSCSensors.linearAccelerationEvent(x, y, z, time, accuracy);
+		if (play && VideOSCSensors.useLinAcc && oscP5 != null)
+			VideOSCSensors.linearAccelerationEvent(x, y, z, time, accuracy);
 	}
 
 	public void onProximityEvent(float distance, long time, int accuracy) {
-		VideOSCSensors.proximityEvent(distance, time, accuracy);
+		if (play && VideOSCSensors.useProx && oscP5 != null)
+			VideOSCSensors.proximityEvent(distance, time, accuracy);
 	}
 
 	public void onLightEvent(float intensity, long time, int accuracy) {
-		VideOSCSensors.lightEvent(intensity, time, accuracy);
+		if (play && VideOSCSensors.useLight && oscP5 != null)
+			VideOSCSensors.lightEvent(intensity, time, accuracy);
 	}
 
 	public void onPressureEvent(float pressure, long time, int accuracy) {
-		VideOSCSensors.pressureEvent(pressure, time, accuracy);
+		if (play && VideOSCSensors.usePress && oscP5 != null)
+			VideOSCSensors.pressureEvent(pressure, time, accuracy);
 	}
 
-	public void onAmbientTemperatureEvent(float temperature/*, long time, int accuracy*/) {
-		VideOSCSensors.temperatureEvent(temperature/*, time, accuracy*/);
+	public void onAmbientTemperatureEvent(float temperature) {
+		if (play && VideOSCSensors.useTemp && oscP5 != null)
+			VideOSCSensors.temperatureEvent(temperature);
 	}
 
 	public void onRelativeHumidityEvent(float humidity) {
-		VideOSCSensors.humidityEvent(humidity);
+		if (play && VideOSCSensors.useHum && oscP5 != null)
+			VideOSCSensors.humidityEvent(humidity);
 	}
 
 	public void onLocationEvent(double latitude, double longitude, double altitude, float accuracy) {
-		VideOSCSensors.gpsEvent(latitude, longitude, altitude, accuracy);
+		if (play && VideOSCSensors.useLoc && oscP5 != null)
+			VideOSCSensors.gpsEvent(latitude, longitude, altitude, accuracy);
 	}
 }

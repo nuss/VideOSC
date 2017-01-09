@@ -13,6 +13,8 @@ import oscP5.OscMessage;
 public class VideOSCLinearAccelerationRunnable implements Runnable {
 	private static Thread linearAccelerationThread;
 	public final static Object linearAccelerationLock = new Object();
+	//	print values to screen
+	public volatile static String info;
 
 	private static OscMessage oscLinAcc;
 
@@ -24,11 +26,18 @@ public class VideOSCLinearAccelerationRunnable implements Runnable {
 	    while (true) {
 		    synchronized (linearAccelerationLock) {
 			    try {
-				    if (VideOSCSensors.useLinAcc && VideOSC.sensors.isLinearAccelerationAvailable()) {
-					    oscLinAcc = VideOSCOscHandling.makeMessage(oscLinAcc, "/" + VideOSC.rootCmd + "/lin_acc");
-					    oscLinAcc.add(VideOSCSensors.linAccX).add(VideOSCSensors.linAccY).add(VideOSCSensors.linAccZ).add(VideOSCSensors.linAccTime).add(VideOSCSensors.linAccAcc);
-					    VideOSC.oscP5.send(oscLinAcc, VideOSC.broadcastLoc);
+				    if (VideOSC.printSensors) {
+					    String xVal = "x: " + VideOSCSensors.linAccX;
+					    String yVal = ", y: " + VideOSCSensors.linAccY;
+					    String zVal = ", z: " + VideOSCSensors.linAccZ;
+					    String time = ", timestamp: " + VideOSCSensors.linAccTime;
+					    String accuracy = ", accuracy: " + VideOSCSensors.linAccAcc;
+					    VideOSCSensors.sensorsInUse.put("linAcc", "linear acceleration - " + xVal + yVal + zVal + time + accuracy);
+//					    info = "linear acceleration - " + xVal + yVal + zVal + time + accuracy;
 				    }
+				    oscLinAcc = VideOSCOscHandling.makeMessage(oscLinAcc, "/" + VideOSC.rootCmd + "/lin_acc");
+				    oscLinAcc.add(VideOSCSensors.linAccX).add(VideOSCSensors.linAccY).add(VideOSCSensors.linAccZ).add(VideOSCSensors.linAccTime).add(VideOSCSensors.linAccAcc);
+				    VideOSC.oscP5.send(oscLinAcc, VideOSC.broadcastLoc);
 				    linearAccelerationLock.wait();
 			    } catch (InterruptedException e) {
 				    e.printStackTrace();

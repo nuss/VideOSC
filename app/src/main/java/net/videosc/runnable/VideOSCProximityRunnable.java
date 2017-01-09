@@ -13,6 +13,8 @@ import oscP5.OscMessage;
 public class VideOSCProximityRunnable implements Runnable {
     private static Thread proximityThread;
     public final static Object proximityLock = new Object();
+    //	print values to screen
+    public volatile static String info;
 
     private OscMessage oscProx;
 
@@ -24,11 +26,16 @@ public class VideOSCProximityRunnable implements Runnable {
         while (true) {
             synchronized (proximityLock) {
                 try {
-                    if (VideOSCSensors.useProx && VideOSC.sensors.isProximityAvailable()) {
-                        oscProx = VideOSCOscHandling.makeMessage(oscProx, "/" + VideOSC.rootCmd + "/prox");
-                        oscProx.add(VideOSCSensors.proxDist).add(VideOSCSensors.proxTime).add(VideOSCSensors.proxAcc);
-                        VideOSC.oscP5.send(oscProx, VideOSC.broadcastLoc);
+                    if (VideOSC.printSensors) {
+                        String proximity = "distance: " + VideOSCSensors.proxDist;
+                        String time = ", timestamp: " + VideOSCSensors.proxTime;
+                        String accuracy = ", accuracy: " + VideOSCSensors.proxAcc;
+                        VideOSCSensors.sensorsInUse.put("prox", "proximity sensor - " + proximity + time + accuracy);
+//                        info = "proximity sensor - " + proximity + time + accuracy;
                     }
+                    oscProx = VideOSCOscHandling.makeMessage(oscProx, "/" + VideOSC.rootCmd + "/prox");
+                    oscProx.add(VideOSCSensors.proxDist).add(VideOSCSensors.proxTime).add(VideOSCSensors.proxAcc);
+                    VideOSC.oscP5.send(oscProx, VideOSC.broadcastLoc);
                     proximityLock.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

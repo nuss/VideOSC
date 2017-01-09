@@ -13,6 +13,8 @@ import oscP5.OscMessage;
 public class VideOSCOrientationRunnable implements Runnable {
     private static Thread orientationThread;
     public static final Object orientationLock = new Object();
+    //	print values to screen
+    public volatile static String info;
 
     private static OscMessage oscOri;
 
@@ -24,11 +26,18 @@ public class VideOSCOrientationRunnable implements Runnable {
         while (true) {
             synchronized (orientationLock) {
                 try {
-                    if (VideOSCSensors.useOri && VideOSC.sensors.isOrientationAvailable()) {
-                        oscOri = VideOSCOscHandling.makeMessage(oscOri, "/" + VideOSC.rootCmd + "/ori");
-                        oscOri.add(VideOSCSensors.oriX).add(VideOSCSensors.oriY).add(VideOSCSensors.oriZ).add(VideOSCSensors.oriTime).add(VideOSCSensors.oriAcc);
-                        VideOSC.oscP5.send(oscOri, VideOSC.broadcastLoc);
+                    if (VideOSC.printSensors) {
+                        String xVal = "x: " + VideOSCSensors.oriX;
+                        String yVal = ", y: " + VideOSCSensors.oriY;
+                        String zVal = ", z: " + VideOSCSensors.oriZ;
+                        String time = ", timestamp: " + VideOSCSensors.oriTime;
+                        String accuracy = ", accuracy: " + VideOSCSensors.oriAcc;
+	                    VideOSCSensors.sensorsInUse.put("ori", "orientation sensor - " + xVal + yVal + zVal + time + accuracy);
+//                        info = "orientation sensor - " + xVal + yVal + zVal + time + accuracy;
                     }
+                    oscOri = VideOSCOscHandling.makeMessage(oscOri, "/" + VideOSC.rootCmd + "/ori");
+                    oscOri.add(VideOSCSensors.oriX).add(VideOSCSensors.oriY).add(VideOSCSensors.oriZ).add(VideOSCSensors.oriTime).add(VideOSCSensors.oriAcc);
+                    VideOSC.oscP5.send(oscOri, VideOSC.broadcastLoc);
                     orientationLock.wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

@@ -13,6 +13,8 @@ import oscP5.OscMessage;
 public class VideOSCPressureRunnable implements Runnable {
 	private static Thread pressureThread;
 	public final static Object pressureLock = new Object();
+	//	print values to screen
+	public volatile static String info;
 
 	private static OscMessage oscPress;
 
@@ -24,11 +26,16 @@ public class VideOSCPressureRunnable implements Runnable {
 		while (true) {
 			synchronized (pressureLock) {
 				try {
-					if (VideOSCSensors.usePress && VideOSC.sensors.isPressureAvailable()) {
-						oscPress = VideOSCOscHandling.makeMessage(oscPress, "/" + VideOSC.rootCmd + "/press");
-						oscPress.add(VideOSCSensors.pressIntensity).add(VideOSCSensors.pressTime).add(VideOSCSensors.pressAcc);
-						VideOSC.oscP5.send(oscPress, VideOSC.broadcastLoc);
+					if (VideOSC.printSensors) {
+						String pressure = "pressure: " + VideOSCSensors.pressIntensity;
+						String time = ", timestamp: " + VideOSCSensors.pressTime;
+						String accuracy = ", accuracy: " + VideOSCSensors.pressAcc;
+						VideOSCSensors.sensorsInUse.put("press", "air pressure sensor - " + pressure + time + accuracy + "hPa/mBar");
+//						info = "air pressure sensor - " + pressure + time + accuracy + "hPa/mBar";
 					}
+					oscPress = VideOSCOscHandling.makeMessage(oscPress, "/" + VideOSC.rootCmd + "/press");
+					oscPress.add(VideOSCSensors.pressIntensity).add(VideOSCSensors.pressTime).add(VideOSCSensors.pressAcc);
+					VideOSC.oscP5.send(oscPress, VideOSC.broadcastLoc);
 					pressureLock.wait();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
