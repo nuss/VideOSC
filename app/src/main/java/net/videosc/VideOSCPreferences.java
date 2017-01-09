@@ -489,27 +489,38 @@ public class VideOSCPreferences extends VideOSC {
                 public void onClickWidget(APWidget apWidget) {
                     VideOSCSensors.useOri = useOri.isChecked() && VideOSC.sensors.isOrientationAvailable();
 	                if (!useOri.isChecked()) VideOSCSensors.sensorsInUse.remove("ori");
+                    else VideOSCSensors.sensorsInUse.put("ori", "orientation sensors - no values yet");
 	                VideOSCSensors.useAcc = useAcc.isChecked() && VideOSC.sensors.isAccelerometerAvailable();
 	                if (!useAcc.isChecked()) VideOSCSensors.sensorsInUse.remove("acc");
+	                else VideOSCSensors.sensorsInUse.put("acc", "accelerometer - no values yet");
                     VideOSCSensors.useMag = useMag.isChecked() && VideOSC.sensors.isMagenticFieldAvailable();
 	                if (!useMag.isChecked()) VideOSCSensors.sensorsInUse.remove("mag");
+	                else VideOSCSensors.sensorsInUse.put("mag", "magnetic field sensor - no values yet");
 	                VideOSCSensors.useGrav = useGrav.isChecked() && ((!sensors.isGyroscopeAvailable() && sensors.isAccelerometerAvailable() && sensors.isMagenticFieldAvailable()) ||
                             (sensors.isGyroscopeAvailable() && sensors.isAccelerometerAvailable()));
 	                if (!useGrav.isChecked()) VideOSCSensors.sensorsInUse.remove("grav");
+	                else VideOSCSensors.sensorsInUse.put("grav", "gravity sensor - no values yet");
 	                VideOSCSensors.useProx = useProx.isChecked() && VideOSC.sensors.isProximityAvailable();
 	                if (!useProx.isChecked()) VideOSCSensors.sensorsInUse.remove("prox");
+	                else VideOSCSensors.sensorsInUse.put("prox", "proximity sensor - no values yet");
                     VideOSCSensors.useLight = useLight.isChecked() && VideOSC.sensors.isLightAvailable();
 	                if (!useLight.isChecked()) VideOSCSensors.sensorsInUse.remove("light");
+	                else VideOSCSensors.sensorsInUse.put("light", "light sensor - no values yet");
                     VideOSCSensors.usePress = usePress.isChecked() && VideOSC.sensors.isPressureAvailable();
 	                if (!usePress.isChecked()) VideOSCSensors.sensorsInUse.remove("press");
+	                else VideOSCSensors.sensorsInUse.put("press", "air pressure sensor - no values yet");
                     VideOSCSensors.useTemp = useTemp.isChecked() && VideOSC.sensors.isAmbientTemperatureAvailable();
 	                if (!useTemp.isChecked()) VideOSCSensors.sensorsInUse.remove("temp");
+	                else VideOSCSensors.sensorsInUse.put("temp", "temperature sensor - no values yet");
                     VideOSCSensors.useLinAcc = useLinAcc.isChecked() && VideOSC.sensors.isLinearAccelerationAvailable();
 	                if (!useLinAcc.isChecked()) VideOSCSensors.sensorsInUse.remove("linAcc");
+	                else VideOSCSensors.sensorsInUse.put("linAcc", "linear acceleration sensor - no values yet");
                     VideOSCSensors.useHum = useHum.isChecked() && VideOSC.sensors.isRelativeHumidityAvailable();
 	                if (!useHum.isChecked()) VideOSCSensors.sensorsInUse.remove("hum");
+	                else VideOSCSensors.sensorsInUse.put("hum", "humidity sensor - no values yet");
                     VideOSCSensors.useLoc = useLoc.isChecked();
                     if (useLoc.isChecked()) {
+	                    VideOSCSensors.sensorsInUse.put("loc", "location - no values yet");
                         if (!provider.equals("gps") && !provider.equals("none"))
                             KetaiAlertDialog.popup(applet, "Geo Location Notice", "Your geo location provider is currently set to '" + provider + "'. Enable GPS for your device to get most accurate results and restart the app.");
                         else if (provider.equals("none"))
@@ -518,7 +529,7 @@ public class VideOSCPreferences extends VideOSC {
 	                    VideOSCSensors.sensorsInUse.remove("loc");
                     }
 
-                    boolean querySuccess = VideOSCDB.updateSensorsSettings(db);
+                    boolean querySuccess = VideOSCDB.updateSensorsSettings(applet, db);
                     if (querySuccess) {
                         apContainer.removeWidget(useOri);
                         apContainer.removeWidget(useAcc);
@@ -534,8 +545,6 @@ public class VideOSCPreferences extends VideOSC {
                         apContainer.removeWidget(save);
                         apContainer.removeWidget(cancel);
                         curOptions = "";
-                    } else {
-                        KetaiAlertDialog.popup(applet, "SQL Error", "Updateting sensors settings failed");
                     }
                 }
             });

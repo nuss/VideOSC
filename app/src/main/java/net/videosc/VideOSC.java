@@ -437,6 +437,7 @@ public class VideOSC extends PApplet {
 			if (displayFramerate)
 				VideOSCUI.printFramerate(this, printFramerate);
 			VideOSCPreferences.darkenBackground(this);
+			VideOSCSensors.printSensors(this);
 		} else {
 			if (play && lastInputList.size() >= dimensions) {
 				int index = frameCount % calcsPerPeriod;
@@ -489,8 +490,6 @@ public class VideOSC extends PApplet {
 //		}
 
 		Log.d(TAG, "how many sensors: " + VideOSCSensors.sensorsInUse.size());
-
-//		VideOSCSensors.printSensors(this);
 	}
 
 	private void printOSC() {

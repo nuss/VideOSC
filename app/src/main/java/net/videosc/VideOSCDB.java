@@ -2,6 +2,10 @@ package net.videosc;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
 import ketai.data.KetaiSQLite;
 import ketai.ui.KetaiAlertDialog;
 import processing.core.PApplet;
@@ -142,36 +146,18 @@ public class VideOSCDB extends VideOSC {
 //			if (db.execute("DROP TABLE vosc_sensors;"))
 //				Log.d(TAG, "Successfully deleted table 'vosc_sensors'");
 			String CREATE_SENSORS_TABLE = "CREATE TABLE vosc_sensors (" +
-					"ori INTEGER NOT NULL DEFAULT 0," +
-					"acc INTEGER NOT NULL DEFAULT 0, " +
-					"magn INTEGER NOT NULL DEFAULT 0, " +
-					"grav INTEGER NOT NULL DEFAULT 0, " +
-					"prox INTEGER NOT NULL DEFAULT 0, " +
-					"light INTEGER NOT NULL DEFAULT 0, " +
-					"press INTEGER NOT NULL DEFAULT 0, " +
-					"temp INTEGER NOT NULL DEFAULT 0, " +
-					"linAcc INTEGER NOT NULL DEFAULT 0, " +
-					"hum INTEGER NOT NULL DEFAULT 0, " +
-					"gps INTEGER NOT NULL DEFAULT 0" +
+					"sensor STRING NOT NULL," +
+					"state INTEGER NOT NULL DEFAULT 0" +
 			");";
 
 			if (!db.tableExists("vosc_sensors")) {
 				success = db.execute(CREATE_SENSORS_TABLE);
+
 				if (success) {
-					db.execute("INSERT INTO vosc_sensors (`ori`, `acc`, `magn`, `grav`, `prox`, " +
-					"`light`, `press`, `temp`, `linAcc`, `hum`, `gps`) VALUES (" +
-							(VideOSCSensors.useOri ? 1 : 0) +
-							", " + (VideOSCSensors.useAcc ? 1 : 0) +
-							", " + (VideOSCSensors.useMag ? 1 : 0) +
-							", " + (VideOSCSensors.useGrav ? 1 : 0) +
-							", " + (VideOSCSensors.useProx ? 1 : 0) +
-							", " + (VideOSCSensors.useLight ? 1 : 0) +
-							", " + (VideOSCSensors.usePress ? 1 : 0) +
-							", " + (VideOSCSensors.useTemp ? 1 : 0) +
-							", " + (VideOSCSensors.useLinAcc ? 1 : 0) +
-							", " + (VideOSCSensors.useHum ? 1 : 0) +
-							", " + (VideOSCSensors.useLoc ? 1 : 0) + ");"
-					);
+					success = db.execute("INSERT INTO vosc_sensors (`sensor`, `state`) VALUES " +
+							"('ori', 0), ('acc', 0), ('mag', 0), ('prox', 0), ('light', 0), ('temp', 0), ('linAcc', 0), ('hum', 0), ('gps', 0);");
+					if (!success)
+						KetaiAlertDialog.popup(applet, "SQL Error", "Inserting initial sensor values failed!");
 				} else {
 					KetaiAlertDialog.popup(applet, "SQL Error", "Creating database table for " +
 							"sensors failed");
@@ -180,18 +166,31 @@ public class VideOSCDB extends VideOSC {
 				success = db.query("SELECT * FROM vosc_sensors;");
 				if (success) {
 					while (db.next()) {
-						Log.d(TAG, "orientation: " + db.getInt("ori"));
-						VideOSCSensors.useOri = db.getInt("ori") > 0;
-						VideOSCSensors.useAcc = db.getInt("acc") > 0;
-						VideOSCSensors.useMag = db.getInt("magn") > 0;
-						VideOSCSensors.useGrav = db.getInt("grav") > 0;
-						VideOSCSensors.useProx = db.getInt("prox") > 0;
-						VideOSCSensors.useLight = db.getInt("light") > 0;
-						VideOSCSensors.usePress = db.getInt("press") > 0;
-						VideOSCSensors.useTemp = db.getInt("temp") > 0;
-						VideOSCSensors.useLinAcc = db.getInt("linAcc") > 0;
-						VideOSCSensors.useHum = db.getInt("hum") > 0;
-						VideOSCSensors.useLoc = db.getInt("gps") > 0;
+						String sensor = db.getString("sensor");
+						int state = db.getInt("state");
+						Log.d(TAG, "sensor: " + sensor + ", state: " + state);
+						if (sensor.equals("ori"))
+							VideOSCSensors.useOri = state > 0;
+						else if (sensor.equals("acc"))
+							VideOSCSensors.useAcc = state > 0;
+						else if (sensor.equals("mag"))
+							VideOSCSensors.useMag = state > 0;
+						else if (sensor.equals("grav"))
+							VideOSCSensors.useGrav = state > 0;
+						else if (sensor.equals("prox"))
+							VideOSCSensors.useProx = state > 0;
+						else if (sensor.equals("light"))
+							VideOSCSensors.useLight = state > 0;
+						else if (sensor.equals("press"))
+							VideOSCSensors.usePress = state > 0;
+						else if (sensor.equals("temp"))
+							VideOSCSensors.useTemp = state > 0;
+						else if (sensor.equals("linAcc"))
+							VideOSCSensors.useLinAcc = state > 0;
+						else if (sensor.equals("hum"))
+							VideOSCSensors.useHum = state > 0;
+						else if (sensor.equals("gps"))
+							VideOSCSensors.useLoc = state > 0;
 					}
 				}
 			}
@@ -226,28 +225,52 @@ public class VideOSCDB extends VideOSC {
 		return success;
 	}
 
-	static boolean updateSensorsSettings(KetaiSQLite db) {
+	static boolean updateSensorsSettings(PApplet applet, KetaiSQLite db) {
 		boolean success = false;
+		Map<String, Integer> sensors = new HashMap<String, Integer>();
+
+		sensors.put("ori", VideOSCSensors.useOri ? 1 : 0);
+		sensors.put("acc", VideOSCSensors.useAcc ? 1 : 0);
+		sensors.put("mag", VideOSCSensors.useMag ? 1 : 0);
+		sensors.put("grav", VideOSCSensors.useGrav ? 1 : 0);
+		sensors.put("prox", VideOSCSensors.useProx ? 1 : 0);
+		sensors.put("light", VideOSCSensors.useLight ? 1 : 0);
+		sensors.put("press", VideOSCSensors.usePress ? 1 : 0);
+		sensors.put("temp", VideOSCSensors.useTemp ? 1 : 0);
+		sensors.put("linAcc", VideOSCSensors.useLinAcc ? 1 : 0);
+		sensors.put("hum", VideOSCSensors.useHum ? 1 : 0);
+		sensors.put("gps", VideOSCSensors.useLoc ? 1 : 0);
 
 		if (db.connect()) {
-			success = db.execute("UPDATE vosc_sensors " +
-			"SET ori=" + (VideOSCSensors.useOri ? 1 : 0) +
-					", acc=" + (VideOSCSensors.useAcc ? 1 : 0) +
-					", magn=" + (VideOSCSensors.useMag ? 1 : 0) +
-					", grav=" + (VideOSCSensors.useGrav ? 1 : 0) +
-					", prox=" + (VideOSCSensors.useProx ? 1 : 0) +
-					", light=" + (VideOSCSensors.useLight ? 1 : 0) +
-					", press=" + (VideOSCSensors.usePress ? 1 : 0) +
-					", temp=" + (VideOSCSensors.useTemp ? 1 : 0) +
-					", linAcc=" + (VideOSCSensors.useLinAcc ? 1 : 0) +
-					", hum=" + (VideOSCSensors.useHum ? 1 : 0) +
-					", gps=" + (VideOSCSensors.useLoc ? 1 : 0) + ";"
-			);
+			for (String key : sensors.keySet()) {
+				success = db.execute("UPDATE vosc_sensors SET state=" + sensors.get(key) + " WHERE sensor='" + key + "';");
+				if (!success) {
+					KetaiAlertDialog.popup(applet, "SQL Error", "Updating sensor setting for '" + key + "' failed!");
+					break;
+				}
+			}
 		}
 
 //		Log.d(TAG, "sensors updated: " + success);
 
 		return success;
+	}
+
+	static Map<String, Boolean> listSensors(KetaiSQLite db) {
+		boolean success;
+		String query = "SELECT * FROM vosc_sensors";
+		Map<String, Boolean> result = new HashMap<String, Boolean>();
+
+		if (db.connect()) {
+			success = db.query(query);
+			if (success) {
+				while (db.next()) {
+					result.put(db.getString("sensor"), db.getInt("state") > 0);
+				}
+			}
+		}
+
+		return result;
 	}
 
 	static boolean addSnapshot(PApplet applet, KetaiSQLite db) {

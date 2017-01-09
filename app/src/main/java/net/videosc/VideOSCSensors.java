@@ -5,10 +5,12 @@ import net.videosc.runnable.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import apwidgets.APButton;
+import apwidgets.APWidget;
 import apwidgets.APWidgetContainer;
+import apwidgets.OnClickWidgetListener;
 import processing.core.PApplet;
 
 /**
@@ -105,8 +107,9 @@ public class VideOSCSensors extends VideOSC {
 
 	// strings to be printed to screen
 	public volatile static Map<String, String> sensorsInUse = new HashMap<String, String>();
+	static ArrayList<APText> texts = new ArrayList<APText>();
 
-    static void availableSensors() {
+	static void availableSensors() {
         Log.d(TAG, "is orientation available: " + sensors.isOrientationAvailable());
         Log.d(TAG, "is acceleration available: " + sensors.isAccelerometerAvailable());
         Log.d(TAG, "is magnetic field available: " + sensors.isMagenticFieldAvailable());
@@ -251,21 +254,37 @@ public class VideOSCSensors extends VideOSC {
     static void printSensors(final PApplet applet) {
 		final APWidgetContainer container = new APWidgetContainer(applet);
 	    APText text;
-	    ArrayList<APText> texts = new ArrayList<APText>();
 	    int nextYPos = 50;
 
 	    applet.fill(0, 153);
 	    applet.rect(0, 0, applet.width, applet.height);
 
+	    for (APText t : texts) {
+		    container.removeWidget(t);
+	    }
+	    texts.clear();
+
 	    for (String key : VideOSCSensors.sensorsInUse.keySet()) {
-		    text = new APText(50, nextYPos, applet.width - 230, 150);
+		    text = new APText(50, nextYPos, applet.width - 230, 100);
 		    text.setText(VideOSCSensors.sensorsInUse.get(key));
 		    texts.add(text);
 		    nextYPos = text.getY() + text.getHeight() + 10;
 	    }
+	    final APButton close = new APButton((applet.width - 220) / 4 + 50, nextYPos, (applet.width - 220) / 2, 50 * (int) density, "Close");
+	    close.addOnClickWidgetListener(new OnClickWidgetListener() {
+		    @Override
+		    public void onClickWidget(APWidget apWidget) {
+			    for (APText t : texts) {
+				    container.removeWidget(t);
+			    }
+			    container.removeWidget(close);
+			    VideOSC.printSensors = false;
+		    }
+	    });
 
 	    for (APText t : texts) {
 		    container.addWidget(t);
 	    }
+	    container.addWidget(close);
     }
 }
