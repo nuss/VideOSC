@@ -2,6 +2,7 @@ package net.videosc;
 
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -154,7 +155,7 @@ public class VideOSCDB extends VideOSC {
 
 				if (success) {
 					success = db.execute("INSERT INTO vosc_sensors (`sensor`, `state`) VALUES " +
-							"('ori', 0), ('acc', 0), ('mag', 0), ('grav', 0), ('prox', 0), ('light', 0), ('temp', 0), ('press', 0), ('linAcc', 0), ('hum', 0), ('gps', 0);");
+							"('ori', 0), ('acc', 0), ('mag', 0), ('grav', 0), ('prox', 0), ('light', 0), ('temp', 0), ('press', 0), ('linAcc', 0), ('hum', 0), ('loc', 0);");
 					if (!success)
 						KetaiAlertDialog.popup(applet, "SQL Error", "Inserting initial sensor values failed!");
 				} else {
@@ -167,7 +168,7 @@ public class VideOSCDB extends VideOSC {
 					while (db.next()) {
 						String sensor = db.getString("sensor");
 						int state = db.getInt("state");
-						Log.d(TAG, "sensor: " + sensor + ", state: " + state);
+//						Log.d(TAG, "sensor: " + sensor + ", state: " + state);
 						if (sensor.equals("ori"))
 							VideOSCSensors.useOri = state > 0;
 						else if (sensor.equals("acc"))
@@ -188,7 +189,7 @@ public class VideOSCDB extends VideOSC {
 							VideOSCSensors.useLinAcc = state > 0;
 						else if (sensor.equals("hum"))
 							VideOSCSensors.useHum = state > 0;
-						else if (sensor.equals("gps"))
+						else if (sensor.equals("loc"))
 							VideOSCSensors.useLoc = state > 0;
 					}
 				}
@@ -238,7 +239,7 @@ public class VideOSCDB extends VideOSC {
 		sensors.put("temp", VideOSCSensors.useTemp ? 1 : 0);
 		sensors.put("linAcc", VideOSCSensors.useLinAcc ? 1 : 0);
 		sensors.put("hum", VideOSCSensors.useHum ? 1 : 0);
-		sensors.put("gps", VideOSCSensors.useLoc ? 1 : 0);
+		sensors.put("loc", VideOSCSensors.useLoc ? 1 : 0);
 
 		if (db.connect()) {
 			for (String key : sensors.keySet()) {
@@ -255,16 +256,16 @@ public class VideOSCDB extends VideOSC {
 		return success;
 	}
 
-	static Map<String, Boolean> listSensors(KetaiSQLite db) {
+	static ArrayList<String> listSensorsInUse(KetaiSQLite db) {
 		boolean success;
 		String query = "SELECT * FROM vosc_sensors";
-		Map<String, Boolean> result = new HashMap<String, Boolean>();
+		ArrayList<String> result = new ArrayList<String>();
 
 		if (db.connect()) {
 			success = db.query(query);
 			if (success) {
 				while (db.next()) {
-					result.put(db.getString("sensor"), db.getInt("state") > 0);
+					if (db.getInt("state") > 0) result.add(db.getString("sensor"));
 				}
 			}
 		}

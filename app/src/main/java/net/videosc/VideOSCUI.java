@@ -1,5 +1,7 @@
 package net.videosc;
 
+import android.util.Log;
+
 import ketai.data.KetaiSQLite;
 import ketai.ui.KetaiList;
 import processing.core.PApplet;
@@ -43,13 +45,16 @@ public class VideOSCUI extends VideOSC {
 	private static PImage snapshotClick;
 	private static PImage snapshotSelect;
 
-	// buttons indicating if feedback messages are activeted or not
+	// buttons indicating if feedback messages are activated or not
 	private static PImage fbOn;
 	private static PImage fbOff;
 
 	// button to show/hide UI elements
 	private static PImage showMenu;
 	private static PImage hideMenu;
+
+	// list active sensors
+	private static PImage sensors;
 
 	// highlight snapshot saving button for a short moment
 	private static boolean snapshotProcessing = false;
@@ -89,6 +94,8 @@ public class VideOSCUI extends VideOSC {
 
 		hideMenu = applet.loadImage("hide_menu.png");
 		showMenu = applet.loadImage("show_menu.png");
+
+		sensors = applet.loadImage("sensors.png");
 
 		settingsBut = applet.loadImage("settings.png");
 	}
@@ -270,11 +277,15 @@ public class VideOSCUI extends VideOSC {
 				localB.height);
 	}
 
-	static void drawTools(PApplet applet) {
+	static void drawTools(PApplet applet, KetaiSQLite db) {
 		if (uiHidden)
 			applet.image(showMenu, 70, 70, 62, 62);
 		else
 			applet.image(hideMenu, 70, 70, 62, 62);
+
+		Log.d(TAG, "number of active sensors: " + VideOSCDB.listSensorsInUse(db).size());
+		if (VideOSCDB.listSensorsInUse(db).size() > 0)
+			applet.image(sensors, 250, 70, 229, 62);
 
 		if (!rgbMode.equals(RGBModes.RGB)) {
 			if (showFB)

@@ -126,10 +126,11 @@ public class VideOSC extends PApplet {
 	static boolean showSnapshots = false;
 	static long numSnapshots;
 
-	public static KetaiSensor sensors;
+	static KetaiSensor sensors;
 	static KetaiLocation location;
-	public static volatile String provider;
-	public static volatile boolean printSensors = true;
+	static volatile String provider;
+	public static volatile boolean printSensors = false;
+	static boolean sensorsPrinting = false;
 
 	static LocationManager locationManager;
 
@@ -164,7 +165,7 @@ public class VideOSC extends PApplet {
 		location.setUpdateRate(2000, 1);
 
 		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
-		Log.d(TAG, "provider: " + locationManager.getProvider("gps"));
+//		Log.d(TAG, "provider: " + locationManager.getProvider("gps"));
 
 		imageMode(CENTER);
 
@@ -428,7 +429,7 @@ public class VideOSC extends PApplet {
 			}
 
 			image(pImg, width / 2, height / 2, width, height);
-			VideOSCUI.drawTools(this);
+			VideOSCUI.drawTools(this, db);
 			if (showFB)
 				printOSC();
 			VideOSCUI.drawRGBUI(this);
@@ -437,7 +438,12 @@ public class VideOSC extends PApplet {
 			if (displayFramerate)
 				VideOSCUI.printFramerate(this, printFramerate);
 			VideOSCPreferences.darkenBackground(this);
-			VideOSCSensors.printSensors(this);
+//			Log.d(TAG, "sensors in use: " + VideOSCDB.listSensorsInUse(db).size());
+//			for (String key : VideOSCSensors.sensorsInUse.keySet()) {
+//				Log.d(TAG, VideOSCSensors.sensorsInUse.get(key));
+//			}
+			if (!sensorsPrinting && printSensors)
+				VideOSCSensors.printSensors(this, db);
 		} else {
 			if (play && lastInputList.size() >= dimensions) {
 				int index = frameCount % calcsPerPeriod;
@@ -489,7 +495,7 @@ public class VideOSC extends PApplet {
 //			Log.d(TAG, VideOSCSensors.sensorsInUse.get(key));
 //		}
 
-		Log.d(TAG, "how many sensors: " + VideOSCSensors.sensorsInUse.size());
+//		Log.d(TAG, "how many sensors: " + VideOSCSensors.sensorsInUse.size());
 	}
 
 	private void printOSC() {

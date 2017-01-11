@@ -11,6 +11,7 @@ import apwidgets.APButton;
 import apwidgets.APWidget;
 import apwidgets.APWidgetContainer;
 import apwidgets.OnClickWidgetListener;
+import ketai.data.KetaiSQLite;
 import processing.core.PApplet;
 
 /**
@@ -251,10 +252,45 @@ public class VideOSCSensors extends VideOSC {
 	    }
     }
 
-    static void printSensors(final PApplet applet) {
+	private static HashMap<String, String> keyNameAssociations() {
+		HashMap<String, String> keyNameAssociations = new HashMap<String, String>();
+
+		keyNameAssociations.put("ori", "orientation sensor");
+		keyNameAssociations.put("acc", "accelerometer");
+		keyNameAssociations.put("mag", "magnetic field sensor");
+		keyNameAssociations.put("grav", "gravity sensor");
+		keyNameAssociations.put("linAcc", "linear acceleration");
+		keyNameAssociations.put("prox", "proximity sensor");
+		keyNameAssociations.put("press", "air pressure sensor");
+		keyNameAssociations.put("temp", "temperature sensor");
+		keyNameAssociations.put("light", "light sensor");
+		keyNameAssociations.put("hum", "humidity sensor");
+		keyNameAssociations.put("loc", "location");
+
+		return keyNameAssociations;
+	}
+
+	static String keyToName(String key) {
+		return keyNameAssociations().get(key);
+	}
+
+	private static void completeSensorsInUse(KetaiSQLite db) {
+		ArrayList sensorsInUse = VideOSCDB.listSensorsInUse(db);
+
+		for (Object key : sensorsInUse) {
+			if (!VideOSCSensors.sensorsInUse.keySet().contains(key.toString())) {
+				VideOSCSensors.sensorsInUse.put((String) key, keyToName((String) key) + " - no value yet");
+			}
+		}
+	}
+
+    static boolean printSensors(final PApplet applet, KetaiSQLite db) {
 		final APWidgetContainer container = new APWidgetContainer(applet);
+	    final APButton close = new APButton((applet.width - 220) / 4 + 50, 50, (applet.width - 220) / 2, 50 * (int) density, "Close");
 	    APText text;
 	    int nextYPos = 50;
+
+	    completeSensorsInUse(db);
 
 	    applet.fill(0, 153);
 	    applet.rect(0, 0, applet.width, applet.height);
@@ -265,12 +301,14 @@ public class VideOSCSensors extends VideOSC {
 	    texts.clear();
 
 	    for (String key : VideOSCSensors.sensorsInUse.keySet()) {
+		    Log.d(TAG, VideOSCSensors.sensorsInUse.get(key));
+
 		    text = new APText(50, nextYPos, applet.width - 230, 100);
 		    text.setText(VideOSCSensors.sensorsInUse.get(key));
 		    texts.add(text);
 		    nextYPos = text.getY() + text.getHeight() + 10;
 	    }
-	    final APButton close = new APButton((applet.width - 220) / 4 + 50, nextYPos, (applet.width - 220) / 2, 50 * (int) density, "Close");
+	    close.setPosition(50, nextYPos);
 	    close.addOnClickWidgetListener(new OnClickWidgetListener() {
 		    @Override
 		    public void onClickWidget(APWidget apWidget) {
@@ -278,6 +316,7 @@ public class VideOSCSensors extends VideOSC {
 				    container.removeWidget(t);
 			    }
 			    container.removeWidget(close);
+			    VideOSC.sensorsPrinting = false;
 			    VideOSC.printSensors = false;
 		    }
 	    });
@@ -286,5 +325,7 @@ public class VideOSCSensors extends VideOSC {
 		    container.addWidget(t);
 	    }
 	    container.addWidget(close);
+
+	    return true;
     }
 }
