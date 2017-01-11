@@ -1,11 +1,13 @@
 package net.videosc;
 
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Camera;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
@@ -128,8 +130,6 @@ public class VideOSC extends PApplet {
 	public static volatile boolean printSensors = false;
 	static boolean sensorsPrinting = false;
 
-	static LocationManager locationManager;
-
 	public void setup() {
 		boolean querySuccess;
 
@@ -148,8 +148,6 @@ public class VideOSC extends PApplet {
 		}
 		camera.release();
 
-//		sensorThread = VideOSCSensors.initThread();
-
 		sensors = new KetaiSensor(this);
 		sensors.start();
 		sensors.enableAllSensors();
@@ -160,7 +158,6 @@ public class VideOSC extends PApplet {
 		provider = location.getProvider();
 		location.setUpdateRate(2000, 1);
 
-		locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
 //		Log.d(TAG, "provider: " + locationManager.getProvider("gps"));
 
 		imageMode(CENTER);
@@ -210,11 +207,6 @@ public class VideOSC extends PApplet {
 		if (!querySuccess) {
 			KetaiAlertDialog.popup(this, "SQL Error", "The sensors settings could not be determined");
 		}
-
-//		if (VideOSCSensors.useLoc)
-//			location.start();
-//		else
-//			location.stop();
 
 		VideOSCDB.setUpSnapshots(this, db);
 		numSnapshots = VideOSCDB.countSnapshots(this, db);
@@ -427,7 +419,7 @@ public class VideOSC extends PApplet {
 			image(pImg, width / 2, height / 2, width, height);
 			VideOSCUI.drawTools(this, db);
 			if (showFB)
-				printOSC();
+				VideOSCUI.printOSC(this);
 			VideOSCUI.drawRGBUI(this);
 			if (displayRGBselector)
 				VideOSCUI.drawRGBModeSelector(this);
@@ -476,101 +468,6 @@ public class VideOSC extends PApplet {
 		}
 		if (showHide)
 			VideOSCUI.setShowHideMenus(this);
-
-//		textAlign(CENTER, CENTER);
-//		textSize(40);
-//		text("Update: " + VideOSCSensors.locCount + "\nLatitude: " + VideOSCLocationRunnable.latitude + "\n" +
-//				"Longitude: " + VideOSCLocationRunnable.longitude + "\n" +
-//				"Altitude: " + VideOSCLocationRunnable.altitude + "\n" +
-//				"Provider: " + location.getProvider(),  0, 0, width, height);
-
-//		for (String key : VideOSCSensors.sensorsInUse.keySet()) {
-//			Log.d(TAG, VideOSCSensors.sensorsInUse.get(key));
-//		}
-
-//		Log.d(TAG, "how many sensors: " + VideOSCSensors.sensorsInUse.size());
-	}
-
-	private void printOSC() {
-		int x;
-		int y;
-		int slot;
-		int pxWidth = PApplet.parseInt(width / resW);
-		int pxHeight = PApplet.parseInt(height / resH);
-		String[] rStrings = new String[dimensions];
-		String[] gStrings = new String[dimensions];
-		String[] bStrings = new String[dimensions];
-
-		if (!rgbMode.equals(RGBModes.RGB)) {
-			textSize(40);
-			if (rgbMode.equals(RGBModes.R)) {
-				for (String cmd : rCmds) {
-					String[] rcmd = cmd.split(";");
-					// command indices start with 1, not 0
-					slot = PApplet.parseInt(rcmd[3]) - 1;
-					// there may be more than one message coming in under a given command
-					if (rStrings[slot] == null) {
-						rStrings[slot] = rcmd[0];
-					} else {
-						rStrings[slot] = rStrings[slot] + "\n" + rcmd[0];
-					}
-					x = PApplet.parseInt((PApplet.parseInt(rcmd[3]) - 1) % resW
-							* pxWidth + 10);
-					y = (PApplet.parseInt(rcmd[3]) - 1) / resW * pxHeight + 50;
-					// display text in inverted color of the pixel
-					if (offPxls.get(slot)[0])
-						fill(0xFF - ((pImg.pixels[slot] >> 16) & 0xFF), 0, 0);
-					else
-						fill(0xFF - ((pImg.pixels[slot] >> 16) & 0xFF), 255, 255);
-					text(trim(rStrings[slot]), x, y);
-				}
-				rCmds.clear();
-			} else if (rgbMode.equals(RGBModes.G)) {
-				for (String cmd : gCmds) {
-					String[] gcmd = cmd.split(";");
-					// command indices start with 1, not 0
-					slot = PApplet.parseInt(gcmd[3]) - 1;
-					// there may be more than one message coming in under a given command
-					if (gStrings[slot] == null) {
-						gStrings[slot] = gcmd[0];
-					} else {
-						gStrings[slot] = gStrings[slot] + "\n" + gcmd[0];
-					}
-					x = PApplet.parseInt((PApplet.parseInt(gcmd[3]) - 1) % resW
-							* pxWidth + 10);
-					y = (PApplet.parseInt(gcmd[3]) - 1) / resW * pxHeight + 50;
-					// we need slot-1 as commands are indexes start with 1, not 0
-					if (offPxls.get(slot)[1])
-						fill(0, 0xFF - ((pImg.pixels[slot] >> 8) & 0xFF), 0);
-					else
-						fill(255, 0xFF - ((pImg.pixels[slot] >> 8) & 0xFF), 255);
-					text(trim(gStrings[slot]), x, y);
-				}
-				gCmds.clear();
-			} else if (rgbMode.equals(RGBModes.B)) {
-				for (String cmd : bCmds) {
-					String[] bcmd = cmd.split(";");
-					// command indices start with 1, not 0
-					slot = PApplet.parseInt(bcmd[3]) - 1;
-					// there may be more than one message coming in under a given command
-					if (bStrings[slot] == null) {
-						bStrings[slot] = bcmd[0];
-					} else {
-						bStrings[slot] = bStrings[slot] + "\n" + bcmd[0];
-					}
-					x = PApplet.parseInt((PApplet.parseInt(bcmd[3]) - 1) % resW
-							* pxWidth + 10);
-					y = (PApplet.parseInt(bcmd[3]) - 1) / resW * pxHeight + 50;
-					// display text in inverted color of the pixel
-					if (offPxls.get(slot)[2])
-						fill(0, 0, 0xFF - (pImg.pixels[slot] & 0xFF));
-					else
-						fill(255, 255, 0xFF - (pImg.pixels[slot] & 0xFF));
-					text(trim(bStrings[slot]), x, y);
-				}
-				bCmds.clear();
-			}
-		}
 	}
 
 	// http://www.sojamo.de/libraries/oscP5/examples/oscP5sendReceive/oscP5sendReceive.pde
@@ -670,37 +567,56 @@ public class VideOSC extends PApplet {
 		VideOSCUI.processKetaiListClicks(this, klist, db);
 	}
 
+/*
 	public void keyPressed() {
+//		Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
+		Log.d(TAG, "is finishing: " + isFinishing());
+//		Context context = getApplicationContext();
+//		Log.d(TAG, "context: " + context);
 		if (key == CODED) {
-			if (keyCode == MENU && curOptions.equals("")/* && preferencesListInvisible*/) {
+			Log.d(TAG, "key == CODED");
+//			restartServiceIntent.setPackage(getPackageName());
+			if (keyCode == MENU && curOptions.equals("")*/
+/* && preferencesListInvisible*//*
+) {
 				showHide = true;
-			} /*else if (keyCode == android.view.KeyEvent.KEYCODE_BACK) {
+			} */
+/*else if (keyCode == android.view.KeyEvent.KEYCODE_BACK) {
 				return true;
 //				Log.d(TAG, "back key hit");
-			}*/
+			}*//*
+
 		}
 	}
+*/
 
-	/*public boolean onKeyDown(int keyCode, KeyEvent event)  {
+/*
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event)  {
+		Log.d(TAG, "onKeyDown called: " + keyCode + ", " + event + ", " + isFinishing());
 		if (keyCode == KeyEvent.KEYCODE_BACK
 				&& event.getRepeatCount() == 0) {
-			Log.d(TAG, "onKeyDown Called");
+			Log.d(TAG, "back button hit");
 			onBackPressed();
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
 	}
+*/
 
+/*
 	@Override
 	public void onBackPressed() {
-		Log.d("CDA", "onBackPressed Called");
+		Log.d("CDA", "onBackPressed Called: " + isFinishing());
 		if (!curOptions.equals(""))
 			curOptions = "";
 		Intent setIntent = new Intent(Intent.ACTION_MAIN);
+		Log.d(TAG, "intent: " + setIntent);
 		setIntent.addCategory(Intent.CATEGORY_HOME);
 		setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		startActivity(setIntent);
-	}*/
+	}
+*/
 
 	// OSC sensor events
 	public void onOrientationEvent(float x, float y, float z, long time, int accuracy) {

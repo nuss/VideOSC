@@ -391,6 +391,87 @@ public class VideOSCUI extends VideOSC {
 		klist.setAdapter(null);
 	}
 
+	static void printOSC(PApplet applet) {
+		int x;
+		int y;
+		int slot;
+		int pxWidth = PApplet.parseInt(applet.width / resW);
+		int pxHeight = PApplet.parseInt(applet.height / resH);
+		String[] rStrings = new String[dimensions];
+		String[] gStrings = new String[dimensions];
+		String[] bStrings = new String[dimensions];
+
+		if (!rgbMode.equals(RGBModes.RGB)) {
+			applet.textSize(40);
+			if (rgbMode.equals(RGBModes.R)) {
+				for (String cmd : rCmds) {
+					String[] rcmd = cmd.split(";");
+					// command indices start with 1, not 0
+					slot = PApplet.parseInt(rcmd[3]) - 1;
+					// there may be more than one message coming in under a given command
+					if (rStrings[slot] == null) {
+						rStrings[slot] = rcmd[0];
+					} else {
+						rStrings[slot] = rStrings[slot] + "\n" + rcmd[0];
+					}
+					x = PApplet.parseInt((PApplet.parseInt(rcmd[3]) - 1) % resW
+							* pxWidth + 10);
+					y = (PApplet.parseInt(rcmd[3]) - 1) / resW * pxHeight + 50;
+					// display text in inverted color of the pixel
+					if (offPxls.get(slot)[0])
+						applet.fill(0xFF - ((pImg.pixels[slot] >> 16) & 0xFF), 0, 0);
+					else
+						applet.fill(0xFF - ((pImg.pixels[slot] >> 16) & 0xFF), 255, 255);
+					applet.text(trim(rStrings[slot]), x, y);
+				}
+				rCmds.clear();
+			} else if (rgbMode.equals(RGBModes.G)) {
+				for (String cmd : gCmds) {
+					String[] gcmd = cmd.split(";");
+					// command indices start with 1, not 0
+					slot = PApplet.parseInt(gcmd[3]) - 1;
+					// there may be more than one message coming in under a given command
+					if (gStrings[slot] == null) {
+						gStrings[slot] = gcmd[0];
+					} else {
+						gStrings[slot] = gStrings[slot] + "\n" + gcmd[0];
+					}
+					x = PApplet.parseInt((PApplet.parseInt(gcmd[3]) - 1) % resW
+							* pxWidth + 10);
+					y = (PApplet.parseInt(gcmd[3]) - 1) / resW * pxHeight + 50;
+					// we need slot-1 as commands are indexes start with 1, not 0
+					if (offPxls.get(slot)[1])
+						applet.fill(0, 0xFF - ((pImg.pixels[slot] >> 8) & 0xFF), 0);
+					else
+						applet.fill(255, 0xFF - ((pImg.pixels[slot] >> 8) & 0xFF), 255);
+					applet.text(trim(gStrings[slot]), x, y);
+				}
+				gCmds.clear();
+			} else if (rgbMode.equals(RGBModes.B)) {
+				for (String cmd : bCmds) {
+					String[] bcmd = cmd.split(";");
+					// command indices start with 1, not 0
+					slot = PApplet.parseInt(bcmd[3]) - 1;
+					// there may be more than one message coming in under a given command
+					if (bStrings[slot] == null) {
+						bStrings[slot] = bcmd[0];
+					} else {
+						bStrings[slot] = bStrings[slot] + "\n" + bcmd[0];
+					}
+					x = PApplet.parseInt((PApplet.parseInt(bcmd[3]) - 1) % resW
+							* pxWidth + 10);
+					y = (PApplet.parseInt(bcmd[3]) - 1) / resW * pxHeight + 50;
+					// display text in inverted color of the pixel
+					if (offPxls.get(slot)[2])
+						applet.fill(0, 0, 0xFF - (pImg.pixels[slot] & 0xFF));
+					else
+						applet.fill(255, 255, 0xFF - (pImg.pixels[slot] & 0xFF));
+					applet.text(trim(bStrings[slot]), x, y);
+				}
+				bCmds.clear();
+			}
+		}
+	}
 }
 
 enum InteractionModes { BASIC, SINGLE_PIXEL }

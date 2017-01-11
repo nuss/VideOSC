@@ -291,7 +291,7 @@ public class VideOSCSensors extends VideOSC {
 	    int nextYPos = 50;
 
 	    completeSensorsInUse(db);
-	    
+
 	    for (String key : texts.keySet()) {
 		    container.removeWidget(texts.get(key));
 	    }
