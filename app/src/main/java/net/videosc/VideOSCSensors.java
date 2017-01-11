@@ -108,7 +108,7 @@ public class VideOSCSensors extends VideOSC {
 
 	// strings to be printed to screen
 	public volatile static Map<String, String> sensorsInUse = new HashMap<String, String>();
-	static ArrayList<APText> texts = new ArrayList<APText>();
+	static HashMap<String, APText> texts = new HashMap<String, APText>();
 
 	static void availableSensors() {
         Log.d(TAG, "is orientation available: " + sensors.isOrientationAvailable());
@@ -291,29 +291,27 @@ public class VideOSCSensors extends VideOSC {
 	    int nextYPos = 50;
 
 	    completeSensorsInUse(db);
-
-	    applet.fill(0, 153);
-	    applet.rect(0, 0, applet.width, applet.height);
-
-	    for (APText t : texts) {
-		    container.removeWidget(t);
+	    
+	    for (String key : texts.keySet()) {
+		    container.removeWidget(texts.get(key));
 	    }
 	    texts.clear();
 
 	    for (String key : VideOSCSensors.sensorsInUse.keySet()) {
 		    Log.d(TAG, VideOSCSensors.sensorsInUse.get(key));
 
-		    text = new APText(50, nextYPos, applet.width - 230, 100);
+		    text = new APText(50, nextYPos, applet.width - 230, 120);
 		    text.setText(VideOSCSensors.sensorsInUse.get(key));
-		    texts.add(text);
+		    text.setTextSize(16);
+		    texts.put(key, text);
 		    nextYPos = text.getY() + text.getHeight() + 10;
 	    }
-	    close.setPosition(50, nextYPos);
+	    close.setPosition((applet.width - 220) / 4 + 50, nextYPos);
 	    close.addOnClickWidgetListener(new OnClickWidgetListener() {
 		    @Override
 		    public void onClickWidget(APWidget apWidget) {
-			    for (APText t : texts) {
-				    container.removeWidget(t);
+			    for (String key : texts.keySet()) {
+				    container.removeWidget(texts.get(key));
 			    }
 			    container.removeWidget(close);
 			    VideOSC.sensorsPrinting = false;
@@ -321,11 +319,17 @@ public class VideOSCSensors extends VideOSC {
 		    }
 	    });
 
-	    for (APText t : texts) {
-		    container.addWidget(t);
+	    for (String key : texts.keySet()) {
+		    container.addWidget(texts.get(key));
 	    }
 	    container.addWidget(close);
 
 	    return true;
     }
+
+	static void updatePrintedSensors() {
+		for (String key : VideOSCSensors.sensorsInUse.keySet()) {
+			texts.get(key).setText(VideOSCSensors.sensorsInUse.get(key));
+		}
+	}
 }

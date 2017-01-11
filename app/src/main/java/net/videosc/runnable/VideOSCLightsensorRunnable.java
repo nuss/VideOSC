@@ -28,7 +28,7 @@ public class VideOSCLightsensorRunnable implements Runnable {
 				        String light = "intensity: " + VideOSCSensors.lightIntensity;
 				        String time = ", timestamp: " + VideOSCSensors.lightTime;
 				        String accuracy = ", accuracy: " + VideOSCSensors.lightAcc;
-				        VideOSCSensors.sensorsInUse.put("light", "light sensor - " + light + time + accuracy +"lx");
+				        VideOSCSensors.sensorsInUse.put("light", "light sensor - " + light + time + accuracy);
 			        }
 			        oscLight = VideOSCOscHandling.makeMessage(oscLight, "/" + VideOSC.rootCmd + "/light");
 			        oscLight.add(VideOSCSensors.lightIntensity).add(VideOSCSensors.lightTime).add(VideOSCSensors.lightAcc);

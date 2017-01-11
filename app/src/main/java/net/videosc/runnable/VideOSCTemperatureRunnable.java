@@ -26,7 +26,7 @@ public class VideOSCTemperatureRunnable implements Runnable {
 				try {
 					if (VideOSC.printSensors) {
 						String temperature = "temperature: " + VideOSCSensors.tempCels;
-						VideOSCSensors.sensorsInUse.put("temp", "temperature sensor - " + temperature + "°C");
+						VideOSCSensors.sensorsInUse.put("temp", "temperature sensor - " + temperature);
 					}
 					oscTemp = VideOSCOscHandling.makeMessage(oscTemp, "/" + VideOSC.rootCmd + "/temp");
 					oscTemp.add(VideOSCSensors.tempCels);

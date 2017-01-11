@@ -28,7 +28,7 @@ public class VideOSCPressureRunnable implements Runnable {
 						String pressure = "pressure: " + VideOSCSensors.pressIntensity;
 						String time = ", timestamp: " + VideOSCSensors.pressTime;
 						String accuracy = ", accuracy: " + VideOSCSensors.pressAcc;
-						VideOSCSensors.sensorsInUse.put("press", "air pressure sensor - " + pressure + time + accuracy + "hPa/mBar");
+						VideOSCSensors.sensorsInUse.put("press", "air pressure sensor - " + pressure + time + accuracy);
 					}
 					oscPress = VideOSCOscHandling.makeMessage(oscPress, "/" + VideOSC.rootCmd + "/press");
 					oscPress.add(VideOSCSensors.pressIntensity).add(VideOSCSensors.pressTime).add(VideOSCSensors.pressAcc);

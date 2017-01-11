@@ -84,10 +84,6 @@ public class VideOSC extends PApplet {
 	static boolean printFramerate = true;
 	static boolean displayFramerate = false;
 
-	static int uiXright;
-	static int uiYtop;
-	static int uiYbottom;
-
 	static int backKeyState;
 	static ArrayList<String> optionsList = new ArrayList<String>();
 	static boolean preferencesListInvisible;
@@ -249,9 +245,9 @@ public class VideOSC extends PApplet {
 
 		VideOSCUI.loadUIImages(this);
 
-		uiYtop = 80;
-		uiXright = width - 130;
-		uiYbottom = height - 90;
+		VideOSCUI.uiYtop = 80;
+		VideOSCUI.uiXright = width - 130;
+		VideOSCUI.uiYbottom = height - 90;
 
 		backKeyState = 0;
 
@@ -438,12 +434,9 @@ public class VideOSC extends PApplet {
 			if (displayFramerate)
 				VideOSCUI.printFramerate(this, printFramerate);
 			VideOSCPreferences.darkenBackground(this);
-//			Log.d(TAG, "sensors in use: " + VideOSCDB.listSensorsInUse(db).size());
-//			for (String key : VideOSCSensors.sensorsInUse.keySet()) {
-//				Log.d(TAG, VideOSCSensors.sensorsInUse.get(key));
-//			}
-			if (!sensorsPrinting && printSensors)
-				VideOSCSensors.printSensors(this, db);
+			if (sensorsPrinting) {
+				VideOSCSensors.updatePrintedSensors();
+			}
 		} else {
 			if (play && lastInputList.size() >= dimensions) {
 				int index = frameCount % calcsPerPeriod;

@@ -63,6 +63,10 @@ public class VideOSCUI extends VideOSC {
 	// snapshots, etc.)
 	static boolean selectionListActive = false;
 
+	static int uiXright;
+	static int uiYtop;
+	static int uiYbottom;
+
 	static void loadUIImages(PApplet applet) {
 		startBut = applet.loadImage("start.png");
 		stopBut = applet.loadImage("stop.png");
@@ -156,7 +160,7 @@ public class VideOSCUI extends VideOSC {
 		KetaiList snapshotsSelect;
 		KetaiList preferencesList;
 
-		if (!selectionListActive) {
+		if (!selectionListActive && !sensorsPrinting) {
 			// only allow interaction if screen is not overlayed by some selection list
 			if (x > 100 && y > 100 && x < applet.width - 130 && !displayRGBselector && curOptions.equals
 					("")) {
@@ -217,6 +221,12 @@ public class VideOSCUI extends VideOSC {
 				}
 			} else if (x <= 100 && y <= 100 && curOptions.equals("")) {
 				showHide = true;
+			} else if (x > 100 && x <= 350 && y <= 100 && curOptions.equals("")) {
+//				Log.d(TAG, "clicked: sensors printed? " + sensorsPrinting + printSensors);
+				printSensors = true;
+				if (!sensorsPrinting && printSensors) {
+					sensorsPrinting = VideOSCSensors.printSensors(applet, db);
+				}
 			}
 
 			if (mode.equals(InteractionModes.SINGLE_PIXEL)) {
@@ -283,9 +293,9 @@ public class VideOSCUI extends VideOSC {
 		else
 			applet.image(hideMenu, 70, 70, 62, 62);
 
-		Log.d(TAG, "number of active sensors: " + VideOSCDB.listSensorsInUse(db).size());
+//		Log.d(TAG, "number of active sensors: " + VideOSCDB.listSensorsInUse(db).size());
 		if (VideOSCDB.listSensorsInUse(db).size() > 0)
-			applet.image(sensors, 250, 70, 229, 62);
+			applet.image(sensors, 250, uiYtop - 10, 229, 62);
 
 		if (!rgbMode.equals(RGBModes.RGB)) {
 			if (showFB)

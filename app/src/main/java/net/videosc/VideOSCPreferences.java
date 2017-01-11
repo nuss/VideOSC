@@ -318,8 +318,9 @@ public class VideOSCPreferences extends VideOSC {
             int nextYPos = 50;
             final APCheckBox useOri, useAcc, useLinAcc, useMag, useGrav, useProx, useLight, usePress, useTemp, useHum, useLoc;
 
-            useOri = new APCheckBox(50, nextYPos, "use orientation sensor (rotation in degrees - '/" + VideOSC.rootCmd + "/ori', x, y, z, timestamp, accuracy)");
+            useOri = new APCheckBox(50, nextYPos, "orientation sensor: rotation in degrees - '/" + VideOSC.rootCmd + "/ori', x, y, z, timestamp, accuracy");
             useOri.setTextSize(16);
+            useOri.setSize(applet.width - 220, (int) (45 * density));
             if (!sensors.isOrientationAvailable())
                 useOri.setText(useOri.getText() + " (not available)");
             useOri.setChecked(VideOSCSensors.useOri);
@@ -333,8 +334,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(useOri);
             nextYPos += 50 * density;
 
-            useAcc = new APCheckBox(50, nextYPos, "use accelerometer (force in m/s^2 - '/" + VideOSC.rootCmd + "/acc', x, y, z, timestamp, accuracy)");
+            useAcc = new APCheckBox(50, nextYPos, "accelerometer: force in m/s^2 - '/" + VideOSC.rootCmd + "/acc', x, y, z, timestamp, accuracy");
             useAcc.setTextSize(16);
+	        useAcc.setSize(applet.width - 220, (int) (45 * density));
             if (!sensors.isAccelerometerAvailable())
                 useAcc.setText(useAcc.getText() + " (not available)");
             useAcc.setChecked(VideOSCSensors.useAcc);
@@ -348,8 +350,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(useAcc);
             nextYPos += 50 * density;
 
-            useLinAcc = new APCheckBox(50, nextYPos, "use linear acceleration sensor (m/s^2 minus gravity - '/" + VideOSC.rootCmd + "/lin_acc', x, y, z, timestamp, accuracy)");
+            useLinAcc = new APCheckBox(50, nextYPos, "linear acceleration sensor: m/s^2 minus gravity - '/" + VideOSC.rootCmd + "/lin_acc', x, y, z, timestamp, accuracy");
             useLinAcc.setTextSize(16);
+	        useLinAcc.setSize(applet.width - 220, (int) (45 * density));
             if (!sensors.isLinearAccelerationAvailable())
                 useLinAcc.setText(useLinAcc.getText() + " (not available)");
             useLinAcc.setChecked(VideOSCSensors.useLinAcc);
@@ -363,8 +366,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(useLinAcc);
             nextYPos += 50 * density;
 
-            useMag = new APCheckBox(50, nextYPos, "use magnetic field sensor (geomagnetic field in uT - '/" + VideOSC.rootCmd + "/mag', x, y, z, timestamp, accuracy)");
+            useMag = new APCheckBox(50, nextYPos, "magnetic field sensor: geomagnetic field in uT - '/" + VideOSC.rootCmd + "/mag', x, y, z, timestamp, accuracy");
             useMag.setTextSize(16);
+	        useMag.setSize(applet.width - 220, (int) (45 * density));
             if (!sensors.isMagenticFieldAvailable())
                 useMag.setText(useMag.getText() + " (not available)");
             useMag.setChecked(VideOSCSensors.useMag);
@@ -378,8 +382,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(useMag);
             nextYPos += 50 * density;
 
-            useGrav = new APCheckBox(50, nextYPos, "use gravity sensor (force of gravity in m/s^2 - '/" + VideOSC.rootCmd + "/grav', x, y, z, timestamp, accuracy)");
+            useGrav = new APCheckBox(50, nextYPos, "gravity sensor: force of gravity in m/s^2 - '/" + VideOSC.rootCmd + "/grav', x, y, z, timestamp, accuracy");
             useGrav.setTextSize(16);
+	        useGrav.setSize(applet.width - 220, (int) (45 * density));
             if ((!sensors.isGyroscopeAvailable() && !sensors.isAccelerometerAvailable() && !sensors.isMagenticFieldAvailable()) ||
                     (sensors.isGyroscopeAvailable() && !sensors.isAccelerometerAvailable()))
                 useGrav.setText(useGrav.getText() + " (not available)");
@@ -395,8 +400,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(useGrav);
             nextYPos += 50 * density;
 
-            useProx = new APCheckBox(50, nextYPos, "use proximity sensor (distance from sensor, typically 0, 1 - '/" + VideOSC.rootCmd + "/prox', distance, timestamp, accuracy)");
+            useProx = new APCheckBox(50, nextYPos, "proximity sensor: distance from sensor, typically 0, 1 - '/" + VideOSC.rootCmd + "/prox', distance, timestamp, accuracy");
             useProx.setTextSize(16);
+	        useProx.setSize(applet.width - 220, (int) (45 * density));
             if (!sensors.isProximityAvailable())
                 useProx.setText(useProx.getText() + " (not available)");
             useProx.setChecked(VideOSCSensors.useProx);
@@ -410,8 +416,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(useProx);
             nextYPos += 50 * density;
 
-            useLight = new APCheckBox(50, nextYPos, "use light sensor (illumination from sensor in lx - '/" + VideOSC.rootCmd + "/light', illumination, timestamp, accuracy)");
+            useLight = new APCheckBox(50, nextYPos, "light sensor: illumination from sensor in lx - '/" + VideOSC.rootCmd + "/light', illumination, timestamp, accuracy");
             useLight.setTextSize(16);
+	        useLight.setSize(applet.width - 220, (int) (45 * density));
             if (!sensors.isLightAvailable())
                 useLight.setText(useLight.getText() + " (not available)");
             useLight.setChecked(VideOSCSensors.useLight);
@@ -425,8 +432,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(useLight);
             nextYPos += 50 * density;
 
-            usePress = new APCheckBox(50, nextYPos, "use air pressure sensor (ambient pressure in hPa or mbar - '/" + VideOSC.rootCmd + "/press', pressure, timestamp, accuracy)");
+            usePress = new APCheckBox(50, nextYPos, "air pressure sensor: ambient pressure in hPa or mbar - '/" + VideOSC.rootCmd + "/press', pressure, timestamp, accuracy");
             usePress.setTextSize(16);
+	        usePress.setSize(applet.width - 220, (int) (45 * density));
             if (!sensors.isPressureAvailable())
                 usePress.setText(usePress.getText() + " (not available)");
             usePress.setChecked(VideOSCSensors.usePress);
@@ -440,8 +448,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(usePress);
             nextYPos += 50 * density;
 
-            useTemp = new APCheckBox(50, nextYPos, "use temperature sensor (temperature in degrees in °C - '/" + VideOSC.rootCmd + "/temp', temperature)");
+            useTemp = new APCheckBox(50, nextYPos, "temperature sensor: temperature in degrees in °C - '/" + VideOSC.rootCmd + "/temp', temperature");
             useTemp.setTextSize(16);
+	        useTemp.setSize(applet.width - 220, (int) (45 * density));
             if (!sensors.isAmbientTemperatureAvailable())
                 useTemp.setText(useTemp.getText() + " (not available)");
             useTemp.setChecked(VideOSCSensors.useTemp);
@@ -455,8 +464,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(useTemp);
             nextYPos += 50 * density;
 
-            useHum = new APCheckBox(50, nextYPos, "use humidity sensor (ambient humidity in % - '/" + VideOSC.rootCmd + "/hum', humidity)");
+            useHum = new APCheckBox(50, nextYPos, "humidity sensor: ambient humidity in % - '/" + VideOSC.rootCmd + "/hum', humidity");
             useHum.setTextSize(16);
+	        useHum.setSize(applet.width - 220, (int) (45 * density));
             if (!sensors.isRelativeHumidityAvailable())
                 useHum.setText(useHum.getText() + " (not available)");
             useHum.setChecked(VideOSCSensors.useHum);
@@ -470,8 +480,9 @@ public class VideOSCPreferences extends VideOSC {
             apContainer.addWidget(useHum);
             nextYPos += 50 * density;
 
-            useLoc = new APCheckBox(50, nextYPos, "use geo location ('/" + VideOSC.rootCmd +"/loc', latitude, longitude, altitude)");
+            useLoc = new APCheckBox(50, nextYPos, "geo location: '/" + VideOSC.rootCmd +"/loc', latitude, longitude, altitude");
             useLoc.setTextSize(16);
+	        useLoc.setSize(applet.width - 220, (int) (45 * density));
             useLoc.setChecked(VideOSCSensors.useLoc);
 
             apContainer.addWidget(useLoc);
@@ -630,7 +641,7 @@ public class VideOSCPreferences extends VideOSC {
     }
 
     static void darkenBackground(PApplet applet) {
-        if (curOptions.length() > 0) {
+        if (curOptions.length() > 0 || sensorsPrinting) {
             applet.fill(0, 153);
             applet.rect(0, 0, applet.width, applet.height);
         }
