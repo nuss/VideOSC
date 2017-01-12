@@ -126,7 +126,7 @@ public class VideOSC extends PApplet {
 
 	static KetaiSensor sensors;
 	static KetaiLocation location;
-	static volatile String provider;
+	public static volatile String provider;
 	public static volatile boolean printSensors = false;
 	static boolean sensorsPrinting = false;
 

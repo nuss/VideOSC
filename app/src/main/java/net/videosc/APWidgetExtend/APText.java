@@ -1,4 +1,4 @@
-package net.videosc;
+package net.videosc.APWidgetExtend;
 
 import android.view.Gravity;
 import android.widget.TextView;
@@ -11,7 +11,7 @@ import processing.core.PApplet;
  * Package: net.videosc
  * Created by Stefan Nussbaumer on Okt 05 2016, 12:01.
  */
-class APText extends APTextView {
+public class APText extends APTextView {
 	private String TAG = "APText";
 
 	/**
@@ -21,7 +21,7 @@ class APText extends APTextView {
 	 * @param width The text field's width.
 	 * @param height The text field's height.
 	 */
-	APText(int x, int y, int width, int height) {
+	public APText(int x, int y, int width, int height) {
 		super(x, y, width, height, "");
 		this.shouldNotSetOnClickListener = true; //otherwise ime options done, next etc doesn't work
 	}
@@ -45,7 +45,7 @@ class APText extends APTextView {
 	 * Hack: set horizontal alignment
 	 * Must be called after addWidget
 	 */
-	void setTextCentered() {
+	public void setTextCentered() {
 		((TextView) view).setGravity(Gravity.CENTER_HORIZONTAL);
 	}
 }

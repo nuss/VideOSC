@@ -1,6 +1,6 @@
 package net.videosc;
 
-import android.util.Log;
+import net.videosc.APWidgetExtend.APText;
 
 import java.util.Calendar;
 
@@ -531,9 +531,9 @@ public class VideOSCPreferences extends VideOSC {
 	                else VideOSCSensors.sensorsInUse.put("hum", "humidity sensor - no values yet");
                     VideOSCSensors.useLoc = useLoc.isChecked();
                     if (useLoc.isChecked()) {
-	                    VideOSCSensors.sensorsInUse.put("loc", "location - no values yet");
+	                    VideOSCSensors.sensorsInUse.put("loc", "location (provider: " + provider + ") - no values yet");
                         if (!provider.equals("gps") && !provider.equals("none"))
-                            KetaiAlertDialog.popup(applet, "Geo Location Notice", "Your geo location provider is currently set to '" + provider + "'. Enable GPS for your device to get most accurate results and restart the app.");
+                            KetaiAlertDialog.popup(applet, "Geo Location Notice", "Your geo location provider is currently set to '" + provider + "'. Enable GPS for your device to get most accurate results.");
                         else if (provider.equals("none"))
                             KetaiAlertDialog.popup(applet, "Geo Location Notice", "Your geo location provider is currently set to 'none'. Please activate GPS for your device and restart the app.");
                     } else {

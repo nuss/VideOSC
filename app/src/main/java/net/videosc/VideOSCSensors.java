@@ -1,6 +1,8 @@
 package net.videosc;
 
 import android.util.Log;
+
+import net.videosc.APWidgetExtend.APText;
 import net.videosc.runnable.*;
 
 import java.util.ArrayList;
@@ -265,7 +267,7 @@ public class VideOSCSensors extends VideOSC {
 		keyNameAssociations.put("temp", "temperature sensor");
 		keyNameAssociations.put("light", "light sensor");
 		keyNameAssociations.put("hum", "humidity sensor");
-		keyNameAssociations.put("loc", "location");
+		keyNameAssociations.put("loc", "location (provider: " + provider + ")");
 
 		return keyNameAssociations;
 	}
