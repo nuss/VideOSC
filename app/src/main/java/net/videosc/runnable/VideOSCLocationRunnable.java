@@ -29,7 +29,7 @@ public class VideOSCLocationRunnable implements Runnable {
 		                String latitude = "latitude: " + VideOSCSensors.locLat;
 		                String longitude = ", longitude: " + VideOSCSensors.locLong;
 		                String altitude = ", altitude: " + VideOSCSensors.locAlt;
-		                VideOSCSensors.sensorsInUse.put("loc", "location (provider: " + VideOSC.provider + ") - " + latitude + longitude + altitude);
+		                VideOSCSensors.sensorsInUse.put("loc", "location (provider: " + VideOSCSensors.provider + ") - " + latitude + longitude + altitude);
 	                }
 
 	                oscGeo = VideOSCOscHandling.makeMessage(oscGeo, "/" + VideOSC.rootCmd + "/loc");

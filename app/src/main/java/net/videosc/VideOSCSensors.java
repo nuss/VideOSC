@@ -14,6 +14,8 @@ import apwidgets.APWidget;
 import apwidgets.APWidgetContainer;
 import apwidgets.OnClickWidgetListener;
 import ketai.data.KetaiSQLite;
+import ketai.sensors.KetaiLocation;
+import ketai.sensors.KetaiSensor;
 import processing.core.PApplet;
 
 /**
@@ -23,7 +25,10 @@ import processing.core.PApplet;
 public class VideOSCSensors extends VideOSC {
     private final static String TAG = "VideOSCSensors";
 
-    // orientation sensor values
+	// common sensors
+	static KetaiSensor sensors;
+
+	// orientation sensor values
     public static volatile float oriX;
     public static volatile float oriY;
     public static volatile float oriZ;
@@ -100,6 +105,8 @@ public class VideOSCSensors extends VideOSC {
     public static boolean useHum = false;
 
     // geolocation support
+	public static volatile KetaiLocation location;
+	public static volatile String provider;
     public static volatile double locLong;
     public static volatile double locLat;
     public static volatile double locAlt;
@@ -111,6 +118,18 @@ public class VideOSCSensors extends VideOSC {
 	// strings to be printed to screen
 	public volatile static Map<String, String> sensorsInUse = new HashMap<String, String>();
 	static HashMap<String, APText> texts = new HashMap<String, APText>();
+
+	static void initSensors(PApplet applet) {
+		// common sensors
+		sensors = new KetaiSensor(applet);
+		sensors.start();
+		sensors.enableAllSensors();
+		// location
+		location = new KetaiLocation(applet);
+		location.start();
+		provider = location.getProvider();
+		location.setUpdateRate(2000, 1);
+	}
 
 	static void availableSensors() {
         Log.d(TAG, "is orientation available: " + sensors.isOrientationAvailable());

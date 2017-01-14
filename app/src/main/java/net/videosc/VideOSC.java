@@ -1,13 +1,8 @@
 package net.videosc;
 
-import android.content.Context;
-import android.content.Intent;
 import android.hardware.Camera;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
@@ -19,7 +14,6 @@ import java.util.Set;
 
 import ketai.camera.KetaiCamera;
 import ketai.data.KetaiSQLite;
-import ketai.sensors.KetaiLocation;
 import ketai.sensors.KetaiSensor;
 import ketai.ui.KetaiAlertDialog;
 import ketai.ui.KetaiList;
@@ -28,10 +22,6 @@ import oscP5.OscMessage;
 import oscP5.OscP5;
 import processing.core.PApplet;
 import processing.core.PImage;
-
-import net.videosc.runnable.*;
-
-//import static net.videosc.VideOSCSensors.sensorThread;
 
 /**
  * Package: net.videosc
@@ -124,9 +114,6 @@ public class VideOSC extends PApplet {
 	static boolean showSnapshots = false;
 	static long numSnapshots;
 
-	static KetaiSensor sensors;
-	static KetaiLocation location;
-	public static volatile String provider;
 	public static volatile boolean printSensors = false;
 	static boolean sensorsPrinting = false;
 
@@ -148,18 +135,8 @@ public class VideOSC extends PApplet {
 		}
 		camera.release();
 
-		sensors = new KetaiSensor(this);
-		sensors.start();
-		sensors.enableAllSensors();
-//		VideOSCSensors.availableSensors();
-
-		location = new KetaiLocation(this);
-		location.start();
-		provider = location.getProvider();
-		location.setUpdateRate(2000, 1);
-
-//		Log.d(TAG, "provider: " + locationManager.getProvider("gps"));
-
+		VideOSCSensors.initSensors(this);
+		
 		imageMode(CENTER);
 
 		DisplayMetrics dm = new DisplayMetrics();
