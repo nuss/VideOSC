@@ -63,6 +63,8 @@ public class VideOSC extends PApplet {
 	static int framerate = 120;
 	static int calcsPerPeriod = 1;
 	static boolean normalize;
+	static String snapshotSavedOnClose;
+	static boolean saveSnapshotOnClose;
 	private static float[] curInput = new float[3];
 	private static ArrayList<float[]> lastInputList = new ArrayList<float[]>();
 	private static ArrayList<float[]> curInputList = new ArrayList<float[]>();
@@ -179,6 +181,9 @@ public class VideOSC extends PApplet {
 			KetaiAlertDialog.popup(this, "SQL Error", "The resolution settings could not be " +
 					"determined");
 		}
+
+		// update database when updating from older VideOSC version
+		VideOSCDB.addActiveSnapshotColumn(this, db);
 
 		querySuccess = VideOSCDB.setUpSensors(this, db);
 		if (!querySuccess) {
@@ -594,6 +599,10 @@ public class VideOSC extends PApplet {
 		startActivity(setIntent);
 	}
 */
+//	@Override
+	public void stop() {
+		// save a snapshot of the activation state of all pixels
+	}
 
 	// OSC sensor events
 	public void onOrientationEvent(float x, float y, float z, long time, int accuracy) {

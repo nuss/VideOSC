@@ -3,6 +3,7 @@ package net.videosc;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,7 +28,9 @@ public class VideOSCDB extends VideOSC {
 			+ "res_h INTEGER NOT NULL DEFAULT '" + resH + "', "
 			+ "framerate INTEGER NOT NULL DEFAULT '" + framerate + "', "
 			+ "calc_period INTEGER NOT NULL DEFAULT '" + calcsPerPeriod + "',"
-			+ "normalisation INTEGER NOT NULL DEFAULT '" + normalize + "');";
+			+ "normalisation INTEGER NOT NULL DEFAULT '" + normalize + "',"
+			+ "saved_snapshot TEXT DEFAULT NULL,"
+			+ "save_snapshot_on_close INTEGER NOT NULL DEFAULT 0);";
 
 	static boolean setUpNetworkSettings(PApplet applet, KetaiSQLite db) {
 		boolean success = false;
@@ -84,8 +87,8 @@ public class VideOSCDB extends VideOSC {
 
 				if (success) {
 					success = db.execute("INSERT INTO vosc_resolution_setup (`res_w`, `res_h`, " +
-							"`framerate`, " +
-							"`calc_period`, `normalisation`) VALUES ('"
+							"`framerate`, `calc_period`, `normalisation`," +
+							"`save_snapshot_on_close`) VALUES ('"
 							+ resW
 							+ "', '"
 							+ resH
@@ -94,7 +97,10 @@ public class VideOSCDB extends VideOSC {
 							+ "', '"
 							+ calcsPerPeriod
 							+ "', '"
-							+ (normalize ? 1 : 0) + "');");
+							+ (normalize ? 1 : 0)
+							+ "', '"
+							+ 0
+							+ "');");
 					if (!success) {
 						KetaiAlertDialog.popup(applet, "SQL Error", "Entering initial resolution " +
 								"settings into database failed");
@@ -112,12 +118,32 @@ public class VideOSCDB extends VideOSC {
 						framerate = db.getInt("framerate");
 						calcsPerPeriod = db.getInt("calc_period");
 						normalize = db.getInt("normalisation") > 0;
+						snapshotSavedOnClose = db.getString("saved_snapshot");
+						saveSnapshotOnClose = db.getInt("save_snapshot_on_close") > 0;
 					}
 				}
 			}
 		}
 
 		return success;
+	}
+
+	static void addActiveSnapshotColumn(PApplet applet, KetaiSQLite db) {
+		String[] result;
+		boolean success;
+
+		if (db.connect() && db.tableExists("vosc_resolution_setup")) {
+			result = db.getFields("vosc_resolution_setup");
+
+			if (Arrays.asList(result).indexOf("saved_snapshot") < 0 && Arrays.asList(result).indexOf("save_snapshot_on_close") < 0) {
+				db.execute("ALTER TABLE vosc_resolution_setup ADD COLUMN saved_snapshot TEXT DEFAULT NULL;");
+				db.execute("ALTER TABLE vosc_resolution_setup ADD COLUMN save_snapshot_on_close INTEGER DEFAULT 0;");
+				success = db.execute("INSERT INTO vosc_resolution_setup (`save_snapshot_on_close`) VALUES(0);");
+				if (!success)
+					KetaiAlertDialog.popup(applet, "SQL Error", "Adding column for snapshot saved on quit failed!");
+			}
+		}
+
 	}
 
 	static void setUpSnapshots(PApplet applet, KetaiSQLite db) {
