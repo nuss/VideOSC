@@ -214,22 +214,23 @@ public class VideOSCPreferences extends VideOSC {
 			setCalcPeriod.setText(str(calcsPerPeriod));
 
 			final APCheckBox setNormalize = new APCheckBox((applet.width - 95) / 2 - 10, 50 + ((int)
-					density * 180), "normalize output (0.0-1.0)");
+					density * 180), "normalize output (0.0-1.0, does not apply to sensor values)");
+			setNormalize.setSize((applet.width - 220) / 2, 120);
 			if (normalize)
 				setNormalize.setChecked(true);
 			else setNormalize.setChecked(false);
 
-			final APCheckBox rememberSnapshotOnClose = new APCheckBox((applet.width - 95) / 2 - 10, 50 + ((int) density * 210), "remember activated/deactivated pixels on quit");
+			final APCheckBox rememberSnapshotOnClose = new APCheckBox((applet.width - 95) / 2 - 10, 50 + ((int) density * 220), "remember activated/deactivated pixels on quit");
 			rememberSnapshotOnClose.setSize((applet.width - 220) / 2, 120);
 			if (saveSnapshotOnClose)
 				rememberSnapshotOnClose.setChecked(true);
 			else rememberSnapshotOnClose.setChecked(false);
 
-			final APButton cancel = new APButton(50, 50 + ((int) density * 260), (applet.width -
+			final APButton cancel = new APButton(50, 50 + ((int) density * 270), (applet.width -
 					220) /
 					2, 60 * (int) density, "Cancel");
 			final APButton setResolution = new APButton(50 + (applet.width - 220) / 2, 50 + ((int)
-					density * 260), (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
+					density * 270), (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
 //			Log.d(TAG, "Resolution Settings selected");
 			apContainer.addWidget(setResWText);
 			apContainer.addWidget((setResHText));

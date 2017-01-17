@@ -121,6 +121,8 @@ public class VideOSCDB extends VideOSC {
 						snapshotSavedOnClose = db.getString("saved_snapshot");
 						saveSnapshotOnClose = db.getInt("save_snapshot_on_close") > 0;
 					}
+					// define preliminary dimensions
+					dimensions = resH * resW;
 				}
 			}
 		}
@@ -317,18 +319,13 @@ public class VideOSCDB extends VideOSC {
 				success = db.execute("INSERT INTO vosc_snapshots (`date`, `pattern`) VALUES" +
 						"(datetime(),'" + offs + "');");
 			} else {
-				success = db.execute("UPDATE vosc_resolution_setup saved_snapshot='" + offs + "';");
+				success = db.execute("UPDATE vosc_resolution_setup SET saved_snapshot='" + offs + "';");
 			}
 
 			if (!success) {
 				KetaiAlertDialog.popup(applet, "SQL Error", "Writing the snapshot to the database" +
 						" failed");
 			} else {
-				if (onQuit) {
-					success = db.query("SELECT saved_snapshot FROM vosc_resolution_setup;");
-					if (success) Log.d(TAG, "success");
-					else Log.d(TAG, "no success");
-				}
 				if (!onQuit) numSnapshots++;
 			}
 		}
@@ -370,7 +367,6 @@ public class VideOSCDB extends VideOSC {
 					if (snapshot != null)
 						res = db.getString("pattern");
 					else res = db.getString("saved_snapshot");
-					Log.d(TAG, "query result: " + res);
 					// make sure not to set any pixels that don't exist, e.g. if a snapshot has
 					// been set for 24 pixels but the current setup only has 20
 					if (res != null) {
@@ -382,10 +378,17 @@ public class VideOSCDB extends VideOSC {
 								// we simply add the result of a non-equality check applied on the
 								// values stored in the db
 								// 0 is unique code number 48
-								offPxls.get(slot)[0] = (int) res.charAt(i) != 48;
-								offPxls.get(slot)[1] = (int) res.charAt(i + 1) != 48;
-								offPxls.get(slot)[2] = (int) res.charAt(i + 2) != 48;
-//								Log.d(TAG, "offPxls[" + slot +"]: " + offPxls.get(slot)[0] + ", " + offPxls.get(slot)[1] + ", " + offPxls.get(slot)[2]);
+								// depending on if offPxls.get(slot) already exists
+								// we have to either replace the existing value
+								// or to add a triplet of booleans
+								if (offPxls.size() <= slot) {
+									Boolean[] sl = {(int) res.charAt(i) != 48, (int) res.charAt(i + 1) != 48, (int) res.charAt(i + 2) != 48};
+									offPxls.add(sl);
+								} else {
+									offPxls.get(slot)[0] = (int) res.charAt(i) != 48;
+									offPxls.get(slot)[1] = (int) res.charAt(i + 1) != 48;
+									offPxls.get(slot)[2] = (int) res.charAt(i + 2) != 48;
+								}
 							} else if (i % 3 == 2) slot++;
 						}
 					}

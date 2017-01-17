@@ -183,18 +183,19 @@ public class VideOSC extends PApplet {
 					"determined");
 		}
 
-		// update database when updating from older VideOSC version
-		VideOSCDB.addActiveSnapshotColumn(this, db);
-
-		if (saveSnapshotOnClose)
-			VideOSCDB.selectSnapshot(this, null, db);
-
 		querySuccess = VideOSCDB.setUpSensors(this, db);
 		if (!querySuccess) {
 			KetaiAlertDialog.popup(this, "SQL Error", "The sensors settings could not be determined");
 		}
 
 		VideOSCDB.setUpSnapshots(this, db);
+
+		// update database when updating from older VideOSC version
+		VideOSCDB.addActiveSnapshotColumn(this, db);
+
+		if (saveSnapshotOnClose)
+			VideOSCDB.selectSnapshot(this, null, db);
+
 		numSnapshots = VideOSCDB.countSnapshots(this, db);
 
 		pxWidth = width / resW;
@@ -202,7 +203,8 @@ public class VideOSC extends PApplet {
 
 		for (int i = 0; i < resH * resW; i++) {
 			lockList.add(falses.clone());
-			offPxls.add(falses.clone());
+			if (offPxls.size() <= i)
+				offPxls.add(falses.clone());
 		}
 
 		if (oscP5 == null) {
@@ -233,7 +235,7 @@ public class VideOSC extends PApplet {
 	}
 
 	public void draw() {
-		float rval, gval, bval;
+		float rval, gval, bval, alpha ;
 
 		if (frameCount % calcsPerPeriod == 0) {
 			// wipe out anything that's still on screen from the previous cycle
@@ -295,23 +297,28 @@ public class VideOSC extends PApplet {
 				if (rgbMode.equals(RGBModes.RGB)) {
 					if (offPxls.get(i)[0] && !offPxls.get(i)[1] && !offPxls.get(i)[2]) {
 						// r
-						pImg.pixels[i] = color(0, gVal, bVal, 255 / 3);
+						alpha = cam.isStarted() ? 255 / 3 : 0;
+						pImg.pixels[i] = color(0, gVal, bVal, alpha);
 					} else if (!offPxls.get(i)[0] && offPxls.get(i)[1] && !offPxls.get(i)[2]) {
 						// g;
-						pImg.pixels[i] = color(rVal, 0, bVal, 255 / 3);
+						alpha = cam.isStarted() ? 255 / 3 : 0;
+						pImg.pixels[i] = color(rVal, 0, bVal, alpha);
 					} else if (!offPxls.get(i)[0] && !offPxls.get(i)[1] && offPxls.get(i)[2]) {
 						// b;
-						pImg.pixels[i] = color(rVal, gVal, 0, 255 / 3);
+						alpha = cam.isStarted() ? 255 / 3 : 0;
+						pImg.pixels[i] = color(rVal, gVal, 0, alpha);
 					} else if (offPxls.get(i)[0] && offPxls.get(i)[1] && !offPxls.get(i)[2]) {
 						// rg;
-						pImg.pixels[i] = color(0, 0, bVal, 255 / 3 * 2);
+						alpha = cam.isStarted ? 255 / 3 * 2 : 0;
+						pImg.pixels[i] = color(0, 0, bVal, alpha);
 					} else if (offPxls.get(i)[0] && !offPxls.get(i)[1] && offPxls.get(i)[2]) {
 						// rb;
-						pImg.pixels[i] = color(0, gVal, 0, 255 / 3 * 2);
+						alpha = cam.isStarted() ? 255 / 3 * 2 : 0;
+						pImg.pixels[i] = color(0, gVal, 0, alpha);
 					} else if (!offPxls.get(i)[0] && offPxls.get(i)[1] && offPxls.get(i)[2]) {
 						// bg;
-						pImg.pixels[i] = color(rVal, 0, 0, 255 / 3 * 2);
-
+						alpha = cam.isStarted() ? 255 / 3 * 2 : 0;
+						pImg.pixels[i] = color(rVal, 0, 0, alpha);
 					} else if (offPxls.get(i)[0] && offPxls.get(i)[1] && offPxls.get(i)[2]) {
 						// rgb
 						pImg.pixels[i] = color(0, 0);
@@ -603,7 +610,7 @@ public class VideOSC extends PApplet {
 		startActivity(setIntent);
 	}
 */
-//	@Override
+	@Override
 	public void stop() {
 		// save a snapshot of the activation state of all pixels
 		if (saveSnapshotOnClose)
