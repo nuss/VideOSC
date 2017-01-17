@@ -219,11 +219,17 @@ public class VideOSCPreferences extends VideOSC {
 				setNormalize.setChecked(true);
 			else setNormalize.setChecked(false);
 
-			final APButton cancel = new APButton(50, 50 + ((int) density * 230), (applet.width -
+			final APCheckBox rememberSnapshotOnClose = new APCheckBox((applet.width - 95) / 2 - 10, 50 + ((int) density * 210), "remember activated/deactivated pixels on quit");
+			rememberSnapshotOnClose.setSize((applet.width - 220) / 2, 120);
+			if (saveSnapshotOnClose)
+				rememberSnapshotOnClose.setChecked(true);
+			else rememberSnapshotOnClose.setChecked(false);
+
+			final APButton cancel = new APButton(50, 50 + ((int) density * 260), (applet.width -
 					220) /
 					2, 60 * (int) density, "Cancel");
 			final APButton setResolution = new APButton(50 + (applet.width - 220) / 2, 50 + ((int)
-					density * 230), (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
+					density * 260), (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
 //			Log.d(TAG, "Resolution Settings selected");
 			apContainer.addWidget(setResWText);
 			apContainer.addWidget((setResHText));
@@ -235,6 +241,7 @@ public class VideOSCPreferences extends VideOSC {
 			apContainer.addWidget(setFrameRate);
 			apContainer.addWidget(setCalcPeriod);
 			apContainer.addWidget(setNormalize);
+			apContainer.addWidget(rememberSnapshotOnClose);
 			apContainer.addWidget(cancel);
 			cancel.getView().setBackgroundColor(0);
 			apContainer.addWidget(setResolution);
@@ -260,6 +267,7 @@ public class VideOSCPreferences extends VideOSC {
 					int oldFramerate = framerate;
 					framerate = parseInt(setFrameRate.getText());
 					normalize = setNormalize.isChecked();
+					saveSnapshotOnClose = rememberSnapshotOnClose.isChecked();
 
 					if (framerate > 0 && tResW > 0 && tResH > 0 && tCalcsPerPeriod > 0) {
 						boolean querySuccess = VideOSCDB.updateResolutionSettings(db);
@@ -274,6 +282,7 @@ public class VideOSCPreferences extends VideOSC {
 							apContainer.removeWidget(setFrameRate);
 							apContainer.removeWidget(setCalcPeriod);
 							apContainer.removeWidget(setNormalize);
+							apContainer.removeWidget(rememberSnapshotOnClose);
 							apContainer.removeWidget(setResolution);
 							apContainer.removeWidget(cancel);
 							curOptions = "";

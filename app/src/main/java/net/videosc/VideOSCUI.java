@@ -239,7 +239,7 @@ public class VideOSCUI extends VideOSC {
 						gestureMode = GestureModes.ERASE;
 					} else if (x <= applet.width - 490 && x >= applet.width - 590) {
 						// add a new snapshot
-						VideOSCDB.addSnapshot(applet, db);
+						VideOSCDB.addSnapshot(applet, db, false);
 						snapshotProcessing = true;
 					} else if (x <= applet.width - 640 && x >= applet.width - 740) {
 						// show list of selectable saved snapshots

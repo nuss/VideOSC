@@ -245,7 +245,7 @@ public class VideOSCDB extends VideOSC {
 					"SET res_w=" + resW
 					+ ", res_h=" + resH + ", framerate=" + framerate
 					+ ", calc_period=" + calcsPerPeriod + ", normalisation=" + (normalize ? 1 : 0)
-					+ ";");
+					+ ", save_snapshot_on_close=" + (saveSnapshotOnClose ? 1 : 0) + ";");
 		}
 
 		return success;
@@ -299,7 +299,7 @@ public class VideOSCDB extends VideOSC {
 		return result;
 	}
 
-	static boolean addSnapshot(PApplet applet, KetaiSQLite db) {
+	static boolean addSnapshot(PApplet applet, KetaiSQLite db, boolean onQuit) {
 		boolean success = false;
 
 		if (db.connect()) {
@@ -312,15 +312,24 @@ public class VideOSCDB extends VideOSC {
 					offs += slot[i] ? 1 : 0;
 			}
 
-			// store the snapshot under a key represented by the current datetime
-			success = db.execute("INSERT INTO vosc_snapshots (`date`, `pattern`) VALUES" +
+			if (!onQuit) {
+				// store the snapshot under a key represented by the current datetime
+				success = db.execute("INSERT INTO vosc_snapshots (`date`, `pattern`) VALUES" +
 						"(datetime(),'" + offs + "');");
+			} else {
+				success = db.execute("UPDATE vosc_resolution_setup saved_snapshot='" + offs + "';");
+			}
 
 			if (!success) {
 				KetaiAlertDialog.popup(applet, "SQL Error", "Writing the snapshot to the database" +
 						" failed");
 			} else {
-				numSnapshots++;
+				if (onQuit) {
+					success = db.query("SELECT saved_snapshot FROM vosc_resolution_setup;");
+					if (success) Log.d(TAG, "success");
+					else Log.d(TAG, "no success");
+				}
+				if (!onQuit) numSnapshots++;
 			}
 		}
 
@@ -351,25 +360,34 @@ public class VideOSCDB extends VideOSC {
 		int slot = 0;
 
 		if (db.connect()) {
-			success = db.query("SELECT pattern FROM vosc_snapshots WHERE date='" + snapshot + "'");
+			if (snapshot != null)
+				success = db.query("SELECT pattern FROM vosc_snapshots WHERE date='" + snapshot + "';");
+			else
+				success = db.query("SELECT saved_snapshot FROM vosc_resolution_setup;");
 
 			if (success) {
 				while (db.next()) {
-					res = db.getString("pattern");
+					if (snapshot != null)
+						res = db.getString("pattern");
+					else res = db.getString("saved_snapshot");
+					Log.d(TAG, "query result: " + res);
 					// make sure not to set any pixels that don't exist, e.g. if a snapshot has
 					// been set for 24 pixels but the current setup only has 20
-					resl = res.length();
-					if (resl > dimensions * 3) resl = dimensions * 3;
-					for (int i = 0; i < resl; i++) {
-						if (i % 3 == 0) {
-							// a snapshot is an ArrayList of boolean tripplets
-							// we simply add the result of a non-equality check applied on the
-							// values stored in the db
-							// 0 is unique code number 48
-							offPxls.get(slot)[0] = (int) res.charAt(i) != 48;
-							offPxls.get(slot)[1] = (int) res.charAt(i + 1) != 48;
-							offPxls.get(slot)[2] = (int) res.charAt(i + 2) != 48;
-						} else if (i % 3 == 2) slot++;
+					if (res != null) {
+						resl = res.length();
+						if (resl > dimensions * 3) resl = dimensions * 3;
+						for (int i = 0; i < resl; i++) {
+							if (i % 3 == 0) {
+								// a snapshot is an ArrayList of boolean tripplets
+								// we simply add the result of a non-equality check applied on the
+								// values stored in the db
+								// 0 is unique code number 48
+								offPxls.get(slot)[0] = (int) res.charAt(i) != 48;
+								offPxls.get(slot)[1] = (int) res.charAt(i + 1) != 48;
+								offPxls.get(slot)[2] = (int) res.charAt(i + 2) != 48;
+//								Log.d(TAG, "offPxls[" + slot +"]: " + offPxls.get(slot)[0] + ", " + offPxls.get(slot)[1] + ", " + offPxls.get(slot)[2]);
+							} else if (i % 3 == 2) slot++;
+						}
 					}
 				}
 			} else {

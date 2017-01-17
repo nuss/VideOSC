@@ -3,6 +3,7 @@ package net.videosc;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
@@ -184,6 +185,9 @@ public class VideOSC extends PApplet {
 
 		// update database when updating from older VideOSC version
 		VideOSCDB.addActiveSnapshotColumn(this, db);
+
+		if (saveSnapshotOnClose)
+			VideOSCDB.selectSnapshot(this, null, db);
 
 		querySuccess = VideOSCDB.setUpSensors(this, db);
 		if (!querySuccess) {
@@ -602,6 +606,8 @@ public class VideOSC extends PApplet {
 //	@Override
 	public void stop() {
 		// save a snapshot of the activation state of all pixels
+		if (saveSnapshotOnClose)
+			VideOSCDB.addSnapshot(this, db, true);
 	}
 
 	// OSC sensor events
