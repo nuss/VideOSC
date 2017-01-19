@@ -15,7 +15,6 @@ import java.util.Set;
 
 import ketai.camera.KetaiCamera;
 import ketai.data.KetaiSQLite;
-import ketai.sensors.KetaiSensor;
 import ketai.ui.KetaiAlertDialog;
 import ketai.ui.KetaiList;
 import netP5.NetAddress;
@@ -597,22 +596,22 @@ public class VideOSC extends PApplet {
 	}
 */
 
-/*
 	@Override
 	public void onBackPressed() {
-		Log.d("CDA", "onBackPressed Called: " + isFinishing());
-		if (!curOptions.equals(""))
-			curOptions = "";
-		Intent setIntent = new Intent(Intent.ACTION_MAIN);
-		Log.d(TAG, "intent: " + setIntent);
-		setIntent.addCategory(Intent.CATEGORY_HOME);
-		setIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-		startActivity(setIntent);
+		// no action - overriding the backbutton seems impossible in processing 2.
+		// See also: https://github.com/processing/processing-android/issues/45
+		// However, keeping this empty method seems to prevent another bug:
+		// When you're editing a text input you will need the back button to return to
+		// the regular dialog (e.g. a settings dislog). If you accidently hit back again
+		// the application doesn't properly quit. rather it will open again in a a frozen state
+		// Keeping onBackPressed() should simply prevent the application from going to that "frozen"
+		// state (found out emprirically rather than understanding the true cause of problem...)
 	}
-*/
+
 	@Override
 	public void stop() {
 		// save a snapshot of the activation state of all pixels
+		Log.d(TAG, "stop it!!");
 		if (saveSnapshotOnClose)
 			VideOSCDB.addSnapshot(this, db, true);
 	}

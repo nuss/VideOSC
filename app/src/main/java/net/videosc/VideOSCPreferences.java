@@ -319,6 +319,7 @@ public class VideOSCPreferences extends VideOSC {
 					apContainer.removeWidget(setFrameRate);
 					apContainer.removeWidget(setCalcPeriod);
 					apContainer.removeWidget(setNormalize);
+					apContainer.removeWidget(rememberSnapshotOnClose);
 					apContainer.removeWidget(setResolution);
 					apContainer.removeWidget(cancel);
 					curOptions = "";
