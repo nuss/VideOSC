@@ -32,8 +32,8 @@ public class VideOSCPreferences extends VideOSC {
 			final APText ipText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(50),
 					(applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60), (int) VideOSCUI.dc(50));
 			ipText.setText("send OSC to IP:");
-			ipText.setTextSize((int) VideOSCUI.dc(30));
-			final APEditText ipField = new APEditText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(80), (applet.width -
+			ipText.setTextSize(15);
+			final APEditText ipField = new APEditText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(100), (applet.width -
 					(int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60), (int) VideOSCUI.dc(150));
 			ipField.setInputType(1);
 			ipField.setText(sendAddr);
@@ -42,56 +42,56 @@ public class VideOSCPreferences extends VideOSC {
 					(int) VideOSCUI.dc(50), (applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(70),
 					(int) VideOSCUI.dc(50));
 			portText.setText("send OSC to port:");
-			portText.setTextSize((int) VideOSCUI.dc(30));
+			portText.setTextSize(15);
 			final APEditText portField = new APEditText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
-					(int) VideOSCUI.dc(80), (applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(70),
+					(int) VideOSCUI.dc(100), (applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(70),
 					(int) VideOSCUI.dc(150));
 			portField.setInputType(2);
 			portField.setText(str(broadcastPort));
 
-			final APText deviceIPText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(250),
+			final APText deviceIPText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(270),
 					(applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60),
 					(int) VideOSCUI.dc(50));
 			deviceIPText.setText("device IP address:");
-			deviceIPText.setTextSize((int) VideOSCUI.dc(30));
-			final APText deviceIP = new APText((int) VideOSCUI.dc(70), (int) VideOSCUI.dc(320),
+			deviceIPText.setTextSize(15);
+			final APText deviceIP = new APText((int) VideOSCUI.dc(70), (int) VideOSCUI.dc(360),
 					(applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(85),
 					(int) VideOSCUI.dc(100));
-			deviceIP.setTextSize((int) VideOSCUI.dc(40));
+			deviceIP.setTextSize(20);
 			deviceIP.setText(KetaiNet.getIP());
 
 			final APText receivePortText = new APText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
-					(int) VideOSCUI.dc(250), (applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60),
+					(int) VideOSCUI.dc(270), (applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60),
 					(int) VideOSCUI.dc(50));
 			receivePortText.setText("receive OSC-feedback on port:");
-			receivePortText.setTextSize((int) VideOSCUI.dc(30));
+			receivePortText.setTextSize(15);
 			final APEditText receivePortField = new APEditText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
-					(int) VideOSCUI.dc(280), (applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(70),
+					(int) VideOSCUI.dc(320), (applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(70),
 					(int) VideOSCUI.dc(150));
 			receivePortField.setInputType(2);
 			receivePortField.setText(str(listenPort));
 
-			final APText cmdNameText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(450), applet.width -
+			final APText cmdNameText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(490), applet.width -
 					(int) VideOSCUI.dc(320), (int) VideOSCUI.dc(50));
 			cmdNameText.setText("command name:");
-			cmdNameText.setTextSize((int) VideOSCUI.dc(30));
-			final APText cmdNameTextPre = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(530),
+			cmdNameText.setTextSize(15);
+			final APText cmdNameTextPre = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(580),
 					(int) VideOSCUI.dc(20), (int) VideOSCUI.dc(50));
-			cmdNameTextPre.setTextSize((int) VideOSCUI.dc(30));
+			cmdNameTextPre.setTextSize(15);
 			cmdNameTextPre.setText("/");
-			final APEditText cmdNameSpace = new APEditText((int) VideOSCUI.dc(70), (int) VideOSCUI.dc(480),
+			final APEditText cmdNameSpace = new APEditText((int) VideOSCUI.dc(70), (int) VideOSCUI.dc(530),
 					(applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(85), (int) VideOSCUI.dc(150));
 			cmdNameSpace.setInputType(1);
 			cmdNameSpace.setText(rootCmd);
 			final APText cmdNameTextPost = new APText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
-					(int) VideOSCUI.dc(530), (int) VideOSCUI.dc(500), (int) VideOSCUI.dc(50));
-			cmdNameTextPost.setTextSize((int) VideOSCUI.dc(30));
+					(int) VideOSCUI.dc(580), (int) VideOSCUI.dc(500), (int) VideOSCUI.dc(50));
+			cmdNameTextPost.setTextSize(15);
 			cmdNameTextPost.setText("/<colorN>");
 
-			final APButton cancel = new APButton((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(650),
+			final APButton cancel = new APButton((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(710),
 					(applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Cancel");
 			final APButton setNetwork = new APButton((int) VideOSCUI.dc(50) + (applet.width - (int) VideOSCUI.dc(220)) / 2,
-					(int) VideOSCUI.dc(650), (applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Save Settings");
+					(int) VideOSCUI.dc(710), (applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Save Settings");
 
 			apContainer.addWidget(ipText);
 			apContainer.addWidget(portText);
@@ -172,42 +172,43 @@ public class VideOSCPreferences extends VideOSC {
 			});
 			curOptions = "network";
 		} else if (select.equals("Resolution Settings")) {
-			final APText setResWText = new APText(50, 50, (applet.width - 100) / 2 - 60, 50 * (int)
-					density);
-			setResWText.setTextSize(20);
+			final APText setResWText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(50),
+					(applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60), (int) VideOSCUI.dc(50));
+			setResWText.setTextSize(15);
 			setResWText.setText("horizontal resolution:");
-			final APEditText setResW = new APEditText(50, 50 + ((int) density * 30), (applet.width -
-					100) / 2 - 60, 50 * (int) density);
+			final APEditText setResW = new APEditText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(100),
+					(applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60), (int) VideOSCUI.dc(150));
 			setResW.setInputType(2);
 			setResW.setText(str(resW));
 
-			final APText setResHText = new APText((applet.width - 95) / 2 - 10, 50, (applet.width -
-					100) / 2 - 60, 50 * (int) density);
-			setResHText.setTextSize(20);
+			final APText setResHText = new APText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
+					(int) VideOSCUI.dc(50), (applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60),
+					(int) VideOSCUI.dc(50));
+			setResHText.setTextSize(15);
 			setResHText.setText("vertical resolution:");
-			final APEditText setResH = new APEditText((applet.width - 95) / 2 - 10, 50 + ((int)
-					density
-					* 30), (applet.width - 100) / 2 - 60, 50 * (int) density);
+			final APEditText setResH = new APEditText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
+					(int) VideOSCUI.dc(100), (applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60),
+					(int) VideOSCUI.dc(150));
 			setResH.setInputType(2);
 			setResH.setText(str(resH));
 
-			final APText setFrameRateText = new APText(50, 50 + ((int) density * 90), (applet
-					.width -
-					100) / 4 - 30, 70 * (int) density);
-			setFrameRateText.setTextSize(20);
+			final APText setFrameRateText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(270),
+					(applet.width - (int) VideOSCUI.dc(100)) / 4 - (int) VideOSCUI.dc(30), (int) VideOSCUI.dc(120));
+			setFrameRateText.setTextSize(15);
 			setFrameRateText.setText("set framerate in frames per second:");
-			final APEditText setFrameRate = new APEditText(50, 50 + ((int) density * 170), (applet
-					.width - 100) / 4 - 30, 50 * (int) density);
+			final APEditText setFrameRate = new APEditText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(370),
+					(applet.width - (int) VideOSCUI.dc(100)) / 4 - (int) VideOSCUI.dc(30), (int) VideOSCUI.dc(150));
 			setFrameRate.setInputType(2);
 			setFrameRate.setText(str(framerate));
 
-			final APText setCalcPeriodText = new APText((applet.width - 100) / 4 + 40, 50 + ((int)
-					density * 90), (applet.width - 100) / 4 - 50, 70 * (int) density);
-			setCalcPeriodText.setTextSize(20);
+			final APText setCalcPeriodText = new APText((applet.width - (int) VideOSCUI.dc(100)) / 4 + (int) VideOSCUI.dc(40),
+					(int) VideOSCUI.dc(270), (applet.width - (int) VideOSCUI.dc(100)) / 4 - (int) VideOSCUI.dc(30),
+					(int) VideOSCUI.dc(120));
+			setCalcPeriodText.setTextSize(15);
 			setCalcPeriodText.setText("set calculation period:");
-			final APEditText setCalcPeriod = new APEditText((applet.width - 100) / 4 + 20, 50 + (
-					(int)
-							density * 170), (applet.width - 100) / 4 - 30, (int) density * 50);
+			final APEditText setCalcPeriod = new APEditText((applet.width - (int) VideOSCUI.dc(100)) / 4 + (int) VideOSCUI.dc(20),
+					(int) VideOSCUI.dc(370), (applet.width - (int) VideOSCUI.dc(100)) / 4 - (int) VideOSCUI.dc(30),
+					(int) VideOSCUI.dc(150));
 			setCalcPeriod.setInputType(2);
 			setCalcPeriod.setText(str(calcsPerPeriod));
 
