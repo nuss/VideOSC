@@ -135,8 +135,8 @@ public class VideOSC extends PApplet {
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		density = dm.density;
 
+		// start the app in basic mode
 		mode = InteractionModes.BASIC;
-//		mode = InteractionModes.SINGLE_PIXEL;
 
 		// for some reason setup() often (but not always) seems to be executed twice
 		// hence, we check if variables have already been initialized
@@ -214,9 +214,9 @@ public class VideOSC extends PApplet {
 
 		VideOSCUI.loadUIImages(this);
 
-		VideOSCUI.uiYtop = 80;
-		VideOSCUI.uiXright = width - 130;
-		VideOSCUI.uiYbottom = height - 90;
+		VideOSCUI.uiYtop = (int) VideOSCUI.dc(80);
+		VideOSCUI.uiXright = (int) (width - VideOSCUI.dc(130));
+		VideOSCUI.uiYbottom = (int) (height - VideOSCUI.dc(90));
 
 		backKeyState = 0;
 
@@ -229,18 +229,22 @@ public class VideOSC extends PApplet {
 			// e.g. text from preferences dialogs...
 			background(0);
 			if (!cam.isStarted()) {
-				new VideOSCPreload(this, width / 2, height / 2 + 170, 12, 5);
+				new VideOSCPreload(this, width / 2, height / 2 + (int) VideOSCUI.dc(170), 12, 5);
 				textAlign(CENTER);
 				fill(255);
-				textSize(40);
-				text("TAP SCREEN TO OPEN CAMERA", width / 2, height / 2 + 280);
+				textSize(VideOSCUI.dc(40));
+				text("TAP SCREEN TO OPEN CAMERA", width / 2, height / 2 + VideOSCUI.dc(280));
 			}
 			textAlign(LEFT);
 
+			// get video frame
 			pImg = cam.get();
 			pImg.loadPixels();
 			pImg.updatePixels();
+			// draw original image behind the down scaled one
 			image(pImg, width / 2, height / 2, width, height);
+
+			// resize the image
 			pImg.resize(resW, resH);
 			pImg.loadPixels();
 			dimensions = pImg.width * pImg.height;
@@ -263,9 +267,13 @@ public class VideOSC extends PApplet {
 				}
 			}
 
+			// handle image creation and sending pixel values via OSC
 			VideOSCImageHandling.drawFrame(this);
 
+			// draw the down-scaled image over the original
 			image(pImg, width / 2, height / 2, width, height);
+
+			// draw GUI elements
 			VideOSCUI.drawTools(this, db);
 			if (showFB)
 				VideOSCUI.printOSC(this);
@@ -279,6 +287,8 @@ public class VideOSC extends PApplet {
 				VideOSCSensors.updatePrintedSensors();
 			}
 		} else {
+			// don't update image but interpolate values between
+			// previously drawn frame and the current one
 			if (play && VideOSCImageHandling.lastInputList.size() >= dimensions) {
 				int index = frameCount % calcsPerPeriod;
 				VideOSCImageHandling.interpolatedFrames(index);
@@ -385,43 +395,6 @@ public class VideOSC extends PApplet {
 		VideOSCUI.processKetaiListClicks(this, klist, db);
 	}
 
-/*
-	public void keyPressed() {
-//		Intent restartServiceIntent = new Intent(getApplicationContext(), this.getClass());
-		Log.d(TAG, "is finishing: " + isFinishing());
-//		Context context = getApplicationContext();
-//		Log.d(TAG, "context: " + context);
-		if (key == CODED) {
-			Log.d(TAG, "key == CODED");
-//			restartServiceIntent.setPackage(getPackageName());
-			if (keyCode == MENU && curOptions.equals("")*/
-/* && preferencesListInvisible*//*
-) {
-				showHide = true;
-			} */
-/*else if (keyCode == android.view.KeyEvent.KEYCODE_BACK) {
-				return true;
-//				Log.d(TAG, "back key hit");
-			}*//*
-
-		}
-	}
-*/
-
-/*
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event)  {
-		Log.d(TAG, "onKeyDown called: " + keyCode + ", " + event + ", " + isFinishing());
-		if (keyCode == KeyEvent.KEYCODE_BACK
-				&& event.getRepeatCount() == 0) {
-			Log.d(TAG, "back button hit");
-			onBackPressed();
-			return true;
-		}
-		return super.onKeyDown(keyCode, event);
-	}
-*/
-
 	@Override
 	public void onBackPressed() {
 		// no action - overriding the backbutton seems impossible in processing 2.
@@ -437,7 +410,6 @@ public class VideOSC extends PApplet {
 	@Override
 	public void stop() {
 		// save a snapshot of the activation state of all pixels
-		Log.d(TAG, "stop it!!");
 		if (saveSnapshotOnClose)
 			VideOSCDB.addSnapshot(this, db, true);
 	}

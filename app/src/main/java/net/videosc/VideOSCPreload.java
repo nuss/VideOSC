@@ -1,13 +1,6 @@
 package net.videosc;
 
-import android.util.Log;
-
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import processing.core.PApplet;
 
 /**
@@ -22,7 +15,7 @@ class VideOSCPreload {
 	private static int width;
 
 	VideOSCPreload(PApplet applet, int x, int y, int size, float probability) {
-		width = size * 50;
+		width = size * (int) VideOSCUI.dc(50);
 
 		if (squareRows.size() > 0) {
 			// create rows for each screen
@@ -33,9 +26,9 @@ class VideOSCPreload {
 
 				for (int i = 0; i < l; i++) {
 					if (row[i] != null) {
-						int newY = row[i][1] - 50;
+						int newY = row[i][1] - (int) VideOSCUI.dc(50);
 						int newAlpha = row[i][2] - 25;
-						if (newY < -50) {
+						if (newY < VideOSCUI.dc(-50)) {
 							rowsToRemove.add(row);
 						} else {
 							new PreloaderSquare(applet, row[i][0], newY, newAlpha);
@@ -65,7 +58,7 @@ class VideOSCPreload {
 		for (int i = 0; i < size; i++) {
 			if (applet.random(10) > probability) {
 				// positions for each square in the row
-				int[] args = {50 * i + x - (width / 2), y, 255};
+				int[] args = {(int) VideOSCUI.dc(50) * i + x - (width / 2), y, 255};
 				row[i] = args;
 			} else  {
 				// don't create square

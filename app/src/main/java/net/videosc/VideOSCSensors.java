@@ -307,9 +307,9 @@ public class VideOSCSensors extends VideOSC {
 
 	static boolean printSensors(final PApplet applet, KetaiSQLite db) {
 		final APWidgetContainer container = new APWidgetContainer(applet);
-		final APButton close = new APButton((applet.width - 220) / 4 + 50, 50, (applet.width - 220) / 2, 50 * (int) density, "Close");
+		final APButton close = new APButton((applet.width - (int) VideOSCUI.dc(220)) / 4 + (int) VideOSCUI.dc(50), (int) VideOSCUI.dc(50), (applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Close");
 		APText text;
-		int nextYPos = 50;
+		int nextYPos = (int) VideOSCUI.dc(50);
 
 		completeSensorsInUse(db);
 
@@ -321,13 +321,13 @@ public class VideOSCSensors extends VideOSC {
 		for (String key : VideOSCSensors.sensorsInUse.keySet()) {
 			Log.d(TAG, VideOSCSensors.sensorsInUse.get(key));
 
-			text = new APText(50, nextYPos, applet.width - 230, 120);
+			text = new APText((int) VideOSCUI.dc(50), nextYPos, applet.width - (int) VideOSCUI.dc(230), (int) VideOSCUI.dc(120));
 			text.setText(VideOSCSensors.sensorsInUse.get(key));
-			text.setTextSize(16);
+			text.setTextSize((int) VideOSCUI.dc(32));
 			texts.put(key, text);
-			nextYPos = text.getY() + text.getHeight() + 10;
+			nextYPos = text.getY() + text.getHeight() + (int) VideOSCUI.dc(10);
 		}
-		close.setPosition((applet.width - 220) / 4 + 50, nextYPos);
+		close.setPosition((applet.width - (int) VideOSCUI.dc(220)) / 4 + (int) VideOSCUI.dc(50), nextYPos);
 		close.addOnClickWidgetListener(new OnClickWidgetListener() {
 			@Override
 			public void onClickWidget(APWidget apWidget) {

@@ -29,71 +29,69 @@ public class VideOSCPreferences extends VideOSC {
 		final APWidgetContainer apContainer = new APWidgetContainer(applet);
 
 		if (select.equals("Network Settings")) {
-//			Log.d(TAG, "select equals Network Settings");
-
-			final APText ipText = new APText(50, 50, (applet.width - 100) / 2 - 60, 50 * (int)
-					density);
+			final APText ipText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(50),
+					(applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60), (int) VideOSCUI.dc(50));
 			ipText.setText("send OSC to IP:");
-			ipText.setTextSize(20);
-			final APEditText ipField = new APEditText(50, 50 + ((int) density * 30), (applet.width -
-					100) / 2 - 60, 50 * (int) density);
+			ipText.setTextSize((int) VideOSCUI.dc(30));
+			final APEditText ipField = new APEditText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(80), (applet.width -
+					(int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60), (int) VideOSCUI.dc(150));
 			ipField.setInputType(1);
 			ipField.setText(sendAddr);
 
-			final APText portText = new APText((applet.width - 95) / 2 - 10, 50, (applet.width - 95)
-					/ 2
-					- 70, 50 * (int) density);
+			final APText portText = new APText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
+					(int) VideOSCUI.dc(50), (applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(70),
+					(int) VideOSCUI.dc(50));
 			portText.setText("send OSC to port:");
-			portText.setTextSize(20);
-			final APEditText portField = new APEditText((applet.width - 95) / 2 - 10, 50 + ((int)
-					density * 30), (applet.width - 95) / 2 - 70, 50 * (int) density);
+			portText.setTextSize((int) VideOSCUI.dc(30));
+			final APEditText portField = new APEditText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
+					(int) VideOSCUI.dc(80), (applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(70),
+					(int) VideOSCUI.dc(150));
 			portField.setInputType(2);
 			portField.setText(str(broadcastPort));
 
-			final APText deviceIPText = new APText(50, 50 + ((int) density * 90), (applet.width -
-					100)
-					/ 2 - 60, 50 * (int) density);
+			final APText deviceIPText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(250),
+					(applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60),
+					(int) VideOSCUI.dc(50));
 			deviceIPText.setText("device IP address:");
-			deviceIPText.setTextSize(20);
-			final APText deviceIP = new APText(70, 50 + ((int) density *
-					140), (applet.width - 95) / 2 - 85, 50 * (int) density);
-			deviceIP.setTextSize(20);
+			deviceIPText.setTextSize((int) VideOSCUI.dc(30));
+			final APText deviceIP = new APText((int) VideOSCUI.dc(70), (int) VideOSCUI.dc(320),
+					(applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(85),
+					(int) VideOSCUI.dc(100));
+			deviceIP.setTextSize((int) VideOSCUI.dc(40));
 			deviceIP.setText(KetaiNet.getIP());
 
-			final APText receivePortText = new APText((applet.width - 95) / 2 - 10, 50 + ((int)
-					density
-					* 90), (applet.width - 95) / 2 - 70, 50 * (int) density);
+			final APText receivePortText = new APText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
+					(int) VideOSCUI.dc(250), (applet.width - (int) VideOSCUI.dc(100)) / 2 - (int) VideOSCUI.dc(60),
+					(int) VideOSCUI.dc(50));
 			receivePortText.setText("receive OSC-feedback on port:");
-			receivePortText.setTextSize(20);
-			final APEditText receivePortField = new APEditText((applet.width - 95) / 2 - 10, 50 + (
-					(int) density * 140), (applet.width - 95) / 2 - 70, 50 * (int) density);
+			receivePortText.setTextSize((int) VideOSCUI.dc(30));
+			final APEditText receivePortField = new APEditText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
+					(int) VideOSCUI.dc(280), (applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(70),
+					(int) VideOSCUI.dc(150));
 			receivePortField.setInputType(2);
 			receivePortField.setText(str(listenPort));
 
-			final APText cmdNameText = new APText(50, 50 + 200 * (int) density, applet.width -
-					300, 50
-					* (int) density);
+			final APText cmdNameText = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(450), applet.width -
+					(int) VideOSCUI.dc(320), (int) VideOSCUI.dc(50));
 			cmdNameText.setText("command name:");
-			cmdNameText.setTextSize(20);
-			final APText cmdNameTextPre = new APText(50, 50 + 240 * (int) density, 20, 50 * (int)
-					density);
-			cmdNameTextPre.setTextSize(20);
+			cmdNameText.setTextSize((int) VideOSCUI.dc(30));
+			final APText cmdNameTextPre = new APText((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(530),
+					(int) VideOSCUI.dc(20), (int) VideOSCUI.dc(50));
+			cmdNameTextPre.setTextSize((int) VideOSCUI.dc(30));
 			cmdNameTextPre.setText("/");
-			final APEditText cmdNameSpace = new APEditText(70, 50 + 230 * (int) density, (applet
-					.width
-					- 95) / 2 - 85, 50 * (int) density);
+			final APEditText cmdNameSpace = new APEditText((int) VideOSCUI.dc(70), (int) VideOSCUI.dc(480),
+					(applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(85), (int) VideOSCUI.dc(150));
 			cmdNameSpace.setInputType(1);
 			cmdNameSpace.setText(rootCmd);
-			final APText cmdNameTextPost = new APText((applet.width - 95) / 2 - 10, 50 + 240 * (int)
-					density, 500, 50 * (int) density);
-			cmdNameTextPost.setTextSize(20);
+			final APText cmdNameTextPost = new APText((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
+					(int) VideOSCUI.dc(530), (int) VideOSCUI.dc(500), (int) VideOSCUI.dc(50));
+			cmdNameTextPost.setTextSize((int) VideOSCUI.dc(30));
 			cmdNameTextPost.setText("/<colorN>");
 
-			final APButton cancel = new APButton(50, 50 + 290 * (int) density, (applet.width -
-					220) /
-					2, 60 * (int) density, "Cancel");
-			final APButton setNetwork = new APButton(50 + (applet.width - 220) / 2, 50 + 290 * (int)
-					density, (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
+			final APButton cancel = new APButton((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(650),
+					(applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Cancel");
+			final APButton setNetwork = new APButton((int) VideOSCUI.dc(50) + (applet.width - (int) VideOSCUI.dc(220)) / 2,
+					(int) VideOSCUI.dc(650), (applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Save Settings");
 
 			apContainer.addWidget(ipText);
 			apContainer.addWidget(portText);
@@ -231,7 +229,7 @@ public class VideOSCPreferences extends VideOSC {
 					2, 60 * (int) density, "Cancel");
 			final APButton setResolution = new APButton(50 + (applet.width - 220) / 2, 50 + ((int)
 					density * 270), (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
-//			Log.d(TAG, "Resolution Settings selected");
+
 			apContainer.addWidget(setResWText);
 			apContainer.addWidget((setResHText));
 			apContainer.addWidget(setFrameRateText);
@@ -668,7 +666,7 @@ public class VideOSCPreferences extends VideOSC {
 
 	static void darkenBackground(PApplet applet) {
 		if (curOptions.length() > 0 || sensorsPrinting) {
-			applet.fill(0, 153);
+			applet.fill(0, 204);
 			applet.rect(0, 0, applet.width, applet.height);
 		}
 	}
