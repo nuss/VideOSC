@@ -213,7 +213,7 @@ public class VideOSCUI extends VideOSC {
 						displayFramerate = !displayFramerate;
 					} else if (y >= applet.height / 6 * 5 && curOptions.equals("")) {
 						preferencesList = new KetaiList(applet, optionsList);
-						preferencesList.setAlpha(0.6f);
+						preferencesList.setAlpha(0.8f);
 						selectionListActive = true;
 						backKeyState = 1;
 						// println("backKeyState: "+backKeyState);
@@ -247,7 +247,7 @@ public class VideOSCUI extends VideOSC {
 						snapshotsList = VideOSCDB.getSnapshotKeys(db);
 						snapshotsList = append(snapshotsList, "Reset Snapshots");
 						snapshotsSelect = new KetaiList(applet, snapshotsList);
-						snapshotsSelect.setAlpha(0.6f);
+						snapshotsSelect.setAlpha(0.8f);
 						selectionListActive = true;
 					}
 				}

@@ -1,5 +1,7 @@
 package net.videosc;
 
+import android.util.Log;
+
 import net.videosc.APWidgetExtend.APText;
 
 import java.util.Calendar;
@@ -212,24 +214,26 @@ public class VideOSCPreferences extends VideOSC {
 			setCalcPeriod.setInputType(2);
 			setCalcPeriod.setText(str(calcsPerPeriod));
 
-			final APCheckBox setNormalize = new APCheckBox((applet.width - 95) / 2 - 10, 50 + ((int)
-					density * 180), "normalize output (0.0-1.0, does not apply to sensor values)");
-			setNormalize.setSize((applet.width - 220) / 2, 120);
+			final APCheckBox setNormalize = new APCheckBox((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
+					(int) VideOSCUI.dc(260), "normalize output (0.0-1.0, does not apply to sensor values)");
+			setNormalize.setSize((applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(200));
+			setNormalize.setTextSize(15);
 			if (normalize)
 				setNormalize.setChecked(true);
 			else setNormalize.setChecked(false);
 
-			final APCheckBox rememberSnapshotOnClose = new APCheckBox((applet.width - 95) / 2 - 10, 50 + ((int) density * 220), "remember activated/deactivated pixels on quit");
-			rememberSnapshotOnClose.setSize((applet.width - 220) / 2, 120);
+			final APCheckBox rememberSnapshotOnClose = new APCheckBox((applet.width - (int) VideOSCUI.dc(95)) / 2 - (int) VideOSCUI.dc(10),
+					(int) VideOSCUI.dc(440), "remember activated/deactivated pixels on quit");
+			rememberSnapshotOnClose.setSize((applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(120));
+			rememberSnapshotOnClose.setTextSize(15);
 			if (saveSnapshotOnClose)
 				rememberSnapshotOnClose.setChecked(true);
 			else rememberSnapshotOnClose.setChecked(false);
 
-			final APButton cancel = new APButton(50, 50 + ((int) density * 270), (applet.width -
-					220) /
-					2, 60 * (int) density, "Cancel");
-			final APButton setResolution = new APButton(50 + (applet.width - 220) / 2, 50 + ((int)
-					density * 270), (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
+			final APButton cancel = new APButton((int) VideOSCUI.dc(50), (int) VideOSCUI.dc(600),
+					(applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Cancel");
+			final APButton setResolution = new APButton((int) VideOSCUI.dc(50) + (applet.width - (int) VideOSCUI.dc(220)) / 2,
+					(int) VideOSCUI.dc(600), (applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Save Settings");
 
 			apContainer.addWidget(setResWText);
 			apContainer.addWidget((setResHText));
@@ -326,12 +330,12 @@ public class VideOSCPreferences extends VideOSC {
 			});
 			curOptions = "resolution";
 		} else if (select.equals("Sensors")) {
-			int nextYPos = 50;
+			int nextYPos = (int) VideOSCUI.dc(50);
 			final APCheckBox useOri, useAcc, useLinAcc, useMag, useGrav, useProx, useLight, usePress, useTemp, useHum, useLoc;
 
-			useOri = new APCheckBox(50, nextYPos, "orientation sensor: rotation in degrees - '/" + VideOSC.rootCmd + "/ori', x, y, z, timestamp, accuracy");
-			useOri.setTextSize(16);
-			useOri.setSize(applet.width - 220, (int) (45 * density));
+			useOri = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "orientation sensor: rotation in degrees - '/" + VideOSC.rootCmd + "/ori', x, y, z, timestamp, accuracy");
+			useOri.setTextSize(15);
+			useOri.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if (!VideOSCSensors.sensors.isOrientationAvailable())
 				useOri.setText(useOri.getText() + " (not available)");
 			useOri.setChecked(VideOSCSensors.useOri);
@@ -343,11 +347,11 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(useOri);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			useAcc = new APCheckBox(50, nextYPos, "accelerometer: force in m/s^2 - '/" + VideOSC.rootCmd + "/acc', x, y, z, timestamp, accuracy");
-			useAcc.setTextSize(16);
-			useAcc.setSize(applet.width - 220, (int) (45 * density));
+			useAcc = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "accelerometer: force in m/s^2 - '/" + VideOSC.rootCmd + "/acc', x, y, z, timestamp, accuracy");
+			useAcc.setTextSize(15);
+			useAcc.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if (!VideOSCSensors.sensors.isAccelerometerAvailable())
 				useAcc.setText(useAcc.getText() + " (not available)");
 			useAcc.setChecked(VideOSCSensors.useAcc);
@@ -359,11 +363,11 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(useAcc);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			useLinAcc = new APCheckBox(50, nextYPos, "linear acceleration sensor: m/s^2 minus gravity - '/" + VideOSC.rootCmd + "/lin_acc', x, y, z, timestamp, accuracy");
-			useLinAcc.setTextSize(16);
-			useLinAcc.setSize(applet.width - 220, (int) (45 * density));
+			useLinAcc = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "linear acceleration sensor: m/s^2 minus gravity - '/" + VideOSC.rootCmd + "/lin_acc', x, y, z, timestamp, accuracy");
+			useLinAcc.setTextSize(15);
+			useLinAcc.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if (!VideOSCSensors.sensors.isLinearAccelerationAvailable())
 				useLinAcc.setText(useLinAcc.getText() + " (not available)");
 			useLinAcc.setChecked(VideOSCSensors.useLinAcc);
@@ -375,11 +379,11 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(useLinAcc);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			useMag = new APCheckBox(50, nextYPos, "magnetic field sensor: geomagnetic field in uT - '/" + VideOSC.rootCmd + "/mag', x, y, z, timestamp, accuracy");
-			useMag.setTextSize(16);
-			useMag.setSize(applet.width - 220, (int) (45 * density));
+			useMag = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "magnetic field sensor: geomagnetic field in uT - '/" + VideOSC.rootCmd + "/mag', x, y, z, timestamp, accuracy");
+			useMag.setTextSize(15);
+			useMag.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if (!VideOSCSensors.sensors.isMagenticFieldAvailable())
 				useMag.setText(useMag.getText() + " (not available)");
 			useMag.setChecked(VideOSCSensors.useMag);
@@ -391,11 +395,11 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(useMag);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			useGrav = new APCheckBox(50, nextYPos, "gravity sensor: force of gravity in m/s^2 - '/" + VideOSC.rootCmd + "/grav', x, y, z, timestamp, accuracy");
-			useGrav.setTextSize(16);
-			useGrav.setSize(applet.width - 220, (int) (45 * density));
+			useGrav = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "gravity sensor: force of gravity in m/s^2 - '/" + VideOSC.rootCmd + "/grav', x, y, z, timestamp, accuracy");
+			useGrav.setTextSize(15);
+			useGrav.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if ((!VideOSCSensors.sensors.isGyroscopeAvailable() && !VideOSCSensors.sensors.isAccelerometerAvailable() && !VideOSCSensors.sensors.isMagenticFieldAvailable()) ||
 					(VideOSCSensors.sensors.isGyroscopeAvailable() && !VideOSCSensors.sensors.isAccelerometerAvailable()))
 				useGrav.setText(useGrav.getText() + " (not available)");
@@ -411,11 +415,11 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(useGrav);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			useProx = new APCheckBox(50, nextYPos, "proximity sensor: distance from sensor, typically 0, 1 - '/" + VideOSC.rootCmd + "/prox', distance, timestamp, accuracy");
-			useProx.setTextSize(16);
-			useProx.setSize(applet.width - 220, (int) (45 * density));
+			useProx = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "proximity sensor: distance from sensor, typically 0, 1 - '/" + VideOSC.rootCmd + "/prox', distance, timestamp, accuracy");
+			useProx.setTextSize(15);
+			useProx.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if (!VideOSCSensors.sensors.isProximityAvailable())
 				useProx.setText(useProx.getText() + " (not available)");
 			useProx.setChecked(VideOSCSensors.useProx);
@@ -427,11 +431,11 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(useProx);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			useLight = new APCheckBox(50, nextYPos, "light sensor: illumination from sensor in lx - '/" + VideOSC.rootCmd + "/light', illumination, timestamp, accuracy");
-			useLight.setTextSize(16);
-			useLight.setSize(applet.width - 220, (int) (45 * density));
+			useLight = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "light sensor: illumination from sensor in lx - '/" + VideOSC.rootCmd + "/light', illumination, timestamp, accuracy");
+			useLight.setTextSize(15);
+			useLight.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if (!VideOSCSensors.sensors.isLightAvailable())
 				useLight.setText(useLight.getText() + " (not available)");
 			useLight.setChecked(VideOSCSensors.useLight);
@@ -443,11 +447,11 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(useLight);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			usePress = new APCheckBox(50, nextYPos, "air pressure sensor: ambient pressure in hPa or mbar - '/" + VideOSC.rootCmd + "/press', pressure, timestamp, accuracy");
-			usePress.setTextSize(16);
-			usePress.setSize(applet.width - 220, (int) (45 * density));
+			usePress = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "air pressure sensor: ambient pressure in hPa or mbar - '/" + VideOSC.rootCmd + "/press', pressure, timestamp, accuracy");
+			usePress.setTextSize(15);
+			usePress.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if (!VideOSCSensors.sensors.isPressureAvailable())
 				usePress.setText(usePress.getText() + " (not available)");
 			usePress.setChecked(VideOSCSensors.usePress);
@@ -459,11 +463,11 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(usePress);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			useTemp = new APCheckBox(50, nextYPos, "temperature sensor: temperature in degrees in °C - '/" + VideOSC.rootCmd + "/temp', temperature");
-			useTemp.setTextSize(16);
-			useTemp.setSize(applet.width - 220, (int) (45 * density));
+			useTemp = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "temperature sensor: temperature in degrees in °C - '/" + VideOSC.rootCmd + "/temp', temperature");
+			useTemp.setTextSize(15);
+			useTemp.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if (!VideOSCSensors.sensors.isAmbientTemperatureAvailable())
 				useTemp.setText(useTemp.getText() + " (not available)");
 			useTemp.setChecked(VideOSCSensors.useTemp);
@@ -475,11 +479,11 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(useTemp);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			useHum = new APCheckBox(50, nextYPos, "humidity sensor: ambient humidity in % - '/" + VideOSC.rootCmd + "/hum', humidity");
-			useHum.setTextSize(16);
-			useHum.setSize(applet.width - 220, (int) (45 * density));
+			useHum = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "humidity sensor: ambient humidity in % - '/" + VideOSC.rootCmd + "/hum', humidity");
+			useHum.setTextSize(15);
+			useHum.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			if (!VideOSCSensors.sensors.isRelativeHumidityAvailable())
 				useHum.setText(useHum.getText() + " (not available)");
 			useHum.setChecked(VideOSCSensors.useHum);
@@ -491,19 +495,19 @@ public class VideOSCPreferences extends VideOSC {
 				}
 			});
 			apContainer.addWidget(useHum);
-			nextYPos += 50 * density;
+			nextYPos += (int) VideOSCUI.dc(140);
 
-			useLoc = new APCheckBox(50, nextYPos, "geo location: '/" + VideOSC.rootCmd + "/loc', latitude, longitude, altitude");
-			useLoc.setTextSize(16);
-			useLoc.setSize(applet.width - 220, (int) (45 * density));
+			useLoc = new APCheckBox((int) VideOSCUI.dc(50), nextYPos, "geo location: '/" + VideOSC.rootCmd + "/loc', latitude, longitude, altitude");
+			useLoc.setTextSize(15);
+			useLoc.setSize(applet.width - (int) VideOSCUI.dc(220), (int) VideOSCUI.dc(120));
 			useLoc.setChecked(VideOSCSensors.useLoc);
 
 			apContainer.addWidget(useLoc);
-			nextYPos += 50 * density;
-			final APButton cancel = new APButton(50, 50 + nextYPos, (applet.width -
-					220) /
-					2, 60 * (int) density, "Cancel");
-			final APButton save = new APButton(50 + (applet.width - 220) / 2, 50 + nextYPos, (applet.width - 220) / 2, 60 * (int) density, "Save Settings");
+			nextYPos += (int) VideOSCUI.dc(140);
+			final APButton cancel = new APButton((int) VideOSCUI.dc(50), nextYPos + (int) VideOSCUI.dc(50),
+					(applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Cancel");
+			final APButton save = new APButton((int) VideOSCUI.dc(50) + (applet.width - (int) VideOSCUI.dc(220)) / 2,
+					nextYPos + (int) VideOSCUI.dc(50), (applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Save Settings");
 			apContainer.addWidget(cancel);
 			cancel.getView().setBackgroundColor(0);
 			apContainer.addWidget(save);
@@ -607,8 +611,10 @@ public class VideOSCPreferences extends VideOSC {
 
 			curOptions = "sensors";
 		} else if (select.equals("About VideOSC")) {
-			final APText about = new APText(50, 50, applet.width - 230, (int) (applet.height * 4.2));
-			about.setTextSize(16);
+			int aboutWidth = 1400;
+			final APText about = new APText(applet.width / 2 - (int) VideOSCUI.dc(aboutWidth / 2 + 65),
+					(int) VideOSCUI.dc(50), (int) VideOSCUI.dc(aboutWidth), (int) (81 * VideOSCUI.dc(50)));
+			about.setTextSize(15);
 			about.setText("VideOSC is an experimental OSC controller, using the color " +
 					"information retrieved from the video stream of the inbuilt backside " +
 					"camera of an Android based smartphone. VideOSC has been created " +
@@ -647,8 +653,8 @@ public class VideOSCPreferences extends VideOSC {
 			apContainer.addWidget(about);
 			about.setTextCentered();
 
-			final APButton cancel = new APButton((applet.width - 220) / 4 + 50, about.getHeight()
-					- 50 * (int) density, (applet.width - 220) / 2, 50 * (int) density, "Close");
+			final APButton cancel = new APButton((applet.width - (int) VideOSCUI.dc(220)) / 4 + (int) VideOSCUI.dc(50),
+					about.getHeight(), (applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Close");
 			apContainer.addWidget(cancel);
 
 			cancel.addOnClickWidgetListener(new OnClickWidgetListener() {

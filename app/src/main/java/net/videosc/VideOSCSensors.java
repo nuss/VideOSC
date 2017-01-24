@@ -323,7 +323,7 @@ public class VideOSCSensors extends VideOSC {
 
 			text = new APText((int) VideOSCUI.dc(50), nextYPos, applet.width - (int) VideOSCUI.dc(230), (int) VideOSCUI.dc(120));
 			text.setText(VideOSCSensors.sensorsInUse.get(key));
-			text.setTextSize((int) VideOSCUI.dc(32));
+			text.setTextSize(15);
 			texts.put(key, text);
 			nextYPos = text.getY() + text.getHeight() + (int) VideOSCUI.dc(10);
 		}
