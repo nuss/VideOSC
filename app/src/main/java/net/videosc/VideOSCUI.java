@@ -2,6 +2,8 @@ package net.videosc;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+
 import ketai.data.KetaiSQLite;
 import ketai.ui.KetaiList;
 import processing.core.PApplet;
@@ -159,6 +161,7 @@ public class VideOSCUI extends VideOSC {
 		String[] snapshotsList;
 		KetaiList snapshotsSelect;
 		KetaiList preferencesList;
+		int numSensors = VideOSCDB.listSensorsInUse(db).size();
 
 		if (!selectionListActive && !sensorsPrinting) {
 			// only allow interaction if screen is not overlayed by some selection list
@@ -221,7 +224,8 @@ public class VideOSCUI extends VideOSC {
 				}
 			} else if (x <= dc(100) && y <= dc(100) && curOptions.equals("")) {
 				showHide = true;
-			} else if (x > dc(100) && x <= dc(400) && y <= uiYtop + dc(50) && curOptions.equals("")) {
+			} else if (numSensors > 0
+					&& x > dc(100) && x <= dc(400) && y <= uiYtop + dc(50) && curOptions.equals("")) {
 //				Log.d(TAG, "clicked: sensors printed? " + sensorsPrinting + printSensors);
 				printSensors = true;
 				if (!sensorsPrinting && printSensors) {
@@ -253,8 +257,9 @@ public class VideOSCUI extends VideOSC {
 				}
 			}
 
-//			if (!rgbMode.equals(RGBModes.RGB) && x <= applet.width - 245 && x >=
-			if (!rgbMode.equals(RGBModes.RGB) && x <= dc(500) && x >= dc(400) && y <= uiYtop + dc(50)) {
+			int leftX = numSensors > 0 ? 400 : 250;
+			int rightX = numSensors > 0 ? 500 : 350;
+			if (!rgbMode.equals(RGBModes.RGB) && x <= dc(rightX) && x >= dc(leftX) && y <= uiYtop + dc(50)) {
 				showFB = !showFB;
 			}
 		}
@@ -288,21 +293,29 @@ public class VideOSCUI extends VideOSC {
 	}
 
 	static void drawTools(PApplet applet, KetaiSQLite db) {
+		int numSensors = VideOSCDB.listSensorsInUse(db).size();
+
 		if (uiHidden)
 			applet.image(showMenu, dc(70), dc(70), dc(62), dc(62));
 		else
 			applet.image(hideMenu, dc(70), dc(70), dc(62), dc(62));
 
-//		Log.d(TAG, "number of active sensors: " + VideOSCDB.listSensorsInUse(db).size());
-		if (VideOSCDB.listSensorsInUse(db).size() > 0)
+		if (numSensors > 0)
 			applet.image(sensors, dc(250), uiYtop - dc(10), dc(183), dc(50));
 
 		if (!rgbMode.equals(RGBModes.RGB)) {
-			if (showFB)
-//				applet.image(fbOff, applet.width - 345, uiYtop - 10, 96, 50);
-				applet.image(fbOff, dc(413), uiYtop - dc(10), dc(96), dc(50));
-			else
-				applet.image(fbOn, dc(413), uiYtop - dc(10), dc(96), dc(50));
+			if (showFB) {
+				// set feedback button position dependent on whether sensors are active or not
+				if (numSensors > 0)
+					applet.image(fbOff, dc(413), uiYtop - dc(10), dc(96), dc(50));
+				else
+					applet.image(fbOff, dc(250), uiYtop - dc(10), dc(96), dc(50));
+			} else {
+				if (numSensors > 0)
+					applet.image(fbOn, dc(413), uiYtop - dc(10), dc(96), dc(50));
+				else
+					applet.image(fbOn, dc(250), uiYtop - dc(10), dc(96), dc(50));
+			}
 		}
 
 		if (mode.equals(InteractionModes.SINGLE_PIXEL)) {

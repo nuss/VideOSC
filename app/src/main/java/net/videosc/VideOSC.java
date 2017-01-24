@@ -326,7 +326,7 @@ public class VideOSC extends PApplet {
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		Boolean[] lockPixel;
 		Boolean[] offPixel;
-		Boolean[] locks;
+		Boolean[] locks = new Boolean[0];
 
 		int x = (int) event.getX();                    // get x/y coords of touch event
 		int y = (int) event.getY();
@@ -361,25 +361,35 @@ public class VideOSC extends PApplet {
 						}
 					} else if (rgbMode.equals(RGBModes.R)) {
 						if (!lockPixel[0]) {
-							offPxls.get(hoverPixel)[0] = !offPixel[0];
-							locks = new Boolean[]{true, lockList.get(hoverPixel)[1], lockList.get(hoverPixel)
-									[2]};
+							if (gestureMode.equals(GestureModes.SWAP)) {
+								offPxls.get(hoverPixel)[0] = !offPixel[0];
+								locks = new Boolean[]{true, lockList.get(hoverPixel)[1], lockList.get(hoverPixel)[2]};
+							} else if (gestureMode.equals(GestureModes.ERASE)) {
+								offPxls.get(hoverPixel)[0] = false;
+								locks = new Boolean[]{false, lockList.get(hoverPixel)[1], lockList.get(hoverPixel)[2]};
+							}
 							lockList.set(hoverPixel, locks);
 						}
 					} else if (rgbMode.equals(RGBModes.G)) {
 						if (!lockPixel[1]) {
-							offPxls.get(hoverPixel)[1] = !offPixel[1];
-							locks = new Boolean[]{lockList.get(hoverPixel)[0], true, lockList.get
-									(hoverPixel)
-									[2]};
+							if (gestureMode.equals(GestureModes.SWAP)) {
+								offPxls.get(hoverPixel)[1] = !offPixel[1];
+								locks = new Boolean[]{lockList.get(hoverPixel)[0], true, lockList.get(hoverPixel)[2]};
+							} else if (gestureMode.equals(GestureModes.ERASE)) {
+								offPxls.get(hoverPixel)[1] = false;
+								locks = new Boolean[]{lockList.get(hoverPixel)[0], false, lockList.get(hoverPixel)[2]};
+							}
 							lockList.set(hoverPixel, locks);
 						}
 					} else if (rgbMode.equals(RGBModes.B)) {
 						if (!lockPixel[2]) {
-							offPxls.get(hoverPixel)[2] = !offPixel[2];
-							locks = new Boolean[]{lockList.get(hoverPixel)[0], lockList.get
-									(hoverPixel)
-									[1], true};
+							if (gestureMode.equals(GestureModes.SWAP)) {
+								offPxls.get(hoverPixel)[2] = !offPixel[2];
+								locks = new Boolean[]{lockList.get(hoverPixel)[0], lockList.get(hoverPixel)[1], true};
+							} else if (gestureMode.equals(GestureModes.ERASE)) {
+								offPxls.get(hoverPixel)[2] = false;
+								locks = new Boolean[]{lockList.get(hoverPixel)[0], lockList.get(hoverPixel)[1], false};
+							}
 							lockList.set(hoverPixel, locks);
 						}
 					}

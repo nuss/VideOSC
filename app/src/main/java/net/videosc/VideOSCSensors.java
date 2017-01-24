@@ -307,10 +307,12 @@ public class VideOSCSensors extends VideOSC {
 
 	static boolean printSensors(final PApplet applet, KetaiSQLite db) {
 		final APWidgetContainer container = new APWidgetContainer(applet);
-		final APButton close = new APButton((applet.width - (int) VideOSCUI.dc(220)) / 4 + (int) VideOSCUI.dc(50), (int) VideOSCUI.dc(50), (applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Close");
+		final APButton close = new APButton((applet.width - (int) VideOSCUI.dc(220)) / 4 + (int) VideOSCUI.dc(50),
+				(int) VideOSCUI.dc(50), (applet.width - (int) VideOSCUI.dc(220)) / 2, (int) VideOSCUI.dc(50) * 3, "Close");
 		APText text;
 		int nextYPos = (int) VideOSCUI.dc(50);
 
+		// don't only rely on info coming from runnables - ask the database
 		completeSensorsInUse(db);
 
 		for (String key : texts.keySet()) {
