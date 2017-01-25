@@ -20,6 +20,7 @@ public class VideOSCUI extends VideOSC {
 	private static PImage startBut;
 	private static PImage stopBut;
 	private static PImage lightBut;
+	private static PImage lightButOn;
 	private static PImage interaction;
 	private static PImage interactionplus;
 	private static PImage infoBut;
@@ -73,6 +74,7 @@ public class VideOSCUI extends VideOSC {
 		startBut = applet.loadImage("start.png");
 		stopBut = applet.loadImage("stop.png");
 		lightBut = applet.loadImage("light.png");
+		lightButOn = applet.loadImage("light_on.png");
 		infoBut = applet.loadImage("i.png");
 		interaction = applet.loadImage("interaction.png");
 		interactionplus = applet.loadImage("interactionplus.png");
@@ -114,13 +116,20 @@ public class VideOSCUI extends VideOSC {
 		applet.stroke(0, 0);
 		applet.fill(0, 153);
 		applet.rect(uiXright, 0, 60 * density, applet.height);
-		if (play) {
-			applet.image(stopBut, uiXright + dc((stopBut.width / 2) + 20), applet.height / 12, dc(stopBut.width), dc(stopBut.height));
-		} else {
-			applet.image(startBut, uiXright + dc((startBut.width / 2) + 20), applet.height / 12, dc(startBut.width), dc(startBut.height));
-		}
-		applet.image(lightBut, uiXright + dc((lightBut.width / 2) + 20), applet.height / 6 + applet.height /
-				12, dc(lightBut.width), dc(lightBut.height));
+
+		if (play)
+			applet.image(stopBut, uiXright + dc((stopBut.width / 2) + 20),
+					applet.height / 12, dc(stopBut.width), dc(stopBut.height));
+		else
+			applet.image(startBut, uiXright + dc((startBut.width / 2) + 20),
+					applet.height / 12, dc(startBut.width), dc(startBut.height));
+
+		if (cam.isFlashEnabled())
+			applet.image(lightButOn, uiXright + dc((lightBut.width / 2) + 20),
+					applet.height / 6 + applet.height / 12, dc(lightBut.width), dc(lightBut.height));
+		else
+			applet.image(lightBut, uiXright + dc((lightBut.width / 2) + 20),
+					applet.height / 6 + applet.height / 12, dc(lightBut.width), dc(lightBut.height));
 
 		if (negative) {
 			localRGB = rgbButNeg;
@@ -136,21 +145,23 @@ public class VideOSCUI extends VideOSC {
 
 		rgbButInMenuX = (int) (uiXright + dc((rgbBut.width / 2) + 20));
 		rgbButInMenuY = applet.height / 6 * 2 + applet.height / 12;
-		if (rgbMode.equals(RGBModes.RGB)) {
+
+		if (rgbMode.equals(RGBModes.RGB))
 			applet.image(localRGB, rgbButInMenuX, rgbButInMenuY, dc(localRGB.width), dc(localRGB.height));
-		} else if (rgbMode.equals(RGBModes.R)) {
+		else if (rgbMode.equals(RGBModes.R))
 			applet.image(localR, rgbButInMenuX, rgbButInMenuY, dc(localR.width), dc(localR.height));
-		} else if (rgbMode.equals(RGBModes.G)) {
+		else if (rgbMode.equals(RGBModes.G))
 			applet.image(localG, rgbButInMenuX, rgbButInMenuY, dc(localG.width), dc(localG.width));
-		} else if (rgbMode.equals(RGBModes.B)) {
+		else if (rgbMode.equals(RGBModes.B))
 			applet.image(localB, rgbButInMenuX, rgbButInMenuY, dc(localB.width), dc(localB.height));
-		}
+
 		if (mode.equals(InteractionModes.BASIC))
 			applet.image(interaction, uiXright + dc((infoBut.width / 2) + 20), applet.height / 6 * 3 +
 					applet.height / 12, dc(interaction.width), dc(interaction.height));
 		else if (mode.equals(InteractionModes.SINGLE_PIXEL))
 			applet.image(interactionplus, uiXright + dc((interactionplus.width / 2) + 20), applet.height / 6 * 3 +
 					applet.height / 12, dc(interactionplus.width), dc(interactionplus.height));
+
 		applet.image(infoBut, uiXright + dc((infoBut.width / 2) + 20), applet.height / 6 * 4 + applet.height
 				/ 12, dc(infoBut.width), dc(infoBut.height));
 		applet.image(settingsBut, uiXright + dc((settingsBut.width / 2) + 20), applet.height / 6 * 5
@@ -257,9 +268,9 @@ public class VideOSCUI extends VideOSC {
 
 			int leftX = VideOSCSensors.numActiveSensors > 0 ? 400 : 250;
 			int rightX = VideOSCSensors.numActiveSensors > 0 ? 500 : 350;
-			if (!rgbMode.equals(RGBModes.RGB) && x <= dc(rightX) && x >= dc(leftX) && y <= uiYtop + dc(50)) {
+
+			if (!rgbMode.equals(RGBModes.RGB) && x <= dc(rightX) && x >= dc(leftX) && y <= uiYtop + dc(50))
 				showFB = !showFB;
-			}
 		}
 	}
 
