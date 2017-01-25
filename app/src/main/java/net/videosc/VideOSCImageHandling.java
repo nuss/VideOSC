@@ -106,11 +106,11 @@ public class VideOSCImageHandling extends VideOSC {
 						oscP5.send(oscR, broadcastLoc);
 					}
 					if (!offPxls.get(i)[1]) {
-						oscR.add(gval);
+						oscG.add(gval);
 						oscP5.send(oscG, broadcastLoc);
 					}
 					if (!offPxls.get(i)[2]) {
-						oscR.add(bval);
+						oscB.add(bval);
 						oscP5.send(oscB, broadcastLoc);
 					}
 				} else {
