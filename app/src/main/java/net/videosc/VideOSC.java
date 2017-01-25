@@ -177,6 +177,8 @@ public class VideOSC extends PApplet {
 			KetaiAlertDialog.popup(this, "SQL Error", "The sensors settings could not be determined");
 		}
 
+		VideOSCSensors.numActiveSensors = VideOSCDB.listSensorsInUse(db).size();
+
 		VideOSCDB.setUpSnapshots(this, db);
 
 		// update database when updating from older VideOSC version

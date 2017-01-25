@@ -119,6 +119,8 @@ public class VideOSCSensors extends VideOSC {
 	public volatile static Map<String, String> sensorsInUse = new HashMap<String, String>();
 	static HashMap<String, APText> texts = new HashMap<String, APText>();
 
+	static int numActiveSensors;
+
 	static void initSensors(PApplet applet) {
 		// common sensors
 		sensors = new KetaiSensor(applet);
@@ -321,8 +323,6 @@ public class VideOSCSensors extends VideOSC {
 		texts.clear();
 
 		for (String key : VideOSCSensors.sensorsInUse.keySet()) {
-			Log.d(TAG, VideOSCSensors.sensorsInUse.get(key));
-
 			text = new APText((int) VideOSCUI.dc(50), nextYPos, applet.width - (int) VideOSCUI.dc(230), (int) VideOSCUI.dc(120));
 			text.setText(VideOSCSensors.sensorsInUse.get(key));
 			text.setTextSize(15);

@@ -196,7 +196,6 @@ public class VideOSCDB extends VideOSC {
 					while (db.next()) {
 						String sensor = db.getString("sensor");
 						int state = db.getInt("state");
-//						Log.d(TAG, "sensor: " + sensor + ", state: " + state);
 						if (sensor.equals("ori"))
 							VideOSCSensors.useOri = state > 0;
 						else if (sensor.equals("acc"))
@@ -257,17 +256,30 @@ public class VideOSCDB extends VideOSC {
 		boolean success = false;
 		Map<String, Integer> sensors = new HashMap<String, Integer>();
 
+		VideOSCSensors.numActiveSensors = 0;
+
 		sensors.put("ori", VideOSCSensors.useOri ? 1 : 0);
+		if (VideOSCSensors.useOri) VideOSCSensors.numActiveSensors++;
 		sensors.put("acc", VideOSCSensors.useAcc ? 1 : 0);
+		if (VideOSCSensors.useAcc) VideOSCSensors.numActiveSensors++;
 		sensors.put("mag", VideOSCSensors.useMag ? 1 : 0);
+		if (VideOSCSensors.useMag) VideOSCSensors.numActiveSensors++;
 		sensors.put("grav", VideOSCSensors.useGrav ? 1 : 0);
+		if (VideOSCSensors.useGrav) VideOSCSensors.numActiveSensors++;
 		sensors.put("prox", VideOSCSensors.useProx ? 1 : 0);
+		if (VideOSCSensors.useProx) VideOSCSensors.numActiveSensors++;
 		sensors.put("light", VideOSCSensors.useLight ? 1 : 0);
+		if (VideOSCSensors.useLight) VideOSCSensors.numActiveSensors++;
 		sensors.put("press", VideOSCSensors.usePress ? 1 : 0);
+		if (VideOSCSensors.usePress) VideOSCSensors.numActiveSensors++;
 		sensors.put("temp", VideOSCSensors.useTemp ? 1 : 0);
+		if (VideOSCSensors.useTemp) VideOSCSensors.numActiveSensors++;
 		sensors.put("linAcc", VideOSCSensors.useLinAcc ? 1 : 0);
+		if (VideOSCSensors.useLinAcc) VideOSCSensors.numActiveSensors++;
 		sensors.put("hum", VideOSCSensors.useHum ? 1 : 0);
+		if (VideOSCSensors.useHum) VideOSCSensors.numActiveSensors++;
 		sensors.put("loc", VideOSCSensors.useLoc ? 1 : 0);
+		if (VideOSCSensors.useLoc) VideOSCSensors.numActiveSensors++;
 
 		if (db.connect()) {
 			for (String key : sensors.keySet()) {
@@ -279,21 +291,19 @@ public class VideOSCDB extends VideOSC {
 			}
 		}
 
-//		Log.d(TAG, "sensors updated: " + success);
-
 		return success;
 	}
 
 	static ArrayList<String> listSensorsInUse(KetaiSQLite db) {
 		boolean success;
-		String query = "SELECT * FROM vosc_sensors";
+		String query = "SELECT * FROM vosc_sensors WHERE state > 0";
 		ArrayList<String> result = new ArrayList<String>();
 
 		if (db.connect()) {
 			success = db.query(query);
 			if (success) {
 				while (db.next()) {
-					if (db.getInt("state") > 0) result.add(db.getString("sensor"));
+					result.add(db.getString("sensor"));
 				}
 			}
 		}
