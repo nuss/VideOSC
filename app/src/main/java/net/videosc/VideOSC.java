@@ -270,7 +270,7 @@ public class VideOSC extends PApplet {
 			}
 
 			// handle image creation and sending pixel values via OSC
-			VideOSCImageHandling.drawFrame(this);
+			pImg = VideOSCImageHandling.drawFrame(this, pImg);
 
 			// draw the down-scaled image over the original
 			image(pImg, width / 2, height / 2, width, height);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import oscP5.OscMessage;
 import processing.core.PApplet;
+import processing.core.PImage;
 
 /**
  * Created by stefan on 20.01.17.
@@ -22,21 +23,21 @@ public class VideOSCImageHandling extends VideOSC {
 	private static float[] slope = new float[3];
 	static ArrayList<float[]> slopes = new ArrayList<float[]>();
 
-	static void drawFrame(PApplet applet) {
+	static PImage drawFrame(PApplet applet, PImage img) {
 		float rval, gval, bval, alpha;
 
 		for (int i = 0; i < dimensions; i++) {
 			// only the downsampled image gets inverted as inverting the original would slow
 			// down the application considerably
-			int rVal = (negative) ? 0xFF - ((pImg.pixels[i] >> 16) & 0xFF)
-					: (pImg.pixels[i] >> 16) & 0xFF;
-			int gVal = (negative) ? 0xFF - ((pImg.pixels[i] >> 8) & 0xFF)
-					: (pImg.pixels[i] >> 8) & 0xFF;
-			int bVal = (negative) ? 0xFF - (pImg.pixels[i] & 0xFF)
-					: pImg.pixels[i] & 0xFF;
+			int rVal = (negative) ? 0xFF - ((img.pixels[i] >> 16) & 0xFF)
+					: (img.pixels[i] >> 16) & 0xFF;
+			int gVal = (negative) ? 0xFF - ((img.pixels[i] >> 8) & 0xFF)
+					: (img.pixels[i] >> 8) & 0xFF;
+			int bVal = (negative) ? 0xFF - (img.pixels[i] & 0xFF)
+					: img.pixels[i] & 0xFF;
 
 			if (negative)
-				pImg.pixels[i] = applet.color(rVal, gVal, bVal, 255);
+				img.pixels[i] = applet.color(rVal, gVal, bVal, 255);
 
 			// compose basic OSC message for slot
 			oscR = VideOSCOscHandling.makeMessage(oscR, r + str(i + 1));
@@ -47,46 +48,46 @@ public class VideOSCImageHandling extends VideOSC {
 				if (offPxls.get(i)[0] && !offPxls.get(i)[1] && !offPxls.get(i)[2]) {
 					// r
 					alpha = cam.isStarted() ? 255 / 3 : 0;
-					pImg.pixels[i] = applet.color(0, gVal, bVal, alpha);
+					img.pixels[i] = applet.color(0, gVal, bVal, alpha);
 				} else if (!offPxls.get(i)[0] && offPxls.get(i)[1] && !offPxls.get(i)[2]) {
 					// g;
 					alpha = cam.isStarted() ? 255 / 3 : 0;
-					pImg.pixels[i] = applet.color(rVal, 0, bVal, alpha);
+					img.pixels[i] = applet.color(rVal, 0, bVal, alpha);
 				} else if (!offPxls.get(i)[0] && !offPxls.get(i)[1] && offPxls.get(i)[2]) {
 					// b;
 					alpha = cam.isStarted() ? 255 / 3 : 0;
-					pImg.pixels[i] = applet.color(rVal, gVal, 0, alpha);
+					img.pixels[i] = applet.color(rVal, gVal, 0, alpha);
 				} else if (offPxls.get(i)[0] && offPxls.get(i)[1] && !offPxls.get(i)[2]) {
 					// rg;
 					alpha = cam.isStarted ? 255 / 3 * 2 : 0;
-					pImg.pixels[i] = applet.color(0, 0, bVal, alpha);
+					img.pixels[i] = applet.color(0, 0, bVal, alpha);
 				} else if (offPxls.get(i)[0] && !offPxls.get(i)[1] && offPxls.get(i)[2]) {
 					// rb;
 					alpha = cam.isStarted() ? 255 / 3 * 2 : 0;
-					pImg.pixels[i] = applet.color(0, gVal, 0, alpha);
+					img.pixels[i] = applet.color(0, gVal, 0, alpha);
 				} else if (!offPxls.get(i)[0] && offPxls.get(i)[1] && offPxls.get(i)[2]) {
 					// bg;
 					alpha = cam.isStarted() ? 255 / 3 * 2 : 0;
-					pImg.pixels[i] = applet.color(rVal, 0, 0, alpha);
+					img.pixels[i] = applet.color(rVal, 0, 0, alpha);
 				} else if (offPxls.get(i)[0] && offPxls.get(i)[1] && offPxls.get(i)[2]) {
 					// rgb
-					pImg.pixels[i] = applet.color(0, 0);
+					img.pixels[i] = applet.color(0, 0);
 				}
 			} else if (rgbMode.equals(RGBModes.R)) {
 				if (offPxls.get(i)[0])
-					pImg.pixels[i] = applet.color(rVal, 255, 255);
+					img.pixels[i] = applet.color(rVal, 255, 255);
 				else
-					pImg.pixels[i] = applet.color(rVal, 0, 0);
+					img.pixels[i] = applet.color(rVal, 0, 0);
 			} else if (rgbMode.equals(RGBModes.G)) {
 				if (offPxls.get(i)[1])
-					pImg.pixels[i] = applet.color(255, gVal, 255);
+					img.pixels[i] = applet.color(255, gVal, 255);
 				else
-					pImg.pixels[i] = applet.color(0, gVal, 0);
+					img.pixels[i] = applet.color(0, gVal, 0);
 			} else if (rgbMode.equals(RGBModes.B)) {
 				if (offPxls.get(i)[2])
-					pImg.pixels[i] = applet.color(255, 255, bVal);
+					img.pixels[i] = applet.color(255, 255, bVal);
 				else
-					pImg.pixels[i] = applet.color(0, 0, bVal);
+					img.pixels[i] = applet.color(0, 0, bVal);
 			}
 
 			if (play) {
@@ -158,6 +159,7 @@ public class VideOSCImageHandling extends VideOSC {
 			}
 		}
 
+		return img;
 	}
 
 	static void interpolatedFrames(int index) {
