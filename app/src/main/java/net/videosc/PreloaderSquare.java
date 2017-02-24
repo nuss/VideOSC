@@ -13,6 +13,6 @@ class PreloaderSquare {
 		applet.noStroke();
 		applet.fill((int) applet.random(256), (int) applet.random(256), (int) applet.random(256),
 				alpha);
-		applet.rect(x, y, 50, 50);
+		applet.rect(x, y, VideOSCUI.dc(50), VideOSCUI.dc(50));
 	}
 }

@@ -2,6 +2,11 @@ package net.videosc;
 
 import android.util.Log;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import ketai.data.KetaiSQLite;
 import ketai.ui.KetaiAlertDialog;
 import processing.core.PApplet;
@@ -23,7 +28,9 @@ public class VideOSCDB extends VideOSC {
 			+ "res_h INTEGER NOT NULL DEFAULT '" + resH + "', "
 			+ "framerate INTEGER NOT NULL DEFAULT '" + framerate + "', "
 			+ "calc_period INTEGER NOT NULL DEFAULT '" + calcsPerPeriod + "',"
-			+ "normalisation INTEGER NOT NULL DEFAULT '" + normalize + "');";
+			+ "normalisation INTEGER NOT NULL DEFAULT '" + normalize + "',"
+			+ "saved_snapshot TEXT DEFAULT NULL,"
+			+ "save_snapshot_on_close INTEGER NOT NULL DEFAULT 0);";
 
 	static boolean setUpNetworkSettings(PApplet applet, KetaiSQLite db) {
 		boolean success = false;
@@ -35,7 +42,7 @@ public class VideOSCDB extends VideOSC {
 				success = db.execute(CREATE_NETWORK_SETTINGS_SQL);
 
 				if (success) {
-					success = db.execute("INSERT into vosc_connect_data (`host_ip`, `host_port`, " +
+					success = db.execute("INSERT INTO vosc_connect_data (`host_ip`, `host_port`, " +
 							"`receive_port`, `root_cmd` ) VALUES ('"
 							+ sendAddr
 							+ "', '"
@@ -79,9 +86,9 @@ public class VideOSCDB extends VideOSC {
 				success = db.execute(CREATE_RESOLUTION_SETUP_SQL);
 
 				if (success) {
-					success = db.execute("INSERT into vosc_resolution_setup (`res_w`, `res_h`, " +
-							"`framerate`, " +
-							"`calc_period`, `normalisation`) VALUES ('"
+					success = db.execute("INSERT INTO vosc_resolution_setup (`res_w`, `res_h`, " +
+							"`framerate`, `calc_period`, `normalisation`," +
+							"`save_snapshot_on_close`) VALUES ('"
 							+ resW
 							+ "', '"
 							+ resH
@@ -90,7 +97,10 @@ public class VideOSCDB extends VideOSC {
 							+ "', '"
 							+ calcsPerPeriod
 							+ "', '"
-							+ (normalize ? 1 : 0) + "');");
+							+ (normalize ? 1 : 0)
+							+ "', '"
+							+ 0
+							+ "');");
 					if (!success) {
 						KetaiAlertDialog.popup(applet, "SQL Error", "Entering initial resolution " +
 								"settings into database failed");
@@ -108,12 +118,34 @@ public class VideOSCDB extends VideOSC {
 						framerate = db.getInt("framerate");
 						calcsPerPeriod = db.getInt("calc_period");
 						normalize = db.getInt("normalisation") > 0;
+						snapshotSavedOnClose = db.getString("saved_snapshot");
+						saveSnapshotOnClose = db.getInt("save_snapshot_on_close") > 0;
 					}
+					// define preliminary dimensions
+					dimensions = resH * resW;
 				}
 			}
 		}
 
 		return success;
+	}
+
+	static void addActiveSnapshotColumn(PApplet applet, KetaiSQLite db) {
+		String[] result;
+		boolean success;
+
+		if (db.connect() && db.tableExists("vosc_resolution_setup")) {
+			result = db.getFields("vosc_resolution_setup");
+
+			if (Arrays.asList(result).indexOf("saved_snapshot") < 0 && Arrays.asList(result).indexOf("save_snapshot_on_close") < 0) {
+				db.execute("ALTER TABLE vosc_resolution_setup ADD COLUMN saved_snapshot TEXT DEFAULT NULL;");
+				db.execute("ALTER TABLE vosc_resolution_setup ADD COLUMN save_snapshot_on_close INTEGER DEFAULT 0;");
+				success = db.execute("INSERT INTO vosc_resolution_setup (`save_snapshot_on_close`) VALUES(0);");
+				if (!success)
+					KetaiAlertDialog.popup(applet, "SQL Error", "Adding column for snapshot saved on quit failed!");
+			}
+		}
+
 	}
 
 	static void setUpSnapshots(PApplet applet, KetaiSQLite db) {
@@ -133,6 +165,65 @@ public class VideOSCDB extends VideOSC {
 				}
 			}
 		}
+	}
+
+	static boolean setUpSensors(PApplet applet, KetaiSQLite db) {
+		boolean success = false;
+
+		if (db.connect()) {
+//			if (db.execute("DROP TABLE vosc_sensors;"))
+//				Log.d(TAG, "Successfully deleted table 'vosc_sensors'");
+			String CREATE_SENSORS_TABLE = "CREATE TABLE vosc_sensors (" +
+					"sensor STRING NOT NULL," +
+					"state INTEGER NOT NULL DEFAULT 0" +
+			");";
+
+			if (!db.tableExists("vosc_sensors")) {
+				success = db.execute(CREATE_SENSORS_TABLE);
+
+				if (success) {
+					success = db.execute("INSERT INTO vosc_sensors (`sensor`, `state`) VALUES " +
+							"('ori', 0), ('acc', 0), ('mag', 0), ('grav', 0), ('prox', 0), ('light', 0), ('temp', 0), ('press', 0), ('linAcc', 0), ('hum', 0), ('loc', 0);");
+					if (!success)
+						KetaiAlertDialog.popup(applet, "SQL Error", "Inserting initial sensor values failed!");
+				} else {
+					KetaiAlertDialog.popup(applet, "SQL Error", "Creating database table for " +
+							"sensors failed");
+				}
+			} else {
+				success = db.query("SELECT * FROM vosc_sensors;");
+				if (success) {
+					while (db.next()) {
+						String sensor = db.getString("sensor");
+						int state = db.getInt("state");
+						if (sensor.equals("ori"))
+							VideOSCSensors.useOri = state > 0;
+						else if (sensor.equals("acc"))
+							VideOSCSensors.useAcc = state > 0;
+						else if (sensor.equals("mag"))
+							VideOSCSensors.useMag = state > 0;
+						else if (sensor.equals("grav"))
+							VideOSCSensors.useGrav = state > 0;
+						else if (sensor.equals("prox"))
+							VideOSCSensors.useProx = state > 0;
+						else if (sensor.equals("light"))
+							VideOSCSensors.useLight = state > 0;
+						else if (sensor.equals("press"))
+							VideOSCSensors.usePress = state > 0;
+						else if (sensor.equals("temp"))
+							VideOSCSensors.useTemp = state > 0;
+						else if (sensor.equals("linAcc"))
+							VideOSCSensors.useLinAcc = state > 0;
+						else if (sensor.equals("hum"))
+							VideOSCSensors.useHum = state > 0;
+						else if (sensor.equals("loc"))
+							VideOSCSensors.useLoc = state > 0;
+					}
+				}
+			}
+		}
+
+		return success;
 	}
 
 	static boolean updateNetworkSettings(KetaiSQLite db) {
@@ -155,13 +246,72 @@ public class VideOSCDB extends VideOSC {
 					"SET res_w=" + resW
 					+ ", res_h=" + resH + ", framerate=" + framerate
 					+ ", calc_period=" + calcsPerPeriod + ", normalisation=" + (normalize ? 1 : 0)
-					+ ";");
+					+ ", save_snapshot_on_close=" + (saveSnapshotOnClose ? 1 : 0) + ";");
 		}
 
 		return success;
 	}
 
-	static boolean addSnapshot(PApplet applet, KetaiSQLite db) {
+	static boolean updateSensorsSettings(PApplet applet, KetaiSQLite db) {
+		boolean success = false;
+		Map<String, Integer> sensors = new HashMap<String, Integer>();
+
+		VideOSCSensors.numActiveSensors = 0;
+
+		sensors.put("ori", VideOSCSensors.useOri ? 1 : 0);
+		if (VideOSCSensors.useOri) VideOSCSensors.numActiveSensors++;
+		sensors.put("acc", VideOSCSensors.useAcc ? 1 : 0);
+		if (VideOSCSensors.useAcc) VideOSCSensors.numActiveSensors++;
+		sensors.put("mag", VideOSCSensors.useMag ? 1 : 0);
+		if (VideOSCSensors.useMag) VideOSCSensors.numActiveSensors++;
+		sensors.put("grav", VideOSCSensors.useGrav ? 1 : 0);
+		if (VideOSCSensors.useGrav) VideOSCSensors.numActiveSensors++;
+		sensors.put("prox", VideOSCSensors.useProx ? 1 : 0);
+		if (VideOSCSensors.useProx) VideOSCSensors.numActiveSensors++;
+		sensors.put("light", VideOSCSensors.useLight ? 1 : 0);
+		if (VideOSCSensors.useLight) VideOSCSensors.numActiveSensors++;
+		sensors.put("press", VideOSCSensors.usePress ? 1 : 0);
+		if (VideOSCSensors.usePress) VideOSCSensors.numActiveSensors++;
+		sensors.put("temp", VideOSCSensors.useTemp ? 1 : 0);
+		if (VideOSCSensors.useTemp) VideOSCSensors.numActiveSensors++;
+		sensors.put("linAcc", VideOSCSensors.useLinAcc ? 1 : 0);
+		if (VideOSCSensors.useLinAcc) VideOSCSensors.numActiveSensors++;
+		sensors.put("hum", VideOSCSensors.useHum ? 1 : 0);
+		if (VideOSCSensors.useHum) VideOSCSensors.numActiveSensors++;
+		sensors.put("loc", VideOSCSensors.useLoc ? 1 : 0);
+		if (VideOSCSensors.useLoc) VideOSCSensors.numActiveSensors++;
+
+		if (db.connect()) {
+			for (String key : sensors.keySet()) {
+				success = db.execute("UPDATE vosc_sensors SET state=" + sensors.get(key) + " WHERE sensor='" + key + "';");
+				if (!success) {
+					KetaiAlertDialog.popup(applet, "SQL Error", "Updating sensor setting for '" + key + "' failed!");
+					break;
+				}
+			}
+		}
+
+		return success;
+	}
+
+	static ArrayList<String> listSensorsInUse(KetaiSQLite db) {
+		boolean success;
+		String query = "SELECT * FROM vosc_sensors WHERE state > 0";
+		ArrayList<String> result = new ArrayList<String>();
+
+		if (db.connect()) {
+			success = db.query(query);
+			if (success) {
+				while (db.next()) {
+					result.add(db.getString("sensor"));
+				}
+			}
+		}
+
+		return result;
+	}
+
+	static boolean addSnapshot(PApplet applet, KetaiSQLite db, boolean onQuit) {
 		boolean success = false;
 
 		if (db.connect()) {
@@ -174,15 +324,19 @@ public class VideOSCDB extends VideOSC {
 					offs += slot[i] ? 1 : 0;
 			}
 
-			// store the snapshot under a key represented by the current datetime
-			success = db.execute("INSERT INTO vosc_snapshots (`date`, `pattern`) VALUES" +
+			if (!onQuit) {
+				// store the snapshot under a key represented by the current datetime
+				success = db.execute("INSERT INTO vosc_snapshots (`date`, `pattern`) VALUES" +
 						"(datetime(),'" + offs + "');");
+			} else {
+				success = db.execute("UPDATE vosc_resolution_setup SET saved_snapshot='" + offs + "';");
+			}
 
 			if (!success) {
 				KetaiAlertDialog.popup(applet, "SQL Error", "Writing the snapshot to the database" +
 						" failed");
 			} else {
-				numSnapshots++;
+				if (!onQuit) numSnapshots++;
 			}
 		}
 
@@ -213,25 +367,40 @@ public class VideOSCDB extends VideOSC {
 		int slot = 0;
 
 		if (db.connect()) {
-			success = db.query("SELECT pattern FROM vosc_snapshots WHERE date='" + snapshot + "'");
+			if (snapshot != null)
+				success = db.query("SELECT pattern FROM vosc_snapshots WHERE date='" + snapshot + "';");
+			else
+				success = db.query("SELECT saved_snapshot FROM vosc_resolution_setup;");
 
 			if (success) {
 				while (db.next()) {
-					res = db.getString("pattern");
+					if (snapshot != null)
+						res = db.getString("pattern");
+					else res = db.getString("saved_snapshot");
 					// make sure not to set any pixels that don't exist, e.g. if a snapshot has
 					// been set for 24 pixels but the current setup only has 20
-					resl = res.length();
-					if (resl > dimensions * 3) resl = dimensions * 3;
-					for (int i = 0; i < resl; i++) {
-						if (i % 3 == 0) {
-							// a snapshot is an ArrayList of boolean tripplets
-							// we simply add the result of a non-equality check applied on the
-							// values stored in the db
-							// 0 is unique code number 48
-							offPxls.get(slot)[0] = (int) res.charAt(i) != 48;
-							offPxls.get(slot)[1] = (int) res.charAt(i + 1) != 48;
-							offPxls.get(slot)[2] = (int) res.charAt(i + 2) != 48;
-						} else if (i % 3 == 2) slot++;
+					if (res != null) {
+						resl = res.length();
+						if (resl > dimensions * 3) resl = dimensions * 3;
+						for (int i = 0; i < resl; i++) {
+							if (i % 3 == 0) {
+								// a snapshot is an ArrayList of boolean tripplets
+								// we simply add the result of a non-equality check applied on the
+								// values stored in the db
+								// 0 is unique code number 48
+								// depending on if offPxls.get(slot) already exists
+								// we have to either replace the existing value
+								// or to add a triplet of booleans
+								if (offPxls.size() <= slot) {
+									Boolean[] sl = {(int) res.charAt(i) != 48, (int) res.charAt(i + 1) != 48, (int) res.charAt(i + 2) != 48};
+									offPxls.add(sl);
+								} else {
+									offPxls.get(slot)[0] = (int) res.charAt(i) != 48;
+									offPxls.get(slot)[1] = (int) res.charAt(i + 1) != 48;
+									offPxls.get(slot)[2] = (int) res.charAt(i + 2) != 48;
+								}
+							} else if (i % 3 == 2) slot++;
+						}
 					}
 				}
 			} else {
@@ -257,13 +426,16 @@ public class VideOSCDB extends VideOSC {
 		}
 	}
 
-	static void countSnapshots(PApplet applet, KetaiSQLite db) {
+	static long countSnapshots(PApplet applet, KetaiSQLite db) {
+		long num = 0;
+
 		if (db.connect()) {
-			numSnapshots = db.getRecordCount("vosc_snapshots");
+			num = db.getRecordCount("vosc_snapshots");
 		} else {
-			numSnapshots = 0;
 			KetaiAlertDialog.popup(applet, "SQL Error", "The number of snapshots could not be " +
 					"determined");
 		}
+
+		return num;
 	}
 }

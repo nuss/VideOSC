@@ -3,6 +3,7 @@ package net.videosc;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.WindowManager;
 
@@ -36,14 +37,9 @@ public class VideOSC extends PApplet {
 	// Ketai Sensor Library for Android: http://KetaiProject.org
 
 	static KetaiCamera cam;
-	static OscP5 oscP5;
-	static NetAddress broadcastLoc;
+	public static OscP5 oscP5;
+	public static NetAddress broadcastLoc;
 	static NetAddress feedbackAddr;
-
-	// OSC messages to be sent to the remote client
-	private static OscMessage oscR;
-	private static OscMessage oscG;
-	private static OscMessage oscB;
 
 	// dimensions = width * height of the user defined resolution
 	static int dimensions;
@@ -62,11 +58,8 @@ public class VideOSC extends PApplet {
 	static int framerate = 120;
 	static int calcsPerPeriod = 1;
 	static boolean normalize;
-	private static float[] curInput = new float[3];
-	private static ArrayList<float[]> lastInputList = new ArrayList<float[]>();
-	private static ArrayList<float[]> curInputList = new ArrayList<float[]>();
-	private static float[] slope = new float[3];
-	private static ArrayList<float[]> slopes = new ArrayList<float[]>();
+	static String snapshotSavedOnClose;
+	static boolean saveSnapshotOnClose;
 
 	static boolean uiHidden = false;
 	static boolean showHide = false;
@@ -75,16 +68,12 @@ public class VideOSC extends PApplet {
 	static boolean printFramerate = true;
 	static boolean displayFramerate = false;
 
-	static int uiXright;
-	static int uiYtop;
-	static int uiYbottom;
-
 	static int backKeyState;
 	static ArrayList<String> optionsList = new ArrayList<String>();
 	static boolean preferencesListInvisible;
 
 	static String sendAddr = "192.168.1.2";
-	static String rootCmd = "vosc";
+	public static String rootCmd = "vosc";
 	static String r = "/" + rootCmd + "/red";
 	static String g = "/" + rootCmd + "/green";
 	static String b = "/" + rootCmd + "/blue";
@@ -117,6 +106,9 @@ public class VideOSC extends PApplet {
 	static boolean showSnapshots = false;
 	static long numSnapshots;
 
+	public static volatile boolean printSensors = false;
+	static boolean sensorsPrinting = false;
+
 	public void setup() {
 		boolean querySuccess;
 
@@ -135,14 +127,16 @@ public class VideOSC extends PApplet {
 		}
 		camera.release();
 
+		VideOSCSensors.initSensors(this);
+		
 		imageMode(CENTER);
 
 		DisplayMetrics dm = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(dm);
 		density = dm.density;
 
+		// start the app in basic mode
 		mode = InteractionModes.BASIC;
-//		mode = InteractionModes.SINGLE_PIXEL;
 
 		// for some reason setup() often (but not always) seems to be executed twice
 		// hence, we check if variables have already been initialized
@@ -152,6 +146,9 @@ public class VideOSC extends PApplet {
 		}
 		if (optionsList.indexOf("Resolution Settings") < 0) {
 			optionsList.add("Resolution Settings");
+		}
+		if (optionsList.indexOf("Sensors") < 0) {
+			optionsList.add("Sensors");
 		}
 		if (optionsList.indexOf("About VideOSC") < 0) {
 			optionsList.add("About VideOSC");
@@ -175,15 +172,30 @@ public class VideOSC extends PApplet {
 					"determined");
 		}
 
+		querySuccess = VideOSCDB.setUpSensors(this, db);
+		if (!querySuccess) {
+			KetaiAlertDialog.popup(this, "SQL Error", "The sensors settings could not be determined");
+		}
+
+		VideOSCSensors.numActiveSensors = VideOSCDB.listSensorsInUse(db).size();
+
 		VideOSCDB.setUpSnapshots(this, db);
-		VideOSCDB.countSnapshots(this, db);
+
+		// update database when updating from older VideOSC version
+		VideOSCDB.addActiveSnapshotColumn(this, db);
+
+		if (saveSnapshotOnClose)
+			VideOSCDB.selectSnapshot(this, null, db);
+
+		numSnapshots = VideOSCDB.countSnapshots(this, db);
 
 		pxWidth = width / resW;
 		pxHeight = height / resH;
 
 		for (int i = 0; i < resH * resW; i++) {
 			lockList.add(falses.clone());
-			offPxls.add(falses.clone());
+			if (offPxls.size() <= i)
+				offPxls.add(falses.clone());
 		}
 
 		if (oscP5 == null) {
@@ -204,9 +216,9 @@ public class VideOSC extends PApplet {
 
 		VideOSCUI.loadUIImages(this);
 
-		uiYtop = 80;
-		uiXright = width - 130;
-		uiYbottom = height - 90;
+		VideOSCUI.uiYtop = (int) VideOSCUI.dc(80);
+		VideOSCUI.uiXright = (int) (width - VideOSCUI.dc(130));
+		VideOSCUI.uiYbottom = (int) (height - VideOSCUI.dc(90));
 
 		backKeyState = 0;
 
@@ -214,36 +226,38 @@ public class VideOSC extends PApplet {
 	}
 
 	public void draw() {
-		float rval, gval, bval;
-
 		if (frameCount % calcsPerPeriod == 0) {
 			// wipe out anything that's still on screen from the previous cycle
 			// e.g. text from preferences dialogs...
 			background(0);
 			if (!cam.isStarted()) {
-				new VideOSCPreload(this, width / 2, height / 2 + 170, 12, 5);
+				new VideOSCPreload(this, width / 2, height / 2 + (int) VideOSCUI.dc(170), 12, 5);
 				textAlign(CENTER);
 				fill(255);
-				textSize(40);
-				text("TAP SCREEN TO OPEN CAMERA", width / 2, height / 2 + 280);
+				textSize(VideOSCUI.dc(40));
+				text("TAP SCREEN TO OPEN CAMERA", width / 2, height / 2 + VideOSCUI.dc(280));
 			}
 			textAlign(LEFT);
 
+			// get video frame
 			pImg = cam.get();
 			pImg.loadPixels();
 			pImg.updatePixels();
+			// draw original image behind the down scaled one
 			image(pImg, width / 2, height / 2, width, height);
+
+			// resize the image
 			pImg.resize(resW, resH);
 			pImg.loadPixels();
 			dimensions = pImg.width * pImg.height;
 
-			lastInputList.clear();
-			slopes.clear();
+			VideOSCImageHandling.lastInputList.clear();
+			VideOSCImageHandling.slopes.clear();
 
-			for (float[] val : curInputList)
-				lastInputList.add(val.clone());
+			for (float[] val : VideOSCImageHandling.curInputList)
+				VideOSCImageHandling.lastInputList.add(val.clone());
 
-			curInputList.clear();
+			VideOSCImageHandling.curInputList.clear();
 
 			// offPxls needs to be at least of the size of dimensions after changing the resolution
 			if (offPxls.size() < dimensions) {
@@ -255,296 +269,40 @@ public class VideOSC extends PApplet {
 				}
 			}
 
-			for (int i = 0; i < dimensions; i++) {
-				// only the downsampled image gets inverted as inverting the original would slow
-				// down the application considerably
-				int rVal = (negative) ? 0xFF - ((pImg.pixels[i] >> 16) & 0xFF)
-						: (pImg.pixels[i] >> 16) & 0xFF;
-				int gVal = (negative) ? 0xFF - ((pImg.pixels[i] >> 8) & 0xFF)
-						: (pImg.pixels[i] >> 8) & 0xFF;
-				int bVal = (negative) ? 0xFF - (pImg.pixels[i] & 0xFF)
-						: pImg.pixels[i] & 0xFF;
+			// handle image creation and sending pixel values via OSC
+			pImg = VideOSCImageHandling.drawFrame(this, pImg);
 
-				if (negative)
-					pImg.pixels[i] = color(rVal, gVal, bVal, 255);
-
-				if (rgbMode.equals(RGBModes.RGB)) {
-					if (offPxls.get(i)[0] && !offPxls.get(i)[1] && !offPxls.get(i)[2]) {
-						// r
-						pImg.pixels[i] = color(0, gVal, bVal, 255 / 3);
-					} else if (!offPxls.get(i)[0] && offPxls.get(i)[1] && !offPxls.get(i)[2]) {
-						// g;
-						pImg.pixels[i] = color(rVal, 0, bVal, 255 / 3);
-					} else if (!offPxls.get(i)[0] && !offPxls.get(i)[1] && offPxls.get(i)[2]) {
-						// b;
-						pImg.pixels[i] = color(rVal, gVal, 0, 255 / 3);
-					} else if (offPxls.get(i)[0] && offPxls.get(i)[1] && !offPxls.get(i)[2]) {
-						// rg;
-						pImg.pixels[i] = color(0, 0, bVal, 255 / 3 * 2);
-					} else if (offPxls.get(i)[0] && !offPxls.get(i)[1] && offPxls.get(i)[2]) {
-						// rb;
-						pImg.pixels[i] = color(0, gVal, 0, 255 / 3 * 2);
-					} else if (!offPxls.get(i)[0] && offPxls.get(i)[1] && offPxls.get(i)[2]) {
-						// bg;
-						pImg.pixels[i] = color(rVal, 0, 0, 255 / 3 * 2);
-
-					} else if (offPxls.get(i)[0] && offPxls.get(i)[1] && offPxls.get(i)[2]) {
-						// rgb
-						pImg.pixels[i] = color(0, 0);
-					}
-				} else if (rgbMode.equals(RGBModes.R)) {
-					if (offPxls.get(i)[0])
-						pImg.pixels[i] = color(rVal, 255, 255);
-					else
-						pImg.pixels[i] = color(rVal, 0, 0);
-				} else if (rgbMode.equals(RGBModes.G)) {
-					if (offPxls.get(i)[1])
-						pImg.pixels[i] = color(255, gVal, 255);
-					else
-						pImg.pixels[i] = color(0, gVal, 0);
-				} else if (rgbMode.equals(RGBModes.B)) {
-					if (offPxls.get(i)[2])
-						pImg.pixels[i] = color(255, 255, bVal);
-					else
-						pImg.pixels[i] = color(0, 0, bVal);
-				}
-
-				if (play) {
-					if (calcsPerPeriod == 1) {
-						if (normalize) {
-							rval = (float) rVal / 255;
-							gval = (float) gVal / 255;
-							bval = (float) bVal / 255;
-						} else {
-							rval = rVal;
-							gval = gVal;
-							bval = bVal;
-						}
-
-						if (!offPxls.get(i)[0])
-							sendOSC(broadcastLoc, oscR, r, i, rval);
-						if (!offPxls.get(i)[1])
-							sendOSC(broadcastLoc, oscG, g, i, gval);
-						if (!offPxls.get(i)[2])
-							sendOSC(broadcastLoc, oscB, b, i, bval);
-					} else {
-						curInput[0] = (float) rVal;
-						curInput[1] = (float) gVal;
-						curInput[2] = (float) bVal;
-
-						curInputList.add(curInput.clone());
-
-						if (lastInputList.size() >= dimensions) {
-							rval = lastInputList.get(i)[0];
-							gval = lastInputList.get(i)[1];
-							bval = lastInputList.get(i)[2];
-
-							if (normalize) {
-								rval = rval / 255;
-								gval = gval / 255;
-								bval = bval / 255;
-							}
-
-							if (!offPxls.get(i)[0]) {
-								sendOSC(broadcastLoc, oscR, r, i, rval);
-							}
-							if (!offPxls.get(i)[1]) {
-								sendOSC(broadcastLoc, oscG, g, i, gval);
-							}
-							if (!offPxls.get(i)[2]) {
-								sendOSC(broadcastLoc, oscB, b, i, bval);
-							}
-
-							float lastInputR = lastInputList.get(i)[0];
-							float lastInputG = lastInputList.get(i)[1];
-							float lastInputB = lastInputList.get(i)[2];
-
-							slope[0] = (curInput[0] - lastInputR) / calcsPerPeriod;
-							slope[1] = (curInput[1] - lastInputG) / calcsPerPeriod;
-							slope[2] = (curInput[2] - lastInputB) / calcsPerPeriod;
-
-							slopes.add(slope.clone());
-						}
-					}
-				}
-			}
-
+			// draw the down-scaled image over the original
 			image(pImg, width / 2, height / 2, width, height);
-			VideOSCUI.drawTools(this);
-			if (showFB) {
-				printOSC();
-				// rCmds.clear();
-				// gCmds.clear();
-				// bCmds.clear();
-			}
+
+			// draw GUI elements
+			VideOSCUI.drawTools(this, db);
+			if (showFB)
+				VideOSCUI.printOSC(this);
 			VideOSCUI.drawRGBUI(this);
 			if (displayRGBselector)
 				VideOSCUI.drawRGBModeSelector(this);
 			if (displayFramerate)
 				VideOSCUI.printFramerate(this, printFramerate);
 			VideOSCPreferences.darkenBackground(this);
+			if (sensorsPrinting) {
+				VideOSCSensors.updatePrintedSensors();
+			}
 		} else {
-			if (play && lastInputList.size() >= dimensions) {
+			// don't update image but interpolate values between
+			// previously drawn frame and the current one
+			if (play && VideOSCImageHandling.lastInputList.size() >= dimensions) {
 				int index = frameCount % calcsPerPeriod;
-				for (int i = 0; i < dimensions; i++) {
-					if (!offPxls.get(i)[0]) {
-						float lastInputR = lastInputList.get(i)[0];
-						float slopeR = slopes.get(i)[0];
-						if (normalize)
-							sendOSC(broadcastLoc, oscR, r, i, (slopeR * index + lastInputR) / 255);
-						else
-							sendOSC(broadcastLoc, oscR, r, i, slopeR * index + lastInputR);
-					}
-					if (!offPxls.get(i)[1]) {
-						float lastInputG = lastInputList.get(i)[1];
-						float slopeG = slopes.get(i)[1];
-						if (normalize)
-							sendOSC(broadcastLoc, oscG, g, i, (slopeG * index + lastInputG) / 255);
-						else
-							sendOSC(broadcastLoc, oscG, g, i, slopeG * index + lastInputG);
-					}
-					if (!offPxls.get(i)[2]) {
-						float lastInputB = lastInputList.get(i)[2];
-						float slopeB = slopes.get(i)[2];
-						if (normalize)
-							sendOSC(broadcastLoc, oscB, b, i, (slopeB * index + lastInputB) / 255);
-						else
-							sendOSC(broadcastLoc, oscB, b, i, slopeB * index + lastInputB);
-					}
-				}
+				VideOSCImageHandling.interpolatedFrames(index);
 			}
 		}
 		if (showHide)
 			VideOSCUI.setShowHideMenus(this);
 	}
 
-	private void sendOSC(NetAddress broadcastLoc, OscMessage msg, String cmd, int slot, float val) {
-		if (msg == null)
-			msg = new OscMessage(cmd + str(slot + 1));
-		else {
-			msg.clear();
-			msg.setAddrPattern(cmd + str(slot + 1));
-		}
-
-		msg.add(val);
-		oscP5.send(msg, broadcastLoc);
-	}
-
-	private void printOSC() {
-		int x;
-		int y;
-		int slot;
-		int pxWidth = PApplet.parseInt(width / resW);
-		int pxHeight = PApplet.parseInt(height / resH);
-		String[] rStrings = new String[dimensions];
-		String[] gStrings = new String[dimensions];
-		String[] bStrings = new String[dimensions];
-
-		if (!rgbMode.equals(RGBModes.RGB)) {
-			textSize(40);
-			if (rgbMode.equals(RGBModes.R)) {
-				for (String cmd : rCmds) {
-					String[] rcmd = cmd.split(";");
-					// command indices start with 1, not 0
-					slot = PApplet.parseInt(rcmd[3]) - 1;
-					// there may be more than one message coming in under a given command
-					if (rStrings[slot] == null) {
-						rStrings[slot] = rcmd[0];
-					} else {
-						rStrings[slot] = rStrings[slot] + "\n" + rcmd[0];
-					}
-					x = PApplet.parseInt((PApplet.parseInt(rcmd[3]) - 1) % resW
-							* pxWidth + 10);
-					y = (PApplet.parseInt(rcmd[3]) - 1) / resW * pxHeight + 50;
-					// display text in inverted color of the pixel
-					if (offPxls.get(slot)[0])
-						fill(0xFF - ((pImg.pixels[slot] >> 16) & 0xFF), 0, 0);
-					else
-						fill(0xFF - ((pImg.pixels[slot] >> 16) & 0xFF), 255, 255);
-					text(trim(rStrings[slot]), x, y);
-				}
-				rCmds.clear();
-			} else if (rgbMode.equals(RGBModes.G)) {
-				for (String cmd : gCmds) {
-					String[] gcmd = cmd.split(";");
-					// command indices start with 1, not 0
-					slot = PApplet.parseInt(gcmd[3]) - 1;
-					// there may be more than one message coming in under a given command
-					if (gStrings[slot] == null) {
-						gStrings[slot] = gcmd[0];
-					} else {
-						gStrings[slot] = gStrings[slot] + "\n" + gcmd[0];
-					}
-					x = PApplet.parseInt((PApplet.parseInt(gcmd[3]) - 1) % resW
-							* pxWidth + 10);
-					y = (PApplet.parseInt(gcmd[3]) - 1) / resW * pxHeight + 50;
-					// we need slot-1 as commands are indexes start with 1, not 0
-					if (offPxls.get(slot)[1])
-						fill(0, 0xFF - ((pImg.pixels[slot] >> 8) & 0xFF), 0);
-					else
-						fill(255, 0xFF - ((pImg.pixels[slot] >> 8) & 0xFF), 255);
-					text(trim(gStrings[slot]), x, y);
-				}
-				gCmds.clear();
-			} else if (rgbMode.equals(RGBModes.B)) {
-				for (String cmd : bCmds) {
-					String[] bcmd = cmd.split(";");
-					// command indices start with 1, not 0
-					slot = PApplet.parseInt(bcmd[3]) - 1;
-					// there may be more than one message coming in under a given command
-					if (bStrings[slot] == null) {
-						bStrings[slot] = bcmd[0];
-					} else {
-						bStrings[slot] = bStrings[slot] + "\n" + bcmd[0];
-					}
-					x = PApplet.parseInt((PApplet.parseInt(bcmd[3]) - 1) % resW
-							* pxWidth + 10);
-					y = (PApplet.parseInt(bcmd[3]) - 1) / resW * pxHeight + 50;
-					// display text in inverted color of the pixel
-					if (offPxls.get(slot)[2])
-						fill(0, 0, 0xFF - (pImg.pixels[slot] & 0xFF));
-					else
-						fill(255, 255, 0xFF - (pImg.pixels[slot] & 0xFF));
-					text(trim(bStrings[slot]), x, y);
-				}
-				bCmds.clear();
-			}
-		}
-	}
-
 	// http://www.sojamo.de/libraries/oscP5/examples/oscP5sendReceive/oscP5sendReceive.pde
 	private void oscEvent(OscMessage fbMessage) {
-		if (!rgbMode.equals(RGBModes.RGB)) {
-			String[] msg = {fbMessage.get(0).stringValue()};
-			String chanSlot;
-			// make as sure as possible no incoming messages except the ones
-			// coming from VideOSC are checked
-			if (showFB && match(fbMessage.addrPattern(),
-					"^/[a-zA-Z0-9_/]+/(red|green|blue)[0-9]+") != null) {
-				if (match(fbMessage.addrPattern().split("/")[2],
-						"(red)([0-9]+)") != null) {
-					chanSlot = join(
-							concat(msg,
-									match(fbMessage.addrPattern().split("/")[2],
-											"(red)([0-9]+)")), ";");
-					rCmds.add(chanSlot);
-				} else if (match(fbMessage.addrPattern().split("/")[2],
-						"(green)([0-9]+)") != null) {
-					chanSlot = join(
-							concat(msg,
-									match(fbMessage.addrPattern().split("/")[2],
-											"(green)([0-9]+)")), ";");
-					gCmds.add(chanSlot);
-				} else if (match(fbMessage.addrPattern().split("/")[2],
-						"(blue)([0-9]+)") != null) {
-					chanSlot = join(
-							concat(msg,
-									match(fbMessage.addrPattern().split("/")[2],
-											"(blue)([0-9]+)")), ";");
-					bCmds.add(chanSlot);
-				}
-			}
-		}
+		VideOSCOscHandling.prepareFeedbackStrings(fbMessage);
 	}
 
 	// which pixel am I currently hovering?
@@ -570,7 +328,7 @@ public class VideOSC extends PApplet {
 	public boolean dispatchTouchEvent(MotionEvent event) {
 		Boolean[] lockPixel;
 		Boolean[] offPixel;
-		Boolean[] locks;
+		Boolean[] locks = new Boolean[0];
 
 		int x = (int) event.getX();                    // get x/y coords of touch event
 		int y = (int) event.getY();
@@ -605,25 +363,35 @@ public class VideOSC extends PApplet {
 						}
 					} else if (rgbMode.equals(RGBModes.R)) {
 						if (!lockPixel[0]) {
-							offPxls.get(hoverPixel)[0] = !offPixel[0];
-							locks = new Boolean[]{true, lockList.get(hoverPixel)[1], lockList.get(hoverPixel)
-									[2]};
+							if (gestureMode.equals(GestureModes.SWAP)) {
+								offPxls.get(hoverPixel)[0] = !offPixel[0];
+								locks = new Boolean[]{true, lockList.get(hoverPixel)[1], lockList.get(hoverPixel)[2]};
+							} else if (gestureMode.equals(GestureModes.ERASE)) {
+								offPxls.get(hoverPixel)[0] = false;
+								locks = new Boolean[]{false, lockList.get(hoverPixel)[1], lockList.get(hoverPixel)[2]};
+							}
 							lockList.set(hoverPixel, locks);
 						}
 					} else if (rgbMode.equals(RGBModes.G)) {
 						if (!lockPixel[1]) {
-							offPxls.get(hoverPixel)[1] = !offPixel[1];
-							locks = new Boolean[]{lockList.get(hoverPixel)[0], true, lockList.get
-									(hoverPixel)
-									[2]};
+							if (gestureMode.equals(GestureModes.SWAP)) {
+								offPxls.get(hoverPixel)[1] = !offPixel[1];
+								locks = new Boolean[]{lockList.get(hoverPixel)[0], true, lockList.get(hoverPixel)[2]};
+							} else if (gestureMode.equals(GestureModes.ERASE)) {
+								offPxls.get(hoverPixel)[1] = false;
+								locks = new Boolean[]{lockList.get(hoverPixel)[0], false, lockList.get(hoverPixel)[2]};
+							}
 							lockList.set(hoverPixel, locks);
 						}
 					} else if (rgbMode.equals(RGBModes.B)) {
 						if (!lockPixel[2]) {
-							offPxls.get(hoverPixel)[2] = !offPixel[2];
-							locks = new Boolean[]{lockList.get(hoverPixel)[0], lockList.get
-									(hoverPixel)
-									[1], true};
+							if (gestureMode.equals(GestureModes.SWAP)) {
+								offPxls.get(hoverPixel)[2] = !offPixel[2];
+								locks = new Boolean[]{lockList.get(hoverPixel)[0], lockList.get(hoverPixel)[1], true};
+							} else if (gestureMode.equals(GestureModes.ERASE)) {
+								offPxls.get(hoverPixel)[2] = false;
+								locks = new Boolean[]{lockList.get(hoverPixel)[0], lockList.get(hoverPixel)[1], false};
+							}
 							lockList.set(hoverPixel, locks);
 						}
 					}
@@ -639,34 +407,78 @@ public class VideOSC extends PApplet {
 		VideOSCUI.processKetaiListClicks(this, klist, db);
 	}
 
-	public void keyPressed() {
-		if (key == CODED) {
-			if (keyCode == MENU && curOptions.equals("")/* && preferencesListInvisible*/) {
-				showHide = true;
-			} /*else if (keyCode == android.view.KeyEvent.KEYCODE_BACK) {
-				return true;
-//				Log.d(TAG, "back key hit");
-			}*/
-		}
-	}
-
-//	@Override
-//	public boolean onKeyDown(int keyCode, KeyEvent event)  {
-//		if (keyCode == KeyEvent.KEYCODE_BACK
-//				&& event.getRepeatCount() == 0) {
-//			Log.d(TAG, "onKeyDown Called");
-//			onBackPressed();
-//			return true;
-//		}
-//		return super.onKeyDown(keyCode, event);
-//	}
-
 	@Override
 	public void onBackPressed() {
-//		Log.d(TAG, "onBackPressed Called");
-		keyCode = 0;
-		if (!curOptions.equals("")) {
-			curOptions = "";
-		}
+		// no action - overriding the backbutton seems impossible in processing 2.
+		// See also: https://github.com/processing/processing-android/issues/45
+		// However, keeping this empty method seems to prevent another bug:
+		// When you're editing a text input you will need the back button to return to
+		// the regular dialog (e.g. a settings dislog). If you accidently hit back again
+		// the application doesn't properly quit. rather it will open again in a a frozen state
+		// Keeping onBackPressed() should simply prevent the application from going to that "frozen"
+		// state (found out emprirically rather than understanding the true cause of problem...)
+	}
+
+	@Override
+	public void stop() {
+		// save a snapshot of the activation state of all pixels
+		if (saveSnapshotOnClose)
+			VideOSCDB.addSnapshot(this, db, true);
+	}
+
+	// OSC sensor events
+	public void onOrientationEvent(float x, float y, float z, long time, int accuracy) {
+		if (play && VideOSCSensors.useOri && oscP5 != null)
+			VideOSCSensors.orientationEvent(x, y, z, time, accuracy);
+	}
+
+	public void onAccelerometerEvent(float x, float y, float z, long time, int accuracy) {
+		if (play && VideOSCSensors.useAcc && oscP5 != null)
+			VideOSCSensors.accelerometerEvent(x, y, z, time, accuracy);
+	}
+
+	public void onMagneticFieldEvent(float x, float y, float z, long time, int accuracy) {
+		if (play && VideOSCSensors.useMag && oscP5 != null)
+			VideOSCSensors.magneticFieldEvent(x, y, z, time, accuracy);
+	}
+
+	public void onGravityEvent(float x, float y, float z, long time, int accuracy) {
+		if (play && VideOSCSensors.useGrav && oscP5 != null)
+			VideOSCSensors.gravityEvent(x, y, z, time, accuracy);
+	}
+
+	public void onLinearAccelerationEvent(float x, float y, float z, long time, int accuracy) {
+		if (play && VideOSCSensors.useLinAcc && oscP5 != null)
+			VideOSCSensors.linearAccelerationEvent(x, y, z, time, accuracy);
+	}
+
+	public void onProximityEvent(float distance, long time, int accuracy) {
+		if (play && VideOSCSensors.useProx && oscP5 != null)
+			VideOSCSensors.proximityEvent(distance, time, accuracy);
+	}
+
+	public void onLightEvent(float intensity, long time, int accuracy) {
+		if (play && VideOSCSensors.useLight && oscP5 != null)
+			VideOSCSensors.lightEvent(intensity, time, accuracy);
+	}
+
+	public void onPressureEvent(float pressure, long time, int accuracy) {
+		if (play && VideOSCSensors.usePress && oscP5 != null)
+			VideOSCSensors.pressureEvent(pressure, time, accuracy);
+	}
+
+	public void onAmbientTemperatureEvent(float temperature) {
+		if (play && VideOSCSensors.useTemp && oscP5 != null)
+			VideOSCSensors.temperatureEvent(temperature);
+	}
+
+	public void onRelativeHumidityEvent(float humidity) {
+		if (play && VideOSCSensors.useHum && oscP5 != null)
+			VideOSCSensors.humidityEvent(humidity);
+	}
+
+	public void onLocationEvent(double latitude, double longitude, double altitude, float accuracy) {
+		if (play && VideOSCSensors.useLoc && oscP5 != null)
+			VideOSCSensors.gpsEvent(latitude, longitude, altitude, accuracy);
 	}
 }
