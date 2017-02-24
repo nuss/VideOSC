@@ -57,15 +57,17 @@ blue3 red4 green4 blue4, f 84;
 #X obj 594 284 > 0;
 #X obj 634 284 > 0;
 #X obj 675 284 > 0;
-#X text 550 449 blue pointer \, derived from the red channel of the
-2x2 pixel grid.;
 #X text 724 237 a 7 bit right shift reduces an integer range of 0-255
 to an integer range of 0-1 (a switch);
 #X text 724 284 if the resulting value is > 0 trigger the event (resulting
 value will either be 0 or 1);
-#X text 112 450 red pointer \, red channel of the 2x2 pixel grid.;
-#X text 331 448 green pointer \, green channel of the 2x2 pixel grid.
-;
+#X text 112 450 red channel of the 2x2 grid;
+#X text 330 448 green channel of the 2x2 grid;
+#X text 550 449 blue channel of the 2x2 grid;
+#X obj 376 25 A simple patch that routes a 2 x 2 pixel matrix to 12
+distinct triggers. The full output range is simple reduced to 0/1 by
+applying a 7 bit right shift on each value. Thanks \, Scott Vanya!
+cc by-sa;
 #X connect 0 0 4 0;
 #X connect 1 0 0 0;
 #X connect 2 0 3 0;
