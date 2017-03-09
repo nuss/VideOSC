@@ -117,14 +117,14 @@ public class VideOSC extends PApplet {
 		// detect smallest possible preview size as that's totally sufficient for our purposes
 		Camera camera = Camera.open();
 		List<Camera.Size> camResList = camera.getParameters().getSupportedPreviewSizes();
+		ArrayList<Integer> productList = new ArrayList<Integer>();
 
-		Camera.Size res  = camResList.get(0);
-		for (int i = 1; i < camResList.size(); i++) {
-			if (camResList.get(i).width * camResList.get(i).width < camResList.get(i-1)
-					.width * camResList.get(i-1).height) {
-				res = camResList.get(i);
-			}
+		for (Camera.Size size : camResList) {
+			productList.add(size.width * size.height);
 		}
+
+		int minIndex = productList.indexOf(Collections.min(productList));
+		Camera.Size res = camResList.get(minIndex);
 		camera.release();
 
 		VideOSCSensors.initSensors(this);
