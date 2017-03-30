@@ -41,7 +41,7 @@ The resolution of the preview image (the down-scaled preview of the incoming vid
 Also, OSC-messages sent to the app under the same command name as the outgoing messages may be displayed if the user selects the regarding channel-preview (hidden behind the RGB symbol in the app's menu). 
 
 ##### Preview, RGB-Mode #####
-![VideOSC: RGB-mode] (layout_data/Nexus-VideOSC-Montage_RGB.png "Preview RGB-mode")
+![VideOSC: RGB-mode] (https://github.com/nuss/VideOSC/master/layout_data/Nexus-VideOSC-Montage_RGB.png "Preview RGB-mode")
 
 ##### Preview, green channel only, with toolbars hidden, displaying incoming OSC feedback messages #####
-![VideOSC: channel-mode (red)] (layout_data/Nexus-VideOSC-Montage_G.png "Preview channel-mode, channel green, hidden toolbars, displaying incoming OSC") 
+![VideOSC: channel-mode (red)] (https://github.com/nuss/VideOSC/master/layout_data/Nexus-VideOSC-Montage_G.png "Preview channel-mode, channel green, hidden toolbars, displaying incoming OSC") 
