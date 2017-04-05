@@ -19,6 +19,8 @@ public class VideOSCUI extends VideOSC {
 	// vertical right toolbar
 	private static PImage startBut;
 	private static PImage stopBut;
+	private static PImage frontCam;
+	private static PImage backCam;
 	private static PImage lightBut;
 	private static PImage lightButOn;
 	private static PImage interaction;
@@ -73,6 +75,8 @@ public class VideOSCUI extends VideOSC {
 	static void loadUIImages(PApplet applet) {
 		startBut = applet.loadImage("start.png");
 		stopBut = applet.loadImage("stop.png");
+		frontCam = applet.loadImage("cam_frontside.png");
+		backCam = applet.loadImage("cam_backside.png");
 		lightBut = applet.loadImage("light.png");
 		lightButOn = applet.loadImage("light_on.png");
 		infoBut = applet.loadImage("i.png");
@@ -119,17 +123,24 @@ public class VideOSCUI extends VideOSC {
 
 		if (play)
 			applet.image(stopBut, uiXright + dc((stopBut.width / 2) + 20),
-					applet.height / 12, dc(stopBut.width), dc(stopBut.height));
+					applet.height / 14, dc(stopBut.width), dc(stopBut.height));
 		else
 			applet.image(startBut, uiXright + dc((startBut.width / 2) + 20),
-					applet.height / 12, dc(startBut.width), dc(startBut.height));
+					applet.height / 14, dc(startBut.width), dc(startBut.height));
 
-		if (cam.isFlashEnabled())
+		if (selectedCam == 0)
+			applet.image(backCam, uiXright + dc((backCam.width / 2) + 20),
+					applet.height / 7 + applet.height / 14, dc(backCam.width), dc(backCam.height));
+		else if (selectedCam == 1)
+			applet.image(frontCam, uiXright + dc((frontCam.width / 2) + 20),
+					applet.height / 7 + applet.height / 14, dc(frontCam.width), dc(frontCam.height));
+
+		if (cam != null && cam.isFlashEnabled())
 			applet.image(lightButOn, uiXright + dc((lightBut.width / 2) + 20),
-					applet.height / 6 + applet.height / 12, dc(lightBut.width), dc(lightBut.height));
+					applet.height / 7 * 2 + applet.height / 14, dc(lightBut.width), dc(lightBut.height));
 		else
 			applet.image(lightBut, uiXright + dc((lightBut.width / 2) + 20),
-					applet.height / 6 + applet.height / 12, dc(lightBut.width), dc(lightBut.height));
+					applet.height / 7 * 2 + applet.height / 14, dc(lightBut.width), dc(lightBut.height));
 
 		if (negative) {
 			localRGB = rgbButNeg;
@@ -144,7 +155,7 @@ public class VideOSCUI extends VideOSC {
 		}
 
 		rgbButInMenuX = (int) (uiXright + dc((rgbBut.width / 2) + 20));
-		rgbButInMenuY = applet.height / 6 * 2 + applet.height / 12;
+		rgbButInMenuY = applet.height / 7 * 3 + applet.height / 14;
 
 		if (rgbMode.equals(RGBModes.RGB))
 			applet.image(localRGB, rgbButInMenuX, rgbButInMenuY, dc(localRGB.width), dc(localRGB.height));
@@ -156,16 +167,16 @@ public class VideOSCUI extends VideOSC {
 			applet.image(localB, rgbButInMenuX, rgbButInMenuY, dc(localB.width), dc(localB.height));
 
 		if (mode.equals(InteractionModes.BASIC))
-			applet.image(interaction, uiXright + dc((infoBut.width / 2) + 20), applet.height / 6 * 3 +
-					applet.height / 12, dc(interaction.width), dc(interaction.height));
+			applet.image(interaction, uiXright + dc((infoBut.width / 2) + 20), applet.height / 7 * 4 +
+					applet.height / 14, dc(interaction.width), dc(interaction.height));
 		else if (mode.equals(InteractionModes.SINGLE_PIXEL))
-			applet.image(interactionplus, uiXright + dc((interactionplus.width / 2) + 20), applet.height / 6 * 3 +
-					applet.height / 12, dc(interactionplus.width), dc(interactionplus.height));
+			applet.image(interactionplus, uiXright + dc((interactionplus.width / 2) + 20), applet.height / 7 * 4 +
+					applet.height / 14, dc(interactionplus.width), dc(interactionplus.height));
 
-		applet.image(infoBut, uiXright + dc((infoBut.width / 2) + 20), applet.height / 6 * 4 + applet.height
-				/ 12, dc(infoBut.width), dc(infoBut.height));
-		applet.image(settingsBut, uiXright + dc((settingsBut.width / 2) + 20), applet.height / 6 * 5
-				+ applet.height / 12, dc(settingsBut.width), dc(settingsBut.height));
+		applet.image(infoBut, uiXright + dc((infoBut.width / 2) + 20), applet.height / 7 * 5 + applet.height
+				/ 14, dc(infoBut.width), dc(infoBut.height));
+		applet.image(settingsBut, uiXright + dc((settingsBut.width / 2) + 20), applet.height / 7 * 6
+				+ applet.height / 14, dc(settingsBut.width), dc(settingsBut.height));
 	}
 
 	static void processUIClicks(PApplet applet, int x, int y, KetaiSQLite db) {
@@ -175,9 +186,11 @@ public class VideOSCUI extends VideOSC {
 
 		if (!selectionListActive && !sensorsPrinting) {
 			// only allow interaction if screen is not overlayed by some selection list
-			if (x > 100 && y > 100 && x < applet.width - 130 && !displayRGBselector && curOptions.equals
+			if (x > 100 && y > dc(100) && x < applet.width - 130 && !displayRGBselector && curOptions.equals
 					("")) {
+				// stop preload and show camera
 				if (!cam.isStarted()) cam.start();
+				preloadPlayed = true;
 			} else if (y >= rgbButInMenuY && y < rgbButInMenuY + dc(140)
 					&& displayRGBselector && curOptions.equals("")) {
 				if (y >= rgbButInMenuY && y < rgbButInMenuY + dc(140)) {
@@ -205,26 +218,29 @@ public class VideOSCUI extends VideOSC {
 				}
 			} else if (x >= applet.width - dc(130)) {
 				if (!uiHidden) {
-					if (y < applet.height / 6 && curOptions.equals("")) {
+					if (y < applet.height / 7 && curOptions.equals("")) {
 						play = !play;
-					} else if (y >= applet.height / 6 && y < applet.height /
-							6 * 2 && curOptions.equals("")) {
+					} else if (y >= applet.height / 7 && y < applet.height /
+							7 * 2 && curOptions.equals("")) {
+						VideOSCImageHandling.switchCamera(applet);
+					} else if (y >= applet.height / 7 * 2 && y < applet.height /
+							7 * 3 && curOptions.equals("")) {
 						if (cam.isFlashEnabled())
 							cam.disableFlash();
 						else
 							cam.enableFlash();
-					} else if (y >= applet.height / 6 * 2 && y < applet
-							.height / 6 * 3 && curOptions.equals("")) {
+					} else if (y >= applet.height / 7 * 3 && y < applet
+							.height / 7 * 4 && curOptions.equals("")) {
 						displayRGBselector = !displayRGBselector;
-					} else if (y >= applet.height / 6 * 3 && y < applet
-							.height / 6 * 4 && curOptions.equals("")) {
+					} else if (y >= applet.height / 7 * 4 && y < applet
+							.height / 7 * 5 && curOptions.equals("")) {
 						if (mode.equals(InteractionModes.BASIC))
 							mode = InteractionModes.SINGLE_PIXEL;
 						else mode = InteractionModes.BASIC;
-					} else if (y >= applet.height / 6 * 4 && y < applet
-							.height / 6 * 5 && curOptions.equals("")) {
+					} else if (y >= applet.height / 7 * 5 && y < applet
+							.height / 7 * 6 && curOptions.equals("")) {
 						displayFramerate = !displayFramerate;
-					} else if (y >= applet.height / 6 * 5 && curOptions.equals("")) {
+					} else if (y >= applet.height / 7 * 6 && curOptions.equals("")) {
 						preferencesList = new KetaiList(applet, optionsList);
 						preferencesList.setAlpha(0.8f);
 						selectionListActive = true;

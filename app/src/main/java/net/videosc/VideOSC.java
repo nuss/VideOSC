@@ -109,26 +109,19 @@ public class VideOSC extends PApplet {
 	public static volatile boolean printSensors = false;
 	static boolean sensorsPrinting = false;
 
+	static int selectedCam = 0;
+	static boolean preloadPlayed = false;
+
 	public void setup() {
 		boolean querySuccess;
 
 		background(0);
 
 		// detect smallest possible preview size as that's totally sufficient for our purposes
-		Camera camera = Camera.open();
-		List<Camera.Size> camResList = camera.getParameters().getSupportedPreviewSizes();
-		ArrayList<Integer> productList = new ArrayList<Integer>();
-
-		for (Camera.Size size : camResList) {
-			productList.add(size.width * size.height);
-		}
-
-		int minIndex = productList.indexOf(Collections.min(productList));
-		Camera.Size res = camResList.get(minIndex);
-		camera.release();
+		Camera.Size res = VideOSCImageHandling.getSmallestPreviewSize(selectedCam);
 
 		VideOSCSensors.initSensors(this);
-		
+
 		imageMode(CENTER);
 
 		DisplayMetrics dm = new DisplayMetrics();
@@ -210,9 +203,8 @@ public class VideOSC extends PApplet {
 			feedbackAddr = new NetAddress(sendAddr, listenPort);
 		}
 
-		if (cam == null) {
-			cam = new KetaiCamera(this, res.width, res.height, 30); // works
-		}
+		if (cam == null)
+			VideOSCImageHandling.setCamera(this, selectedCam);
 
 		VideOSCUI.loadUIImages(this);
 
@@ -230,7 +222,7 @@ public class VideOSC extends PApplet {
 			// wipe out anything that's still on screen from the previous cycle
 			// e.g. text from preferences dialogs...
 			background(0);
-			if (!cam.isStarted()) {
+			if (cam != null && !cam.isStarted() && !preloadPlayed) {
 				new VideOSCPreload(this, width / 2, height / 2 + (int) VideOSCUI.dc(170), 12, 5);
 				textAlign(CENTER);
 				fill(255);
@@ -240,40 +232,42 @@ public class VideOSC extends PApplet {
 			textAlign(LEFT);
 
 			// get video frame
-			pImg = cam.get();
-			pImg.loadPixels();
-			pImg.updatePixels();
-			// draw original image behind the down scaled one
-			image(pImg, width / 2, height / 2, width, height);
+			if (cam != null) {
+				pImg = cam.get();
+				pImg.loadPixels();
+				pImg.updatePixels();
+				// draw original image behind the down scaled one
+				image(pImg, width / 2, height / 2, width, height);
 
-			// resize the image
-			pImg.resize(resW, resH);
-			pImg.loadPixels();
-			dimensions = pImg.width * pImg.height;
+				// resize the image
+				pImg.resize(resW, resH);
+				pImg.loadPixels();
+				dimensions = pImg.width * pImg.height;
 
-			VideOSCImageHandling.lastInputList.clear();
-			VideOSCImageHandling.slopes.clear();
+				VideOSCImageHandling.lastInputList.clear();
+				VideOSCImageHandling.slopes.clear();
 
-			for (float[] val : VideOSCImageHandling.curInputList)
-				VideOSCImageHandling.lastInputList.add(val.clone());
+				for (float[] val : VideOSCImageHandling.curInputList)
+					VideOSCImageHandling.lastInputList.add(val.clone());
 
-			VideOSCImageHandling.curInputList.clear();
+				VideOSCImageHandling.curInputList.clear();
 
-			// offPxls needs to be at least of the size of dimensions after changing the resolution
-			if (offPxls.size() < dimensions) {
-				// pad up offPxls with 'falses' triplets
-				int sizeDiff = dimensions - offPxls.size();
-				for (int i = 0; i < sizeDiff; i++) {
-					offPxls.add(falses.clone());
-					lockList.add(falses.clone());
+				// offPxls needs to be at least of the size of dimensions after changing the resolution
+				if (offPxls.size() < dimensions) {
+					// pad up offPxls with 'falses' triplets
+					int sizeDiff = dimensions - offPxls.size();
+					for (int i = 0; i < sizeDiff; i++) {
+						offPxls.add(falses.clone());
+						lockList.add(falses.clone());
+					}
 				}
+
+				// handle image creation and sending pixel values via OSC
+				pImg = VideOSCImageHandling.drawFrame(this, pImg);
+
+				// draw the down-scaled image over the original
+				image(pImg, width / 2, height / 2, width, height);
 			}
-
-			// handle image creation and sending pixel values via OSC
-			pImg = VideOSCImageHandling.drawFrame(this, pImg);
-
-			// draw the down-scaled image over the original
-			image(pImg, width / 2, height / 2, width, height);
 
 			// draw GUI elements
 			VideOSCUI.drawTools(this, db);
@@ -346,7 +340,7 @@ public class VideOSC extends PApplet {
 				Collections.fill(lockList, falses.clone());
 				break;
 			case MotionEvent.ACTION_MOVE:
-				if (mode.equals(InteractionModes.SINGLE_PIXEL) && pressure > 0.65) {
+				if (mode.equals(InteractionModes.SINGLE_PIXEL) && pressure > 0.75) {
 					hoverPixel = getHoverPixel(x, y);
 					lockPixel = lockList.get(hoverPixel);
 					offPixel = offPxls.get(hoverPixel);

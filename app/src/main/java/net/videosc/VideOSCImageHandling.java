@@ -1,7 +1,12 @@
 package net.videosc;
 
-import java.util.ArrayList;
+import android.hardware.Camera;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import ketai.camera.KetaiCamera;
 import oscP5.OscMessage;
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -197,4 +202,40 @@ public class VideOSCImageHandling extends VideOSC {
 		}
 
 	}
- }
+
+	static Camera.Size getSmallestPreviewSize(int cameraId) {
+		Camera camera = Camera.open(cameraId);
+		List<Camera.Size> camResList = camera.getParameters().getSupportedPreviewSizes();
+		ArrayList<Integer> productList = new ArrayList<Integer>();
+
+		for (Camera.Size size : camResList) {
+			productList.add(size.width * size.height);
+		}
+
+		int minIndex = productList.indexOf(Collections.min(productList));
+		Camera.Size res = camResList.get(minIndex);
+		camera.release();
+
+		return res;
+	}
+
+	static void switchCamera(PApplet applet) {
+		if (selectedCam == 0) selectedCam = 1;
+		else if (selectedCam == 1) selectedCam = 0;
+		setCamera(applet, selectedCam);
+	}
+
+	static void setCamera(PApplet applet, int cameraId) {
+		if (cam != null) {
+			cam.stop();
+			cam.dispose();
+			cam = null;
+		}
+
+		Camera.Size res = getSmallestPreviewSize(cameraId);
+
+		cam = new KetaiCamera(applet, res.width, res.height, 30); // works
+		cam.setCameraID(selectedCam);
+		if (preloadPlayed) cam.start();
+	}
+}
