@@ -413,12 +413,38 @@ public class VideOSC extends PApplet {
 		// state (found out emprirically rather than understanding the true cause of problem...)
 	}
 
+	// trying to find out why the app crashes on resume if the camera has been switched and
+	// the app has been sent to back
+/*
 	@Override
 	public void stop() {
 		// save a snapshot of the activation state of all pixels
 		if (saveSnapshotOnClose)
 			VideOSCDB.addSnapshot(this, db, true);
 	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		Log.d(TAG, "onPause: " + cam.dump() + "\nid: " + cam.getCameraID() + ", cam is started: " + cam.isStarted);
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		if (cam  != null) {
+			Log.d(TAG, "onResume: " + cam.dump() + "\nid: " + cam.getCameraID() + ", cam is started: " + cam.isStarted);
+		}
+	}
+
+	@Override
+	public void onStart() {
+		super.onStart();
+		if (cam  != null) {
+			Log.d(TAG, "onStart: " + cam.dump() + "\nid: " + cam.getCameraID() + ", cam is started: " + cam.isStarted);
+		}
+	}
+*/
 
 	// OSC sensor events
 	public void onOrientationEvent(float x, float y, float z, long time, int accuracy) {
