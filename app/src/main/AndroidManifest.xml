@@ -14,6 +14,7 @@
 
     <application
         android:icon="@drawable/icon"
+        android:name="net.videosc.VideOSCApplication"
         android:label="VideOSC"
         android:allowBackup="true">
 
