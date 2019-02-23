@@ -1,5 +1,5 @@
 <div style="background-color: #f99; color: #900">
- <h2>Please note that development in this repository has been ceased. For a new version, built using the native Android API, please visit https://github.com/nuss/VideOSC2</h2>
+ <h2>Please note that development in this repository has been stalled. For a new version, built using the native Android API, please visit https://github.com/nuss/VideOSC2</h2>
 </div>
 
 [![Build Status](https://travis-ci.org/nuss/VideOSC.svg?branch=master)](https://travis-ci.org/nuss/VideOSC)
